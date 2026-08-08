@@ -38,7 +38,7 @@ export default {
   about: {
     quote: "“我 90% 的技能，价值刚刚归零。剩下那 10% 的杠杆，放大了一千倍。”",
     quoteAuthor: "——Kent Beck，TDD 与极限编程的奠基者",
-    title: "一场 AI 时代软件工程的文艺复兴",
+    title: "一场 AI 时代软件工程的工业革命",
     partOf: "作为",
     partOfEvent: "OAIC 开放智能体产业联盟「软件工厂」行动",
     partOfSuffix:
@@ -87,6 +87,8 @@ export default {
     boardCountry: "国家 / 地区",
     boardScore: "分数",
     boardMock: "示例数据",
+    boardRefresh: "Refresh",
+    boardUpdated: "更新于",
     themes: [
       {
         number: "01",

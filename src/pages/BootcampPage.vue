@@ -163,7 +163,7 @@ const purposes = [
           </li>
         </ul>
 
-        <p class="muted">{{ isEn ? 'All six fall between September 1 and 15. Exact dates and times are still being settled with the speakers and will be posted on this page once they are fixed — nothing here is final until it is announced.' : '六讲都安排在 9 月 1 日至 15 日之间。具体日期与时间仍在与讲者敲定，确定后公布在本页——公布之前，这里的安排都不作数。' }}</p>
+        <p class="muted">{{ isEn ? 'All six fall between September 1 and 15. Exact dates and times are still being settled and go up on this page once fixed — no time here is final until it is announced.' : '六讲都安排在 9 月 1 日至 15 日之间。具体日期与时间仍在敲定，确定后公布在本页——公布之前，这里的时间都不作数。' }}</p>
       </section>
 
       <section>
