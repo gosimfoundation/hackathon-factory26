@@ -13,18 +13,19 @@ export default {
     applyNow: "报名即将开始",
   },
   hero: {
-    eyebrow: "开放智能体产业联盟 （OAIC），上海交通大学计算机学院，启悟社主办",
-    system: "AI 软件工程国际智客松",
+    eyebrow: "开放智能体产业联盟（OAIC）、启悟社主办",
+    system: "智能体工厂国际黑客松",
     pipeline: [
       { label: "研习营", date: "9.1 – 9.15" },
       { label: "初赛", date: "9.1 – 9.30" },
-      { label: "决赛", date: "10.1 – 10.17" },
+      { label: "决赛", date: "10.1 – 10.7" },
       { label: "颁奖", date: "10.17" },
     ],
     eventTitle: "From Vibe Coding to Harness Engineering",
     location: [
       "2026.9.1 – 9.30 · 研习营 / 初赛 · 线上",
-      "2026.10.1 – 10.17 · 决赛 · 线上 + 深圳 GOSIM 大会",
+      "2026.10.1 – 10.7 · 决赛 · 线上",
+      "2026.10.17 · 颁奖 · 深圳 GOSIM 大会",
     ],
     sponsorNotice: "更多赞助方将在露出授权确认后公布。",
     countdownLabel: "9月1日研习营和初赛开赛",
@@ -65,7 +66,7 @@ export default {
     desc: "初赛在线上进行，统一沙箱环境 + 模型网关，全球同时起跑。大赛将邀请专家通过线上研习营（可选参加），通过与参赛者选择工具模拟比赛完成（Workshop）和答疑（Office Hour）等形式与参赛者互动并提供录像。",
     finaleTitle: "荣耀日 · 深圳 GOSIM 大会",
     finaleDesc:
-      "决赛 Top 11 队伍受邀到深圳 GOSIM 大会现场。10 月 17 日现场比拼、决出最终名次，随后颁奖典礼，并与组织者、伙伴共进晚宴。",
+      "决赛至少前 3 名队伍派代表受邀到深圳 GOSIM 大会现场，10 月 16 日发出邀请。10 月 17 日现场比拼、决出最终名次，随后颁奖典礼，并与组织者、伙伴共进晚宴。",
     stats: [
       { value: "3", label: "站" },
       { value: "47", label: "天" },
@@ -79,7 +80,7 @@ export default {
       "ARC-Bench 是本次比赛的运行与评测平台。它提供统一的容器运行时、workspace 生命周期管理、事件流与可视化——把你的 Agent 打包上传，就能看着它一步步跑，而不是事后从日志里往回读。赛题、提交、计分与排行榜都在平台上统一维护，所有队伍面对同一套环境和同一批开源模型（MiniMax、Kimi、GLM、DeepSeek）。",
     detailsNote: "完整赛题说明、样例与评测细节，请参赛者前往",
     leaderboardNote: "实时排行榜：",
-    boardTitle: "实时排行榜 · TOP 11",
+    boardTitle: "实时排行榜 · TOP 20",
     boardFull: "完整榜单",
     boardLoading: "读取中……",
     boardEmpty: "排行榜将在 9 月 1 日开赛后实时更新，数据由 ARC-Bench 维护。",
@@ -219,7 +220,9 @@ export default {
     pool: "奖金池合计约 35 万人民币（$51,500 美金），共 11 个获奖席位",
     allParticipants: "所有完赛队伍获得",
     certificate: "完赛证书，并在官网留档",
-    gosimSeat: "决赛 Top 11 队伍受邀出席深圳 GOSIM 大会。",
+    gosimSeat: "决赛至少前 3 名队伍派代表受邀出席深圳 GOSIM 大会荣耀颁奖典礼。",
+    vacancyTitle: "关于特等奖",
+    vacancy: "特等奖依作品质量评定，可能空缺。空缺的奖金滚入下一届比赛。",
     apiCredits: "开源模型 Token 额度",
     fromSponsors: "由模型厂商赞助提供。",
   },
@@ -243,10 +246,10 @@ export default {
       {
         number: "02",
         name: "大奖赛 · Grand Challenge",
-        dates: "10/1–10/16",
+        dates: "10/1–10/7",
         format: "线上",
         challenge: "基于真实复杂企业需求的命题。",
-        participants: "初赛排行榜 Top 11 队伍。",
+        participants: "初赛排行榜 Top 20 队伍。",
       },
       {
         number: "03",
@@ -254,7 +257,7 @@ export default {
         dates: "10/17",
         format: "深圳 GOSIM 大会现场",
         challenge: "现场决赛与 Demo Day，最终名次在现场决出，随后颁奖。",
-        participants: "决赛 Top 11 队伍。",
+        participants: "决赛至少前 3 名队伍派代表出席（10/16 发出邀请）。",
       },
     ],
     activitiesTitle: "研习营活动",
@@ -318,7 +321,7 @@ export default {
     title: "主办与赞助",
     confirmed: [
       { name: "OAIC 开放智能体产业联盟", role: "主办" },
-      { name: "上海交通大学计算机学院 CoPhi Group", role: "主办 · ARC / ARC-Bench" },
+      { name: "上海交通大学计算机学院 CoPhi Group", role: "技术伙伴 · ARC / ARC-Bench" },
       { name: "启悟学习社区", role: "社区伙伴" },
     ],
     pending: "更多赞助方将在露出授权确认后公布。",
@@ -363,7 +366,7 @@ export default {
       },
       {
         q: "怎么参赛？要先经过初赛吗？",
-        a: "初赛是唯一入口。所有队伍先参加研习营和初赛（9/1–9/30），初赛排行榜前 11 名的队伍进入决赛（10/1–10/17）。",
+        a: "初赛是唯一入口。所有队伍先参加研习营和初赛（9/1–9/30），初赛排行榜前 20 名的队伍进入决赛（10/1–10/7）。",
       },
       {
         q: "赛题是什么？",
@@ -383,7 +386,7 @@ export default {
       },
       {
         q: "有什么奖？",
-        a: "共 11 个获奖席位，奖金池约 35 万人民币（$51,500 美金）：OAIC 特等奖 $20,000（1 名）、一等奖 $10,000（2 名）、二等奖 $3,000（3 名）、三等奖 $500（5 名）。所有完赛队伍获完赛证书并在官网留档；决赛 Top 11 队伍受邀出席深圳 GOSIM 大会。",
+        a: "共 11 个获奖席位，奖金池约 35 万人民币（$51,500 美金）：OAIC 特等奖 $20,000（1 名）、一等奖 $10,000（2 名）、二等奖 $3,000（3 名）、三等奖 $500（5 名）。所有完赛队伍获完赛证书并在官网留档；决赛至少前 3 名队伍派代表受邀出席深圳 GOSIM 大会荣耀颁奖典礼。特等奖依作品质量评定，可能空缺，空缺奖金滚入下一届。",
       },
       {
         q: "需要提交什么？",
@@ -402,7 +405,7 @@ export default {
     dismiss: "知道了",
   },
   footer: {
-    copyright: "2026 OAIC 国际人工智能软件工程研习营、黑客松和大奖赛系列",
+    copyright: "2026 OAIC 智能体工厂国际黑客松和大奖赛系列",
     mainSite: "hackathon.gosim.org",
     register: "报名",
   },

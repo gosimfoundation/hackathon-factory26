@@ -1,6 +1,6 @@
-# 2026 OAIC Harness Engineering Campathon
+# 2026 OAIC International Hackathon for Agentic Factory and Grand Challenge Series
 
-Official website for the **2026 OAIC Harness Engineering Campathon and Grand Challenge Series**, running September 1–October 17, 2026 online and concluding at GOSIM Shenzhen.
+Official website for the **2026 OAIC International Hackathon for Agentic Factory and Grand Challenge Series**, running September 1–October 17, 2026 online and concluding at GOSIM Shenzhen.
 
 The application is a Vue 3 + TypeScript + Vite site with bilingual public content, Supabase authentication, team registration, project submissions, invitations, announcements, and administrative tools. It was migrated from the earlier Paris hackathon sites and the reusable hackathon kit, then rewritten for the 2026 event.
 

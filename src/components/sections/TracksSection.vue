@@ -4,7 +4,7 @@ import { useI18n } from '../../composables/useI18n'
 import { useLeaderboard } from '../../composables/useLeaderboard'
 
 const { t, pick } = useI18n()
-const { entries: board, loading: boardLoading, refreshing, isMock, updatedAt, reload, leaderboardUrl } = useLeaderboard(11)
+const { entries: board, loading: boardLoading, refreshing, isMock, updatedAt, reload, leaderboardUrl } = useLeaderboard(20)
 
 const updatedLabel = computed(() => {
   if (!updatedAt.value) return ''
@@ -26,7 +26,7 @@ const updatedLabel = computed(() => {
           </p>
         </div>
 
-        <!-- 实时排行榜 · Top 11：与晋级现场的名额一致（全量榜单由 ARC-Bench 维护） -->
+        <!-- 实时排行榜 · Top 20：与进决赛的名额一致（全量榜单由 ARC-Bench 维护） -->
         <div class="reveal reveal-delay-1">
           <div class="flex flex-wrap items-baseline justify-between gap-3 border-b border-border pb-4">
             <h3 class="flex items-center text-xl font-semibold tracking-[-0.03em] text-text-primary md:text-2xl">
@@ -75,10 +75,10 @@ const updatedLabel = computed(() => {
                 :class="{ 'board-row--moved': row.delta !== null && row.delta !== 0 }"
                 :style="{ '--row-index': i }"
               >
-                <td class="py-3.5 font-mono text-xs" :class="row.rank <= 3 ? 'text-accent' : 'text-text-muted'">{{ String(row.rank).padStart(2, '0') }}</td>
-                <td class="py-3.5 pr-4 text-sm font-medium text-text-primary md:text-base">{{ row.team }}</td>
-                <td class="py-3.5 text-xs text-text-secondary md:text-sm">{{ row.country || '—' }}</td>
-                <td class="py-3.5 text-right font-mono text-sm text-text-primary">
+                <td class="py-2.5 font-mono text-[11px]" :class="row.rank <= 3 ? 'text-accent' : 'text-text-muted'">{{ String(row.rank).padStart(2, '0') }}</td>
+                <td class="py-2.5 pr-4 text-[13px] font-medium text-text-primary md:text-sm">{{ row.team }}</td>
+                <td class="py-2.5 text-[11px] text-text-secondary md:text-xs">{{ row.country || '—' }}</td>
+                <td class="py-2.5 text-right font-mono text-[13px] text-text-primary">
                   <span class="board-delta" :class="row.delta && row.delta > 0 ? 'is-up' : row.delta && row.delta < 0 ? 'is-down' : ''">
                     <template v-if="row.delta && row.delta !== 0">{{ row.delta > 0 ? '▲' : '▼' }}{{ Math.abs(row.delta) }}</template>
                   </span>

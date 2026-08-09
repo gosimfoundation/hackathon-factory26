@@ -2,7 +2,7 @@
 # The website currently reads public copy from src/i18n/en.ts and src/i18n/zh.ts.
 
 event:
-  name: "2026 OAIC Harness Engineering Campathon and Grand Challenge Series"
+  name: "2026 OAIC International Hackathon for Agentic Factory and Grand Challenge Series"
   tagline: "Requirements as Source Code"
   organizer: "OAIC"
   dates: "September 1–October 17, 2026"

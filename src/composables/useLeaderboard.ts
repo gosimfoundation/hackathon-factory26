@@ -39,6 +39,15 @@ const MOCK: Row[] = [
   { rank: 9, team: 'Le Compilateur', country: 'France', score: 77.4 },
   { rank: 10, team: 'Redwood Six', country: 'United States', score: 75.2 },
   { rank: 11, team: 'Tokyo Toolsmiths', country: 'Japan', score: 73.9 },
+  { rank: 12, team: 'Nordic Compilers', country: 'Sweden', score: 72.6 },
+  { rank: 13, team: '流水线工坊', country: 'China', score: 71.4 },
+  { rank: 14, team: 'Cape Town Coders', country: 'South Africa', score: 70.1 },
+  { rank: 15, team: 'Batch Normalizers', country: 'India', score: 68.8 },
+  { rank: 16, team: 'Meridian Agents', country: 'United Kingdom', score: 67.3 },
+  { rank: 17, team: 'São Paulo Systems', country: 'Brazil', score: 65.9 },
+  { rank: 18, team: '静默构建组', country: 'China', score: 64.2 },
+  { rank: 19, team: 'Alpine Runtime', country: 'Switzerland', score: 62.7 },
+  { rank: 20, team: 'Harbor Six', country: 'Canada', score: 61.5 },
 ]
 
 function normalize(raw: any, i: number): Row {
@@ -61,7 +70,7 @@ function simulateRound(rows: Row[]): Row[] {
     .map((row, i) => ({ ...row, rank: i + 1, score: Math.round((row.score ?? 0) * 10) / 10 }))
 }
 
-export function useLeaderboard(limit = 11) {
+export function useLeaderboard(limit = 20) {
   const entries = ref<LeaderboardEntry[]>([])
   const loading = ref(true)
   /** 刷新进行中（区别于首屏 loading，刷新时表格不清空） */

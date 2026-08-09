@@ -27,7 +27,10 @@ const prizes = computed(() => t('awards.prizes') as any[])
       </div>
 
       <p class="reveal mt-12 border-b border-white/25 pb-5 text-xl font-medium md:text-3xl">{{ t('awards.pool') }}</p>
-      <div class="reveal grid md:grid-cols-3 md:divide-x md:divide-white/25">
+      <p class="reveal mt-6 max-w-3xl text-sm leading-relaxed text-white/55">
+        <span class="mono-label mr-3 text-[#dca6b9]">{{ t('awards.vacancyTitle') }}</span>{{ t('awards.vacancy') }}
+      </p>
+      <div class="reveal mt-6 grid border-t border-white/25 md:grid-cols-3 md:divide-x md:divide-white/25">
         <div class="py-7 md:px-7 md:first:pl-0"><span class="mono-label text-[#dca6b9]">{{ t('awards.allParticipants') }}</span><p class="mt-3 text-sm leading-relaxed text-white/55">{{ t('awards.certificate') }}</p></div>
         <div class="py-7 md:px-7"><span class="mono-label text-[#dca6b9]">{{ pick('GOSIM Shenzhen', 'GOSIM 深圳') }}</span><p class="mt-3 text-sm leading-relaxed text-white/55">{{ t('awards.gosimSeat') }}</p></div>
         <div class="py-7 md:px-7"><span class="mono-label text-[#dca6b9]">{{ t('awards.apiCredits') }}</span><p class="mt-3 text-sm leading-relaxed text-white/55">{{ t('awards.fromSponsors') }}</p></div>

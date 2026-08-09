@@ -28,7 +28,7 @@ function wrap(title: string, innerHtml: string, cta?: { url: string; label: stri
     ${innerHtml}
     ${button}
     <hr style="border:none;border-top:1px solid #222;margin:32px 0"/>
-    <p style="color:#555;font-size:12px;text-align:center">2026 OAIC Harness Engineering Campathon · Online + GOSIM Shenzhen</p>
+    <p style="color:#555;font-size:12px;text-align:center">2026 OAIC International Hackathon for Agentic Factory · Online + GOSIM Shenzhen</p>
   </div>`
 }
 
