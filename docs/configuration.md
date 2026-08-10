@@ -14,8 +14,8 @@ VITE_BASE_PATH=/
 `VITE_SITE_URL` is used for authentication redirects, invitation links, and QR codes. `VITE_BASE_PATH` controls the URL prefix where the app is mounted and must start and end with `/`. For the shared GOSIM hackathon domain, use:
 
 ```dotenv
-VITE_SITE_URL=https://hackathon.gosim.org/oaic-harness-2026
-VITE_BASE_PATH=/oaic-harness-2026/
+VITE_SITE_URL=https://create.gosim.org/factory26
+VITE_BASE_PATH=/factory26/
 ```
 
 ## Public event content

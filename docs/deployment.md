@@ -57,7 +57,7 @@ Set secrets in your GitHub repo settings.
    - `VITE_SUPABASE_URL`
    - `VITE_SUPABASE_ANON_KEY`
    - `VITE_SITE_URL`
-   - `VITE_BASE_PATH` (`/` at the domain root, or for example `/oaic-harness-2026/` behind the shared hackathon gateway)
+   - `VITE_BASE_PATH` (`/` at the domain root, or `/factory26/` behind the shared GOSIM Create gateway)
 
 ## Netlify
 

@@ -406,7 +406,7 @@ export default {
   },
   footer: {
     copyright: "2026 OAIC 智能体工厂国际黑客松和大奖赛系列",
-    mainSite: "hackathon.gosim.org",
+    mainSite: "create.gosim.org",
     register: "报名",
   },
 };
