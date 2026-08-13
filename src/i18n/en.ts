@@ -14,7 +14,7 @@ export default {
   },
   hero: {
     eyebrow: 'Organized by OAIC and Qiwoo',
-    system: 'International Hackathon for Agentic Factory',
+    system: 'Intl. Hackathon for Agentic Factory',
     pipeline: [
       { label: 'Camp', date: 'Sep 1–15' },
       { label: 'Qualifier', date: 'Sep 1–30' },

@@ -353,10 +353,15 @@ async function saveProfile() {
     :class="!isHome || scrolled || mobileOpen ? 'is-scrolled bg-bg-primary border-border' : 'border-white/25 bg-transparent'"
   >
     <div class="max-w-[1440px] mx-auto px-6 md:px-10 xl:px-14 h-16 flex items-center justify-between">
-      <router-link to="/" class="flex items-center gap-3 group">
-        <span class="text-lg font-semibold tracking-[-0.05em] text-text-primary">OAIC</span>
-        <span class="h-5 w-px bg-border"></span>
-        <span class="max-w-[9rem] font-mono text-xs uppercase leading-[1.35] tracking-[0.1em] text-text-tertiary">{{ t('hero.system') }}</span>
+      <router-link to="/" class="flex min-w-0 items-center gap-3 group">
+        <span class="shrink-0 text-lg font-semibold tracking-[-0.05em] text-text-primary">OAIC</span>
+        <span class="h-5 w-px shrink-0 bg-border"></span>
+        <span
+          class="font-mono uppercase leading-[1.35] text-text-tertiary"
+          :class="locale === 'zh'
+            ? 'whitespace-nowrap text-xs tracking-[0.1em]'
+            : 'max-w-[18rem] line-clamp-2 text-[11px] tracking-[0.08em] sm:text-xs sm:tracking-[0.1em]'"
+        >{{ t('hero.system') }}</span>
       </router-link>
 
       <!-- Desktop Nav -->
@@ -395,7 +400,7 @@ async function saveProfile() {
         <!-- Language toggle -->
         <button
           @click="toggleLocale"
-          class="inline-flex h-10 min-w-10 items-center justify-center border border-border px-2 py-0 font-mono text-xs text-text-tertiary transition-colors hover:text-text-primary"
+          class="inline-flex h-10 min-w-12 shrink-0 items-center justify-center whitespace-nowrap border border-border px-2 py-0 font-mono text-xs text-text-tertiary transition-colors hover:text-text-primary"
         >
           {{ locale === 'en' ? '中文' : 'EN' }}
         </button>
