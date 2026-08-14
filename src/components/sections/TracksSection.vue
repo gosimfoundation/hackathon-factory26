@@ -4,12 +4,24 @@ import { useI18n } from '../../composables/useI18n'
 import { useLeaderboard } from '../../composables/useLeaderboard'
 
 const { t, pick } = useI18n()
-const { entries: board, loading: boardLoading, refreshing, isMock, updatedAt, reload, leaderboardUrl } = useLeaderboard(20)
+const { entries: board, loading: boardLoading, refreshing, error: boardError, updatedAt, reload, leaderboardUrl } = useLeaderboard(20)
 
 const updatedLabel = computed(() => {
   if (!updatedAt.value) return ''
   return updatedAt.value.toLocaleTimeString(pick('en-US', 'zh-CN'), { hour: '2-digit', minute: '2-digit', second: '2-digit' })
 })
+
+function formatRuntime(seconds: number | null): string {
+  if (seconds == null) return '—'
+  const rounded = Math.max(0, Math.round(seconds))
+  const minutes = Math.floor(rounded / 60)
+  const remainder = rounded % 60
+  return minutes ? `${minutes}m ${remainder}s` : `${remainder}s`
+}
+
+function formatTokens(millions: number | null): string {
+  return millions == null ? '—' : `${millions.toFixed(2)}M`
+}
 </script>
 
 <template>
@@ -30,10 +42,8 @@ const updatedLabel = computed(() => {
         <div class="reveal reveal-delay-1">
           <div class="flex flex-wrap items-baseline justify-between gap-3 border-b border-border pb-4">
             <h3 class="flex items-center text-xl font-semibold tracking-[-0.03em] text-text-primary md:text-2xl">
-              <!-- 只有真在拉实时数据时才亮「live」灯；占位数据不配这盏灯。 -->
-              <span v-if="!isMock && !boardLoading" class="live-dot" aria-hidden="true"></span>
+              <span v-if="board.length && !boardError && !boardLoading" class="live-dot" aria-hidden="true"></span>
               {{ t('tracks.boardTitle') }}
-              <span v-if="isMock" class="ml-3 border border-border px-2 py-0.5 align-middle font-mono text-xs uppercase tracking-[0.1em] text-text-muted">{{ t('tracks.boardMock') }}</span>
             </h3>
             <div class="flex items-center gap-4">
               <button
@@ -57,36 +67,49 @@ const updatedLabel = computed(() => {
 
           <p v-if="boardLoading" class="mono-label mt-6 text-text-muted">{{ t('tracks.boardLoading') }}</p>
 
-          <table v-else class="w-full border-collapse text-left">
-            <thead>
-              <tr class="border-b border-border">
-                <th class="mono-label w-12 py-3 text-text-muted">#</th>
-                <th class="mono-label py-3 text-text-muted">{{ t('tracks.boardTeam') }}</th>
-                <th class="mono-label py-3 text-text-muted">{{ t('tracks.boardCountry') }}</th>
-                <th class="mono-label py-3 text-right text-text-muted">{{ t('tracks.boardScore') }}</th>
-              </tr>
-            </thead>
-            <!-- key 用队名而非名次：名次是会变的那个量，拿它做身份就永远换不了位。 -->
-            <TransitionGroup tag="tbody" name="board">
-              <tr
-                v-for="(row, i) in board"
-                :key="row.team"
-                class="board-row border-b border-border-subtle"
-                :class="{ 'board-row--moved': row.delta !== null && row.delta !== 0 }"
-                :style="{ '--row-index': i }"
-              >
-                <td class="py-2.5 font-mono text-[11px]" :class="row.rank <= 3 ? 'text-accent' : 'text-text-muted'">{{ String(row.rank).padStart(2, '0') }}</td>
-                <td class="py-2.5 pr-4 text-[13px] font-medium text-text-primary md:text-sm">{{ row.team }}</td>
-                <td class="py-2.5 text-[11px] text-text-secondary md:text-xs">{{ row.country || '—' }}</td>
-                <td class="py-2.5 text-right font-mono text-[13px] text-text-primary">
-                  <span class="board-delta" :class="row.delta && row.delta > 0 ? 'is-up' : row.delta && row.delta < 0 ? 'is-down' : ''">
-                    <template v-if="row.delta && row.delta !== 0">{{ row.delta > 0 ? '▲' : '▼' }}{{ Math.abs(row.delta) }}</template>
-                  </span>
-                  {{ row.score != null ? row.score.toFixed(1) : '—' }}
-                </td>
-              </tr>
-            </TransitionGroup>
-          </table>
+          <p v-else-if="boardError && !board.length" class="mt-6 text-sm leading-relaxed text-text-secondary">
+            {{ t('tracks.boardUnavailable') }}
+          </p>
+
+          <p v-else-if="!board.length" class="mt-6 text-sm leading-relaxed text-text-secondary">{{ t('tracks.boardEmpty') }}</p>
+
+          <div v-else class="overflow-x-auto">
+            <table class="w-full min-w-[700px] border-collapse text-left">
+              <thead>
+                <tr class="border-b border-border">
+                  <th class="mono-label w-12 py-3 text-text-muted">#</th>
+                  <th class="mono-label py-3 text-text-muted">{{ t('tracks.boardUser') }}</th>
+                  <th class="mono-label py-3 text-text-muted">{{ t('tracks.boardModel') }}</th>
+                  <th class="mono-label py-3 text-right text-text-muted">{{ t('tracks.boardPassRate') }}</th>
+                  <th class="mono-label py-3 text-right text-text-muted">{{ t('tracks.boardTokens') }}</th>
+                  <th class="mono-label py-3 text-right text-text-muted">{{ t('tracks.boardRuntime') }}</th>
+                  <th class="mono-label py-3 text-right text-text-muted">{{ t('tracks.boardSubmissions') }}</th>
+                </tr>
+              </thead>
+              <TransitionGroup tag="tbody" name="board">
+                <tr
+                  v-for="(row, i) in board"
+                  :key="`${row.username}:${row.modelName}`"
+                  class="board-row border-b border-border-subtle"
+                  :class="{ 'board-row--moved': row.delta !== null && row.delta !== 0 }"
+                  :style="{ '--row-index': i }"
+                >
+                  <td class="py-2.5 font-mono text-[11px]" :class="row.rank <= 3 ? 'text-accent' : 'text-text-muted'">{{ String(row.rank).padStart(2, '0') }}</td>
+                  <td class="py-2.5 pr-4 text-[13px] font-medium text-text-primary md:text-sm">
+                    <span class="board-delta" :class="row.delta && row.delta > 0 ? 'is-up' : row.delta && row.delta < 0 ? 'is-down' : ''">
+                      <template v-if="row.delta && row.delta !== 0">{{ row.delta > 0 ? '▲' : '▼' }}{{ Math.abs(row.delta) }}</template>
+                    </span>
+                    {{ row.username }}
+                  </td>
+                  <td class="py-2.5 text-[11px] text-text-secondary md:text-xs">{{ row.modelName }}</td>
+                  <td class="py-2.5 text-right font-mono text-[13px] text-text-primary">{{ row.avgPassRate != null ? row.avgPassRate.toFixed(1) : '—' }}</td>
+                  <td class="py-2.5 text-right font-mono text-[13px] text-text-secondary">{{ formatTokens(row.totalTokenMillions) }}</td>
+                  <td class="py-2.5 text-right font-mono text-[13px] text-text-secondary">{{ formatRuntime(row.avgRuntimeSeconds) }}</td>
+                  <td class="py-2.5 text-right font-mono text-[13px] text-text-secondary">{{ row.submissionCount }}</td>
+                </tr>
+              </TransitionGroup>
+            </table>
+          </div>
 
           <p class="mt-5 text-sm leading-relaxed text-text-secondary">
             {{ t('tracks.leaderboardNote') }}
