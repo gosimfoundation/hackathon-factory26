@@ -8,6 +8,7 @@ const locationLines = computed(() => t('hero.location') as string[])
 const rounds = computed(() => t('schedule.rounds') as any[])
 const criteria = computed(() => t('judging.criteria') as any[])
 const fairness = computed(() => t('judging.fairness') as any[])
+const awardsSettled = computed(() => t('awards.settled') as any[])
 </script>
 
 <template>
@@ -61,7 +62,8 @@ const fairness = computed(() => t('judging.fairness') as any[])
       <section>
         <h2>{{ isEn ? '7. Awards and completion' : '7. 奖项与完赛' }}</h2>
         <p>{{ t('awards.subtitle') }}</p>
-        <p>{{ t('awards.certificate') }}{{ isEn ? '. ' : '。' }}{{ t('awards.gosimSeat') }}</p>
+        <ul><li v-for="item in awardsSettled" :key="item.name"><strong>{{ item.name }}</strong> · {{ item.slots }} — {{ item.desc }}</li></ul>
+        <p>{{ t('awards.poolNote') }}</p>
       </section>
 
       <section>

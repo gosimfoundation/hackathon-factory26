@@ -2,7 +2,7 @@
 import { computed } from 'vue'
 import { useI18n } from '../../composables/useI18n'
 const { t, pick } = useI18n()
-const prizes = computed(() => t('awards.prizes') as any[])
+const settled = computed(() => t('awards.settled') as any[])
 </script>
 
 <template>
@@ -14,27 +14,27 @@ const prizes = computed(() => t('awards.prizes') as any[])
           <h2 class="mt-8 text-[clamp(2.75rem,6vw,6rem)] font-semibold leading-none tracking-[-.06em]">{{ t('awards.title') }}</h2>
           <p class="mt-8 max-w-md leading-relaxed text-white/55">{{ t('awards.subtitle') }}</p>
         </div>
-        <div class="reveal reveal-delay-1 border-t border-white/25">
-          <article v-for="(prize, i) in prizes" :key="prize.name" class="grid grid-cols-[2.5rem_1fr] gap-4 border-b border-white/25 py-6 md:grid-cols-[3rem_1fr_auto] md:items-end md:py-8">
-            <span class="font-mono text-xs text-[#dca6b9]">0{{ i + 1 }}</span>
-            <div>
-              <h3 class="text-lg font-medium tracking-[-0.025em] md:text-2xl">{{ prize.name }}</h3>
-              <p class="mono-label mt-2 text-white/40">{{ prize.slots }}</p>
-            </div>
-            <p class="col-start-2 text-4xl font-semibold tracking-[-0.06em] text-[#dca6b9] md:col-start-3 md:text-6xl">{{ prize.amount }}</p>
-          </article>
+        <div class="reveal reveal-delay-1">
+          <span class="mono-label text-[#dca6b9]">{{ t('awards.settledTitle') }}</span>
+          <div class="mt-5 border-t border-white/25">
+            <article v-for="(item, i) in settled" :key="item.name" class="grid grid-cols-[2.5rem_1fr] gap-x-4 gap-y-3 border-b border-white/25 py-6 md:grid-cols-[3rem_1fr_1.15fr] md:py-8">
+              <span class="font-mono text-xs text-[#dca6b9] md:pt-1">0{{ i + 1 }}</span>
+              <div>
+                <h3 class="text-lg font-medium tracking-[-0.025em] md:text-2xl">{{ item.name }}</h3>
+                <p class="mono-label mt-2 text-white/40">{{ item.slots }}</p>
+              </div>
+              <p class="col-start-2 text-sm leading-relaxed text-white/55 md:col-start-3 md:pt-1">{{ item.desc }}</p>
+            </article>
+          </div>
         </div>
       </div>
 
-      <p class="reveal mt-12 border-b border-white/25 pb-5 text-xl font-medium md:text-3xl">{{ t('awards.pool') }}</p>
-      <p class="reveal mt-6 max-w-3xl text-sm leading-relaxed text-white/55">
-        <span class="mono-label mr-3 text-[#dca6b9]">{{ t('awards.vacancyTitle') }}</span>{{ t('awards.vacancy') }}
+      <p class="reveal mt-12 border-b border-white/25 pb-5 text-xl font-medium md:text-3xl">
+        {{ t('awards.poolLabel') }}<span class="text-white/45"> · {{ t('awards.poolStatus') }}</span>
       </p>
-      <div class="reveal mt-6 grid border-t border-white/25 md:grid-cols-3 md:divide-x md:divide-white/25">
-        <div class="py-7 md:px-7 md:first:pl-0"><span class="mono-label text-[#dca6b9]">{{ t('awards.allParticipants') }}</span><p class="mt-3 text-sm leading-relaxed text-white/55">{{ t('awards.certificate') }}</p></div>
-        <div class="py-7 md:px-7"><span class="mono-label text-[#dca6b9]">{{ pick('GOSIM Shenzhen', 'GOSIM 深圳') }}</span><p class="mt-3 text-sm leading-relaxed text-white/55">{{ t('awards.gosimSeat') }}</p></div>
-        <div class="py-7 md:px-7"><span class="mono-label text-[#dca6b9]">{{ t('awards.apiCredits') }}</span><p class="mt-3 text-sm leading-relaxed text-white/55">{{ t('awards.fromSponsors') }}</p></div>
-      </div>
+      <p class="reveal mt-6 max-w-3xl text-sm leading-relaxed text-white/55">
+        <span class="mono-label mr-3 text-[#dca6b9]">{{ t('awards.poolNoteTitle') }}</span>{{ t('awards.poolNote') }}
+      </p>
     </div>
   </section>
 </template>
