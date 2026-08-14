@@ -22,7 +22,7 @@ const existingSubmission = ref<any>(null)
 const myTeam = computed(() => teams.value.find(team => team.members.some(member => member.id === user.value?.id)))
 const isLeader = computed(() => myTeam.value?.leaderId === user.value?.id)
 const roundOptions = computed(() => [
-  { id: 'qualifier', label: isEn.value ? 'Bootcamp & Qualifier' : '研习营和初赛', dates: isEn.value ? 'Submissions close Sep 29' : '比赛截止 9 月 29 日' },
+  { id: 'qualifier', label: isEn.value ? 'Qualifier' : '初赛', dates: isEn.value ? 'Submissions close Sep 30' : '比赛截止 9 月 30 日' },
   { id: 'grand-challenge', label: isEn.value ? 'Finals' : '决赛', dates: isEn.value ? 'Oct 1–17' : '10 月 1–17 日' },
 ])
 

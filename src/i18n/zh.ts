@@ -16,19 +16,20 @@ export default {
     eyebrow: "开放智能体产业联盟（OAIC）、启悟社主办",
     system: "智能体工厂国际黑客松",
     pipeline: [
-      { label: "研习营", date: "9.1 – 9.15" },
-      { label: "初赛", date: "9.1 – 9.30" },
+      { label: "研习营", date: "9.7 – 9.20" },
+      { label: "初赛", date: "9.21 – 9.30" },
       { label: "决赛", date: "10.1 – 10.7" },
       { label: "颁奖", date: "10.17" },
     ],
     eventTitle: "From Vibe Coding to Harness Engineering",
     location: [
-      "2026.9.1 – 9.30 · 研习营 / 初赛 · 线上",
+      "2026.9.7 – 9.20 · 研习营 · 线上",
+      "2026.9.21 – 9.30 · 初赛 · 线上",
       "2026.10.1 – 10.7 · 决赛 · 线上",
       "2026.10.17 · 颁奖 · 深圳 GOSIM 大会",
     ],
     sponsorNotice: "更多赞助方将在露出授权确认后公布。",
-    countdownLabel: "9月1日研习营和初赛开赛",
+    countdownLabel: "9月7日研习营开营",
     days: "天",
     hours: "时",
     mins: "分",
@@ -60,16 +61,16 @@ export default {
     closing: "让AI时代的软件开发，从手搓到生产，从碰碰运气到稳稳驾驭。",
   },
   venue: {
-    label: "09.01—09.30 / 线上",
+    label: "09.07—09.30 / 线上",
     title: "初赛",
     subtitle: "全球",
-    desc: "初赛在线上进行，统一沙箱环境 + 模型网关，全球同时起跑。大赛将邀请专家通过线上研习营（可选参加），通过与参赛者选择工具模拟比赛完成（Workshop）和答疑（Office Hour）等形式与参赛者互动并提供录像。",
+    desc: "研习营先行，9 月 7 日至 20 日：邀请专家带着参赛者用比赛工具走一遍模拟赛（Workshop），并设答疑（Office Hour），全程录像、可选参加，在计分开始之前结束。初赛随后于 9 月 21 日开赛、9 月 30 日截止，线上进行，统一沙箱环境 + 模型网关，全球同时起跑。",
     finaleTitle: "荣耀日 · 深圳 GOSIM 大会",
     finaleDesc:
       "决赛至少前 3 名队伍派代表受邀到深圳 GOSIM 大会现场，10 月 16 日发出邀请。10 月 17 日现场比拼、决出最终名次，随后颁奖典礼，并与组织者、伙伴共进晚宴。",
     stats: [
       { value: "3", label: "站" },
-      { value: "47", label: "天" },
+      { value: "41", label: "天" },
       { value: "5", label: "评审指标" },
       { value: "20", label: "晋级大奖赛队伍" },
     ],
@@ -83,7 +84,7 @@ export default {
     boardTitle: "实时排行榜 · TOP 20",
     boardFull: "完整榜单",
     boardLoading: "读取中……",
-    boardEmpty: "排行榜将在 9 月 1 日开赛后实时更新，数据由 ARC-Bench 维护。",
+    boardEmpty: "排行榜将在 9 月 21 日初赛开赛后实时更新，数据由 ARC-Bench 维护。",
     boardUnavailable: "实时排行榜暂时无法读取，请稍后重试。",
     boardUser: "参赛账号",
     boardModel: "模型",
@@ -241,14 +242,14 @@ export default {
   schedule: {
     title: "赛程",
     intro:
-      "三站，一个半月：从线上的研习营与初赛，走到深圳 GOSIM 大会的荣耀日。",
+      "三站，六周：从线上的研习营与初赛，走到深圳 GOSIM 大会的荣耀日。",
     challengeLabel: "赛题",
     participantsLabel: "参赛",
     rounds: [
       {
         number: "01",
         name: "研习营和初赛",
-        dates: "研习营 9/1–9/15 · 初赛截止 9/30",
+        dates: "研习营 9/7–9/20 · 初赛 9/21–9/30",
         format: "线上",
         challenge:
           "GitHub + Lark 功能复刻：Actions、组织权限、审计与 Rulesets。",
@@ -274,7 +275,7 @@ export default {
     ],
     activitiesTitle: "研习营活动",
     activities:
-      "六讲课程 + 三场答疑（9/1–9/15）：先讲比赛系统，再讲自研 Agent、Octos、HAgency、Claude Code、Codex 五条参赛路径的参考实现；答疑按平台与规则、Harness 与 Agent、提交与评分分三场。每场一小时以内，提供录像，鼓励参加但不作要求。",
+      "六讲课程 + 三场答疑（9/7–9/20）：先讲比赛系统，再讲自研 Agent、Octos、HAgency、Claude Code、Codex 五条参赛路径的参考实现；答疑按平台与规则、Harness 与 Agent、提交与评分分三场。每场一小时以内，提供录像，鼓励参加但不作要求。",
     activitiesLink: "查看研习营课程",
   },
   judging: {
@@ -342,7 +343,7 @@ export default {
     title: "已注册",
     titleAccent: "队伍",
     subtitle: "报名即将开始。点击队伍加入，或创建你自己的队伍。",
-    registerNote: "加入或创建队伍后才算完成报名。9 月 1 日研习营开营。",
+    registerNote: "加入或创建队伍后才算完成报名。9 月 7 日研习营开营。",
     registerWarn: "请勿重复注册，否则可能影响参赛资格。",
     refresh: "刷新",
     teams: "队伍",
@@ -374,11 +375,11 @@ export default {
     items: [
       {
         q: "谁可以参加？",
-        a: "面向全球开放，不设资历门槛，个人与团队均可参加，初赛与大奖赛无需现场到场。你不必已经会 Harness Engineering，9 月 1 日起的研习营就是为此而设。",
+        a: "面向全球开放，不设资历门槛，个人与团队均可参加，初赛与大奖赛无需现场到场。你不必已经会 Harness Engineering，9 月 7 日起的研习营就是为此而设。",
       },
       {
         q: "怎么参赛？要先经过初赛吗？",
-        a: "初赛是唯一入口。所有队伍先参加研习营和初赛（9/1–9/30），初赛排行榜前 20 名的队伍进入决赛（10/1–10/7）。",
+        a: "初赛是唯一入口。研习营先行（9/7–9/20，可选参加），初赛 9 月 21 日开赛、9 月 30 日截止，初赛排行榜前 20 名的队伍进入决赛（10/1–10/7）。",
       },
       {
         q: "赛题是什么？",
@@ -409,7 +410,7 @@ export default {
   cta: {
     title: "从手搓到生产，从运气到驾驭",
     tagline: "软件工程没有在 AI 的浪潮里消亡，反而比以往任何时候都更重要。",
-    location: "2026年9月1日 – 10月17日 · 线上 + 深圳 GOSIM",
+    location: "2026年9月7日 – 10月17日 · 线上 + 深圳 GOSIM",
   },
   footer: {
     copyright: "2026 OAIC 智能体工厂国际黑客松和大奖赛系列",

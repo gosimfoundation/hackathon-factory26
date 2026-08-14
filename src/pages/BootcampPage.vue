@@ -122,7 +122,7 @@ const purposes = [
       <router-link to="/" class="inline-flex items-center gap-2 text-text-tertiary hover:text-text-primary transition-colors mb-12">← {{ isEn ? 'Back to Home' : '返回首页' }}</router-link>
 
       <h1 class="heading-serif text-4xl md:text-5xl text-text-primary mb-4">{{ isEn ? 'Bootcamp' : '研习营' }}</h1>
-      <p class="text-text-tertiary mb-2">{{ isEn ? 'September 1 – 15, 2026 · Online video sessions' : '2026 年 9 月 1 日 – 9 月 15 日 · 线上视频会议' }}</p>
+      <p class="text-text-tertiary mb-2">{{ isEn ? 'September 7 – 20, 2026 · Online video sessions' : '2026 年 9 月 7 日 – 9 月 20 日 · 线上视频会议' }}</p>
       <p class="text-text-muted text-sm mb-12">{{ isEn ? 'Six teaching sessions and three office hours, each under an hour. Encouraged, never required.' : '六讲课程，三场答疑，每场一小时以内。鼓励参加，但不作要求。' }}</p>
 
       <p class="lede">{{ isEn ? 'The bootcamp is scaffolding, not a gate. The organizers invite technical experts to explain what you need to know to compete, and to answer questions on the spot. Every session is optional — skipping it costs you nothing in the standings, and attending all nine earns you nothing either. It is here because we would rather you spend the qualifier building than working out how the pieces fit.' : '研习营是脚手架，不是门槛。组织者邀请技术专家，把打这场比赛需要知道的东西讲清楚，把问题当场答掉。每一讲都可以不参加——不参加不影响成绩，全部参加也不加分。它存在的理由只有一个：让你在初赛的时间里用来搭东西，而不是用来搞清楚零件怎么装。' }}</p>
@@ -135,7 +135,7 @@ const purposes = [
           <li><strong>{{ isEn ? 'Shape' : '结构' }}</strong> — {{ isEn ? 'the six teaching sessions are led by an invited expert and close with live questions; the three office hours are questions from the first minute.' : '六讲课程由受邀专家主讲，末尾现场答疑；三场答疑从第一分钟起就是提问。' }}</li>
           <li><strong>{{ isEn ? 'Recordings' : '录像' }}</strong> — {{ isEn ? 'every session is recorded and made available afterwards, so a clash with your timezone is not a problem.' : '每一讲都提供录像，事后可以回看——时区对不上不影响。' }}</li>
         </ul>
-        <p class="muted">{{ isEn ? 'The bootcamp runs alongside the qualifier, which is open the whole time (September 1–30). You do not need to wait for it to finish before you start competing.' : '研习营与初赛并行，初赛全程开放（9 月 1 日 – 9 月 30 日）。不必等研习营结束再开始打。' }}</p>
+        <p class="muted">{{ isEn ? 'The bootcamp runs before the qualifier, not alongside it: it closes on September 20 and the qualifier opens on September 21. Nothing here is scored, so you can treat the two weeks as preparation and arrive at the qualifier already fluent in the tooling.' : '研习营在初赛之前，不与初赛并行：9 月 20 日结营，初赛 9 月 21 日开赛。研习营不计分，这两周就是备赛——把工具练熟了再上初赛。' }}</p>
       </section>
 
       <section>
@@ -163,7 +163,7 @@ const purposes = [
           </li>
         </ul>
 
-        <p class="muted">{{ isEn ? 'All six fall between September 1 and 15. Exact dates and times are still being settled and go up on this page once fixed — no time here is final until it is announced.' : '六讲都安排在 9 月 1 日至 15 日之间。具体日期与时间仍在敲定，确定后公布在本页——公布之前，这里的时间都不作数。' }}</p>
+        <p class="muted">{{ isEn ? 'All six fall between September 7 and 20. Exact dates and times are still being settled and go up on this page once fixed — no time here is final until it is announced.' : '六讲都安排在 9 月 7 日至 20 日之间。具体日期与时间仍在敲定，确定后公布在本页——公布之前，这里的时间都不作数。' }}</p>
       </section>
 
       <section>
@@ -183,7 +183,7 @@ const purposes = [
           </li>
         </ul>
 
-        <p class="muted">{{ isEn ? 'The three office hours also fall between September 1 and 15, interleaved with the teaching sessions. Times are posted here once fixed.' : '三场答疑同样安排在 9 月 1 日至 15 日之间，与六讲课程穿插进行。时间确定后公布在本页。' }}</p>
+        <p class="muted">{{ isEn ? 'The three office hours also fall between September 7 and 20, interleaved with the teaching sessions. Times are posted here once fixed.' : '三场答疑同样安排在 9 月 7 日至 20 日之间，与六讲课程穿插进行。时间确定后公布在本页。' }}</p>
       </section>
 
       <section>

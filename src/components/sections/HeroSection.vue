@@ -7,7 +7,7 @@ import { assetUrl } from '../../composables/api'
 const { t } = useI18n()
 const locationLines = computed(() => t('hero.location') as string[])
 const { days, hours, minutes, seconds, isLive, isOver } = useCountdown(
-  '2026-09-01T00:00:00+08:00',
+  '2026-09-07T00:00:00+08:00',
   '2026-10-18T00:00:00+08:00',
 )
 

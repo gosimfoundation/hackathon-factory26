@@ -16,19 +16,20 @@ export default {
     eyebrow: 'Organized by OAIC and Qiwoo',
     system: 'Intl. Hackathon for Agentic Factory',
     pipeline: [
-      { label: 'Camp', date: 'Sep 1–15' },
-      { label: 'Qualifier', date: 'Sep 1–30' },
+      { label: 'Camp', date: 'Sep 7–20' },
+      { label: 'Qualifier', date: 'Sep 21–30' },
       { label: 'Finals', date: 'Oct 1–7' },
       { label: 'Awards', date: 'Oct 17' },
     ],
     eventTitle: '2026 OAIC International Hackathon for Agentic Factory and Grand Challenge Series',
     location: [
-      'Sep 1 – Sep 30, 2026 · Bootcamp / Qualifier · Online',
+      'Sep 7 – Sep 20, 2026 · Bootcamp · Online',
+      'Sep 21 – Sep 30, 2026 · Qualifier · Online',
       'Oct 1 – Oct 7, 2026 · Finals · Online',
       'Oct 17, 2026 · Awards · GOSIM Shenzhen',
     ],
     sponsorNotice: 'More sponsors will be announced once visibility authorization is confirmed.',
-    countdownLabel: 'Bootcamp & Qualifier begins September 1',
+    countdownLabel: 'Bootcamp begins September 7',
     days: 'Days',
     hours: 'Hours',
     mins: 'Mins',
@@ -56,15 +57,15 @@ export default {
     closing: 'Take software development in the AI era from hand-rolled to produced, from chancing it to steering it.',
   },
   venue: {
-    label: '09.01—09.30 / ONLINE',
+    label: '09.07—09.30 / ONLINE',
     title: 'Qualifier',
     subtitle: 'Worldwide',
-    desc: 'The qualifier runs online on a unified sandbox and model gateway, with every team starting at the same moment. Invited experts run an optional online camp alongside it — workshops that walk through the tooling on a mock run, plus office hours for questions, all recorded and available afterwards.',
+    desc: 'The bootcamp comes first, September 7–20: invited experts walk through the tooling on a mock run, with office hours for questions — all recorded, optional, and finished before anything is scored. The qualifier then opens September 21 and closes September 30, running online on a unified sandbox and model gateway with every team starting at the same moment.',
     finaleTitle: 'Glory Day · GOSIM Shenzhen',
     finaleDesc: 'At least the top 3 finalists are invited to send representatives to GOSIM Shenzhen, with invitations going out on October 16. On October 17 they compete on stage, final standings are decided, and the awards ceremony follows — with dinner alongside the organizers and partners.',
     stats: [
       { value: '3', label: 'Stages' },
-      { value: '47', label: 'Days' },
+      { value: '41', label: 'Days' },
       { value: '5', label: 'Metrics' },
       { value: '20', label: 'Grand Challenge teams' },
     ],
@@ -77,7 +78,7 @@ export default {
     boardTitle: 'Live Leaderboard · Top 20',
     boardFull: 'Full standings',
     boardLoading: 'Loading…',
-    boardEmpty: 'The leaderboard goes live when the competition opens on September 1. Standings are maintained by ARC-Bench.',
+    boardEmpty: 'The leaderboard goes live when the qualifier opens on September 21. Standings are maintained by ARC-Bench.',
     boardUnavailable: 'The live leaderboard is temporarily unavailable. Please try again shortly.',
     boardUser: 'Participant',
     boardModel: 'Model',
@@ -177,7 +178,7 @@ export default {
     participantsLabel: 'Who advances',
     rounds: [
       {
-        number: '01', name: 'Bootcamp & Qualifier', dates: 'Bootcamp Sep 1–15 · Qualifier closes Sep 30', format: 'Online',
+        number: '01', name: 'Bootcamp & Qualifier', dates: 'Bootcamp Sep 7–20 · Qualifier Sep 21–30', format: 'Online',
         challenge: 'Rebuild selected GitHub + Lark capabilities: Actions, org permissions, audit, and Rulesets.',
         participants: 'Open worldwide, no prerequisites — individuals and teams alike.',
       },
@@ -193,7 +194,7 @@ export default {
       },
     ],
     activitiesTitle: 'Bootcamp activities',
-    activities: 'Six teaching sessions and three office hours (Sep 1–15): the competition system first, then reference implementations for five routes — your own agent, Octos, HAgency, Claude Code, and Codex — with office hours on the platform and rules, on harnesses and agents, and on submission and scoring. Each runs under an hour, all are recorded, and none are required.',
+    activities: 'Six teaching sessions and three office hours (Sep 7–20): the competition system first, then reference implementations for five routes — your own agent, Octos, HAgency, Claude Code, and Codex — with office hours on the platform and rules, on harnesses and agents, and on submission and scoring. Each runs under an hour, all are recorded, and none are required.',
     activitiesLink: 'See the bootcamp sessions',
   },
   judging: {
@@ -225,7 +226,7 @@ export default {
   },
   teams: {
     title: 'Registered', titleAccent: 'Teams', subtitle: 'Registration opens soon. Click a team to join, or create your own.',
-    registerNote: 'You complete registration only after joining or creating a team. The bootcamp begins September 1.',
+    registerNote: 'You complete registration only after joining or creating a team. The bootcamp begins September 7.',
     registerWarn: 'Please register only once — duplicate accounts may affect eligibility.',
     refresh: 'Refresh', teams: 'teams', registerBtn: 'Register Your Team', closedBtn: 'Registration Closed', noTeams: 'No teams registered yet. Be the first!', createTitle: 'Register Your Team',
     teamName: 'Team Name', teamAvatar: 'Team Avatar', githubRepo: 'GitHub Repository', members: 'Members',
@@ -235,8 +236,8 @@ export default {
   faq: {
     title: 'FAQ',
     items: [
-      { q: 'Who can participate?', a: 'Open worldwide with no prerequisites — individuals and teams alike, and no in-person attendance is required for the qualifier or the Grand Challenge. You do not need prior Harness Engineering experience; the bootcamp begins September 1.' },
-      { q: 'How do I compete? Is the qualifier required?', a: 'The qualifier is the only way in. Every team starts with the bootcamp and qualifier (Sep 1–30); the top 20 teams on the qualifier leaderboard advance to the finals (Oct 1–7).' },
+      { q: 'Who can participate?', a: 'Open worldwide with no prerequisites — individuals and teams alike, and no in-person attendance is required for the qualifier or the Grand Challenge. You do not need prior Harness Engineering experience; the bootcamp begins September 7.' },
+      { q: 'How do I compete? Is the qualifier required?', a: 'The qualifier is the only way in. The bootcamp runs first (Sep 7–20) and is optional; the qualifier then opens Sep 21 and closes Sep 30, and the top 20 teams on its leaderboard advance to the finals (Oct 1–7).' },
       { q: 'What is the challenge?', a: 'The qualifier rebuilds selected GitHub and Lark capabilities — Actions, org permissions, audit, and Rulesets. The finals move to a challenge drawn from real, complex enterprise requirements. Full challenge details are on the competition platform, arc-bench.com.' },
       { q: 'Must I use a specific model?', a: 'Compute uses organizer-issued open-source model tokens: Kimi, GLM, MiniMax, and DeepSeek. Every call goes through one metered gateway so token efficiency can be compared.' },
       { q: 'Is the harness restricted?', a: 'No. The competition is open to Octos, HAgency, ARC, Claude Code, custom agents, and others. You may change your harness, but never the tests, gateway metering, or scoring.' },
@@ -245,6 +246,6 @@ export default {
       { q: 'What must we submit?', a: 'A runnable rebuild with code and startup instructions, the complete production trace (prompts, tool calls, agent iterations, and human intervention points), and a 3–5 minute demo.' },
     ],
   },
-  cta: { title: 'From vibe to harness, from luck to mastery', tagline: 'Software development did not die in the AI wave — it matters more than ever.', location: 'Sep 1 – Oct 17, 2026 · Online + GOSIM Shenzhen' },
+  cta: { title: 'From vibe to harness, from luck to mastery', tagline: 'Software development did not die in the AI wave — it matters more than ever.', location: 'Sep 7 – Oct 17, 2026 · Online + GOSIM Shenzhen' },
   footer: { copyright: '2026 OAIC International Hackathon for Agentic Factory and Grand Challenge Series', mainSite: 'ARC-Bench', register: 'Register' },
 }
