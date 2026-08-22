@@ -504,7 +504,7 @@ onUnmounted(() => window.removeEventListener('open-my-team', handleOpenMyTeam))
         </template>
         <template v-else>
           <button @click="promptAuth('register')" class="px-8 py-4 bg-btn-bg text-btn-text text-sm font-semibold tracking-widest uppercase hover:bg-btn-hover transition-colors">
-            {{ t('nav.applyNow') }}
+            {{ pick('Register Now', '立即注册') }}
           </button>
         </template>
       </div>

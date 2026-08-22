@@ -10,7 +10,7 @@ export default {
     judging: 'Judging',
     teams: 'Teams',
     faq: 'FAQ',
-    applyNow: 'Registration Opens Soon',
+    applyNow: 'Register Now',
   },
   hero: {
     eyebrow: 'Organized by OAIC and Qiwoo',
@@ -225,7 +225,7 @@ export default {
     pending: 'Additional sponsor acknowledgements will appear after authorization is confirmed.',
   },
   teams: {
-    title: 'Registered', titleAccent: 'Teams', subtitle: 'Registration opens soon. Click a team to join, or create your own.',
+    title: 'Registered', titleAccent: 'Teams', subtitle: 'Registration is open. Click a team to join, or create your own.',
     registerNote: 'You complete registration only after joining or creating a team. The bootcamp begins September 7.',
     registerWarn: 'Please register only once — duplicate accounts may affect eligibility.',
     refresh: 'Refresh', teams: 'teams', registerBtn: 'Register Your Team', closedBtn: 'Registration Closed', noTeams: 'No teams registered yet. Be the first!', createTitle: 'Register Your Team',

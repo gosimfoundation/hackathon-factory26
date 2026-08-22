@@ -10,7 +10,7 @@ export default {
     judging: "评审",
     teams: "队伍",
     faq: "常见问题",
-    applyNow: "报名即将开始",
+    applyNow: "立即报名",
   },
   hero: {
     eyebrow: "开放智能体产业联盟（OAIC）、启悟社主办",
@@ -342,7 +342,7 @@ export default {
   teams: {
     title: "已注册",
     titleAccent: "队伍",
-    subtitle: "报名即将开始。点击队伍加入，或创建你自己的队伍。",
+    subtitle: "报名已开放。点击队伍加入，或创建你自己的队伍。",
     registerNote: "加入或创建队伍后才算完成报名。9 月 7 日研习营开营。",
     registerWarn: "请勿重复注册，否则可能影响参赛资格。",
     refresh: "刷新",

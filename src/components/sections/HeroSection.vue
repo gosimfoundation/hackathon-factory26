@@ -24,7 +24,7 @@ const pipeline = computed(() => t('hero.pipeline') as PipelineStep[])
 
 <template>
   <section class="hero-section relative min-h-[760px] h-[100svh] overflow-hidden bg-[#0b0d0c] text-white">
-    <video autoplay loop muted playsinline preload="metadata" :poster="assetUrl('/videos/shenzhen-hero-sz1-poster.jpg')" class="absolute inset-0 h-full w-full object-cover">
+    <video autoplay loop muted playsinline preload="auto" :poster="assetUrl('/videos/shenzhen-hero-sz1-poster.jpg')" class="absolute inset-0 h-full w-full object-cover">
       <source :src="assetUrl('/videos/shenzhen-hero-sz1.mp4')" type="video/mp4" />
     </video>
     <div class="hero-color-wash absolute inset-0"></div>
