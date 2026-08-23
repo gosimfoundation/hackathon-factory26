@@ -80,7 +80,7 @@ export default {
     desc: "研习营先行，9 月 7 日至 20 日：邀请专家带着参赛者用比赛工具走一遍模拟赛（Workshop），并设答疑（Office Hour），全程录像、可选参加，在计分开始之前结束。初赛随后于 9 月 21 日开赛、9 月 30 日截止，线上进行，统一沙箱环境 + 模型网关，全球同时起跑。",
     finaleTitle: "荣耀日 · 深圳 GOSIM 大会",
     finaleDesc:
-      "邀请优胜者参加 GOSIM 深圳 2026 大会，并在 10 月 17 日大会闭幕式现场荣耀颁奖。",
+      "邀请一等奖和二等奖获奖队伍参加 GOSIM 深圳 2026 大会，并在 10 月 17 日大会闭幕式现场荣耀颁奖。",
     stats: [
       { value: "3", label: "站" },
       { value: "41", label: "天" },
@@ -248,7 +248,7 @@ export default {
     poolLabel: "奖金池",
     poolStatus: "5,500 美元",
     poolNoteTitle: "其他权益",
-    poolNote: "所有完赛队伍获完赛证书并在官网留档；赛程期间可使用赞助方提供的开源模型 Token 额度。GOSIM 深圳 2026 大会现场邀请名额另行公布。",
+    poolNote: "所有完赛队伍获完赛证书并在官网留档；赛程期间可使用赞助方提供的开源模型 Token 额度。一等奖和二等奖获奖队伍将受邀参加 GOSIM 深圳 2026 大会。",
   },
   schedule: {
     title: "赛程",
@@ -282,7 +282,7 @@ export default {
         format: "深圳 GOSIM 大会现场",
         challengeLabel: "活动",
         challenge: "大会闭幕式现场荣耀颁奖。",
-        participants: "邀请优胜者参加 GOSIM 深圳 2026 大会。",
+        participants: "邀请一等奖和二等奖获奖队伍参加 GOSIM 深圳 2026 大会。",
       },
     ],
     activitiesTitle: "研习营活动",
@@ -334,8 +334,11 @@ export default {
     title: "主办与赞助",
     confirmed: [
       { name: "OAIC 开放智能体产业联盟", role: "主办" },
+      { name: "启悟学习社区", role: "主办" },
       { name: "上海交通大学计算机学院 CoPhi Group", role: "技术伙伴 · ARC / ARC-Bench" },
-      { name: "启悟学习社区", role: "社区伙伴" },
+      { name: "中国电信", role: "Token 赞助方" },
+      { name: "TaoToken.net", role: "Token 赞助方" },
+      { name: "ofox.ai", role: "Token 赞助方" },
     ],
     pending: "更多赞助方将在露出授权确认后公布。",
   },
@@ -399,7 +402,7 @@ export default {
       },
       {
         q: "有什么奖？",
-        a: "总奖金池 5,500 美元：一等奖 1 个，奖金 2,000 美元；二等奖 2 个，每个 1,000 美元；三等奖 3 个，每个 500 美元。所有完赛队伍另获完赛证书并在官网留档，GOSIM 深圳 2026 大会现场邀请名额另行公布。",
+        a: "总奖金池 5,500 美元：一等奖 1 个，奖金 2,000 美元；二等奖 2 个，每个 1,000 美元；三等奖 3 个，每个 500 美元。所有完赛队伍另获完赛证书并在官网留档，一等奖和二等奖获奖队伍将受邀参加 GOSIM 深圳 2026 大会。",
       },
       {
         q: "需要提交什么？",
