@@ -11,7 +11,7 @@ function toggle(i: number) { openIndex.value = openIndex.value === i ? null : i 
   <section id="faq" class="bg-bg-primary py-24 md:py-36">
     <div class="mx-auto grid max-w-[1440px] gap-10 px-6 md:px-10 lg:grid-cols-[.7fr_1.3fr] lg:gap-20 xl:px-14">
       <div class="reveal">
-        <span class="section-kicker">{{ pick('11 / FAQ', '11 / 常见问题') }}</span>
+        <span class="section-kicker">{{ pick('09 / FAQ', '09 / 常见问题') }}</span>
         <h2 class="section-title mt-8">{{ t('faq.title') }}</h2>
       </div>
       <div class="reveal reveal-delay-1 border-t border-border">

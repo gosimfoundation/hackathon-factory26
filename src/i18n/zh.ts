@@ -14,7 +14,7 @@ export default {
   },
   hero: {
     eyebrow: "GOSIM 黑客松 · 软件工程 × 智能体",
-    system: "智能体软件工厂国际黑客松",
+    system: "智能体软件工厂",
     pipeline: [
       { label: "研习营", date: "9.7 – 9.20" },
       { label: "初赛", date: "9.21 – 9.30" },
@@ -36,6 +36,19 @@ export default {
     secs: "秒",
     live: "赛程进行中",
     concluded: "赛程已结束",
+  },
+  taskIntro: {
+    title: "智能体软件工程",
+    text: "在统一模型与沙箱中用智能体实现真实软件功能，用可运行结果比拼正确率、Token 效率与完成速度。",
+  },
+  deliverables: {
+    title: "参赛交付物",
+    intro: "提交的不只是 Demo，而是一套可运行、可复现、可审计的完整成果。",
+    items: [
+      { name: "可运行的软件复刻", desc: "完整代码与清晰的启动方式。" },
+      { name: "完整生产轨迹", desc: "Prompts、工具调用、智能体迭代与人工干预点。" },
+      { name: "3–5 分钟 Demo", desc: "展示核心功能、运行结果与工程方法。" },
+    ],
   },
   about: {
     quote: "“我 90% 的技能，价值刚刚归零。剩下那 10% 的杠杆，放大了一千倍。”",
@@ -62,16 +75,16 @@ export default {
   },
   venue: {
     label: "09.07—09.30 / 线上",
-    title: "初赛",
+    title: "比赛",
     subtitle: "全球",
     desc: "研习营先行，9 月 7 日至 20 日：邀请专家带着参赛者用比赛工具走一遍模拟赛（Workshop），并设答疑（Office Hour），全程录像、可选参加，在计分开始之前结束。初赛随后于 9 月 21 日开赛、9 月 30 日截止，线上进行，统一沙箱环境 + 模型网关，全球同时起跑。",
     finaleTitle: "荣耀日 · 深圳 GOSIM 大会",
     finaleDesc:
-      "决赛至少前 3 名队伍派代表受邀到深圳 GOSIM 大会现场，10 月 16 日发出邀请。10 月 17 日现场比拼、决出最终名次，随后颁奖典礼，并与组织者、伙伴共进晚宴。",
+      "邀请优胜者参加 GOSIM 深圳 2026 大会，并在 10 月 17 日大会闭幕式现场荣耀颁奖。",
     stats: [
       { value: "3", label: "站" },
       { value: "41", label: "天" },
-      { value: "5", label: "评审指标" },
+      { value: "3", label: "评审指标" },
       { value: "20", label: "晋级大奖赛队伍" },
     ],
   },
@@ -212,32 +225,30 @@ export default {
     ],
   },
   awards: {
-    title: "奖项",
-    subtitle:
-      "每一支完赛的队伍都会被记住。以下是已经确定的部分；奖项层级与奖金池仍在与组织方、赞助方敲定中。",
-    settledTitle: "已经确定的",
+    title: "奖金与奖项",
+    subtitle: "总奖金池 5,500 美元，共设 6 个现金奖项。所有完赛队伍另获完赛证书并在官网留档。",
+    settledTitle: "现金奖项",
     settled: [
       {
-        name: "完赛证书",
-        slots: "所有完赛队伍",
-        desc: "颁发给每一支完赛队伍，并在官网永久留档。",
+        name: "一等奖",
+        slots: "1 个",
+        desc: "奖金 2,000 美元。",
       },
       {
-        name: "深圳 GOSIM 大会席位",
-        slots: "决赛至少前 3 名",
-        desc: "派代表受邀出席 10 月 17 日深圳 GOSIM 大会的荣耀颁奖典礼。",
+        name: "二等奖",
+        slots: "2 个",
+        desc: "每个奖金 1,000 美元。",
       },
       {
-        name: "开源模型 Token 额度",
-        slots: "由模型厂商赞助提供",
-        desc: "赛程期间，参赛队伍可使用赞助方提供的开源模型 Token 额度。",
+        name: "三等奖",
+        slots: "3 个",
+        desc: "每个奖金 500 美元。",
       },
     ],
     poolLabel: "奖金池",
-    poolStatus: "待公布",
-    poolNoteTitle: "关于奖金池",
-    poolNote:
-      "在本页正式公布之前，任何奖金数字都不作准。奖项层级与奖金池一经确定，会第一时间在此更新，并通知所有已报名的队伍。",
+    poolStatus: "5,500 美元",
+    poolNoteTitle: "其他权益",
+    poolNote: "所有完赛队伍获完赛证书并在官网留档；赛程期间可使用赞助方提供的开源模型 Token 额度。GOSIM 深圳 2026 大会现场邀请名额另行公布。",
   },
   schedule: {
     title: "赛程",
@@ -261,16 +272,17 @@ export default {
         name: "大奖赛 · Grand Challenge",
         dates: "10/1–10/7",
         format: "线上",
-        challenge: "基于真实复杂企业需求的命题。",
+        challenge: "更具挑战性的、基于真实复杂企业需求的命题。",
         participants: "初赛排行榜 Top 20 队伍。",
       },
       {
         number: "03",
-        name: "荣耀日 · Demo Day",
+        name: "GOSIM 深圳 2026 · 荣耀颁奖",
         dates: "10/17",
         format: "深圳 GOSIM 大会现场",
-        challenge: "现场决赛与 Demo Day，最终名次在现场决出，随后颁奖。",
-        participants: "决赛至少前 3 名队伍派代表出席（10/16 发出邀请）。",
+        challengeLabel: "活动",
+        challenge: "大会闭幕式现场荣耀颁奖。",
+        participants: "邀请优胜者参加 GOSIM 深圳 2026 大会。",
       },
     ],
     activitiesTitle: "研习营活动",
@@ -281,7 +293,7 @@ export default {
   judging: {
     title: "初赛",
     titleAccent: "评审标准",
-    desc: "前三项由机器自动采集——客观、可复现、可横向比；第四、五项由 AI Agent 初审，评委复核校准。权重将在确认后公布。",
+    desc: "三项指标均由机器自动采集——客观、可复现、可横向比。权重将在确认后公布。",
     criteria: [
       {
         name: "GUI 测试用例通过率",
@@ -300,18 +312,6 @@ export default {
         summary: "快不快",
         desc: "开工到提交的墙钟耗时，由计时器与 git 时间戳采集。",
         method: "自动",
-      },
-      {
-        name: "Harness 工程",
-        summary: "稳不稳",
-        desc: "AI 初审读取轨迹，评自动化程度与人工干预比例，评委复核校准。",
-        method: "AI + 评委",
-      },
-      {
-        name: "软件可维护性",
-        summary: "活不活",
-        desc: "AI 初审读取代码，评结构、命名与测试覆盖，评委复核校准。",
-        method: "AI + 评委",
       },
     ],
     fairness: [
@@ -395,11 +395,11 @@ export default {
       },
       {
         q: "怎么评分？",
-        a: "五项指标：GUI 测试用例通过率、Token 效率、完成时间由机器自动采集；Harness 工程、软件可维护性由 AI 初审 + 评委复核。每个分背后都有测试日志与 trace 可查。",
+        a: "三项指标：GUI 测试用例通过率、Token 效率、完成时间，均由机器自动采集。每个分背后都有测试日志与 trace 可查。",
       },
       {
         q: "有什么奖？",
-        a: "所有完赛队伍获完赛证书并在官网留档；决赛至少前 3 名队伍派代表受邀出席深圳 GOSIM 大会荣耀颁奖典礼；赛程期间可使用赞助方提供的开源模型 Token 额度。奖项层级与奖金池仍在与组织方、赞助方敲定中，一经确定即在官网「奖项」一节公布——未在那里出现的数字，都不作准。",
+        a: "总奖金池 5,500 美元：一等奖 1 个，奖金 2,000 美元；二等奖 2 个，每个 1,000 美元；三等奖 3 个，每个 500 美元。所有完赛队伍另获完赛证书并在官网留档，GOSIM 深圳 2026 大会现场邀请名额另行公布。",
       },
       {
         q: "需要提交什么？",

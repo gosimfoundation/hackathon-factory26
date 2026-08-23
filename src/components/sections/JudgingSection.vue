@@ -11,7 +11,7 @@ const fairness = computed(() => t('judging.fairness') as any[])
     <div class="mx-auto max-w-[1440px] px-6 md:px-10 xl:px-14">
       <div class="grid gap-10 lg:grid-cols-[.7fr_1.3fr] lg:gap-20">
         <div class="reveal">
-          <span class="section-kicker">{{ pick('09 / Qualifier Judging', '09 / 初赛评审') }}</span>
+          <span class="section-kicker">{{ pick('05 / Judging', '05 / 评测标准') }}</span>
           <h2 class="section-title mt-8">{{ t('judging.title') }} {{ t('judging.titleAccent') }}</h2>
           <p class="mt-8 max-w-lg leading-relaxed text-text-secondary">{{ t('judging.desc') }}</p>
         </div>

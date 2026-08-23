@@ -36,6 +36,7 @@ const sessions = [
     enSubtitle: 'Open source · Reference implementation',
     zhNote: '用开源的 Octos Agent OS 打比赛的一条完整路径。',
     enNote: 'One complete route through the competition using the open-source Octos Agent OS.',
+    url: 'https://github.com/octos-org/arc-adapter',
   },
   {
     number: '04',
@@ -46,6 +47,7 @@ const sessions = [
     enSubtitle: 'Open source · Reference implementation',
     zhNote: '用开源的 HAgency Software Factory 系统打比赛的一条完整路径。',
     enNote: 'One complete route through the competition using the open-source HAgency Software Factory.',
+    url: 'https://github.com/onewesong/hafleet-arc',
   },
   {
     number: '05',
@@ -89,8 +91,8 @@ const officeHours = [
     number: '03',
     zhTitle: '提交与评分',
     enTitle: 'Submission and scoring',
-    zhNote: '提交物到底要交什么、生产轨迹怎么留、五项指标怎么算、申诉走什么流程。安排在初赛 9 月 30 日截止之前。',
-    enNote: 'What the submission package actually contains, how to keep a production trace, how the five metrics are computed, and how appeals work. Scheduled well before the qualifier closes on September 30.',
+    zhNote: '提交物到底要交什么、生产轨迹怎么留、三项指标怎么算、申诉走什么流程。安排在初赛 9 月 30 日截止之前。',
+    enNote: 'What the submission package actually contains, how to keep a production trace, how the three metrics are computed, and how appeals work. Scheduled well before the qualifier closes on September 30.',
   },
 ]
 
@@ -155,7 +157,10 @@ const purposes = [
               <span class="session-no">{{ s.number }}</span>
               <div>
                 <strong>{{ isEn ? s.enTitle : s.zhTitle }}</strong>
-                <span class="session-sub">{{ isEn ? s.enSubtitle : s.zhSubtitle }}</span>
+                <a v-if="s.url" :href="s.url" target="_blank" rel="noopener noreferrer" class="session-sub session-link">
+                  {{ isEn ? s.enSubtitle : s.zhSubtitle }} ↗
+                </a>
+                <span v-else class="session-sub">{{ isEn ? s.enSubtitle : s.zhSubtitle }}</span>
               </div>
               <span class="session-tba">{{ isEn ? 'Time TBA' : '时间待定' }}</span>
             </div>
@@ -211,6 +216,8 @@ const purposes = [
 .bootcamp-content .session-head { display: flex; align-items: baseline; gap: .75rem; flex-wrap: wrap; }
 .bootcamp-content .session-no { font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: .72rem; color: var(--color-accent); }
 .bootcamp-content .session-head strong { color: var(--color-text-primary); font-weight: 600; }
+.bootcamp-content .session-link { display: table; color: var(--color-text-tertiary); text-decoration: none; border-bottom: 1px solid var(--color-accent); transition: color .2s ease; }
+.bootcamp-content .session-link:hover { color: var(--color-accent); }
 .bootcamp-content .session-sub { display: block; font-size: .88rem; color: var(--color-text-tertiary); margin-top: .15rem; }
 .bootcamp-content .session-tba { margin-left: auto; font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: .68rem; text-transform: uppercase; letter-spacing: .08em; color: var(--color-text-muted); border: 1px solid var(--color-border); padding: .15rem .45rem; white-space: nowrap; }
 .bootcamp-content .sessionlist span.block { color: var(--color-text-muted); font-size: .92rem; line-height: 1.7; margin-top: .45rem; }

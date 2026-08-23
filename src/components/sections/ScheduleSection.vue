@@ -10,7 +10,7 @@ const rounds = computed(() => t('schedule.rounds') as any[])
     <div class="mx-auto max-w-[1440px] px-6 md:px-10 xl:px-14">
       <div class="grid gap-10 lg:grid-cols-[.7fr_1.3fr] lg:gap-20">
         <div class="reveal">
-          <span class="section-kicker">{{ pick('08 / Timeline', '08 / 时间线') }}</span>
+          <span class="section-kicker">{{ pick('03 / Timeline', '03 / 赛程') }}</span>
           <h2 class="section-title mt-8">{{ t('schedule.title') }}</h2>
           <p class="mt-8 max-w-lg leading-relaxed text-text-secondary">{{ t('schedule.intro') }}</p>
         </div>
@@ -24,7 +24,7 @@ const rounds = computed(() => t('schedule.rounds') as any[])
               <p class="mt-3 text-sm text-text-secondary">{{ round.format }}</p>
             </div>
             <dl class="grid gap-5 text-sm">
-              <div><dt class="mono-label text-text-muted">{{ t('schedule.challengeLabel') }}</dt><dd class="mt-2 leading-relaxed text-text-primary">{{ round.challenge }}</dd></div>
+              <div><dt class="mono-label text-text-muted">{{ round.challengeLabel || t('schedule.challengeLabel') }}</dt><dd class="mt-2 leading-relaxed text-text-primary">{{ round.challenge }}</dd></div>
               <div><dt class="mono-label text-text-muted">{{ t('schedule.participantsLabel') }}</dt><dd class="mt-2 leading-relaxed text-text-secondary">{{ round.participants }}</dd></div>
             </dl>
           </article>

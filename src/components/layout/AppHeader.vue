@@ -354,7 +354,7 @@ async function saveProfile() {
   >
     <div class="max-w-[1440px] mx-auto px-6 md:px-10 xl:px-14 h-16 flex items-center justify-between">
       <router-link to="/" class="flex min-w-0 items-center gap-3 group">
-        <span class="shrink-0 text-lg font-semibold tracking-[-0.05em] text-text-primary">OAIC</span>
+        <span class="shrink-0 text-lg font-semibold tracking-[-0.05em] text-text-primary">GOSIM</span>
         <span class="h-5 w-px shrink-0 bg-border"></span>
         <span
           class="font-mono uppercase leading-[1.35] text-text-tertiary"

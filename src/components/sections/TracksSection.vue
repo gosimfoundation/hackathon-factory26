@@ -29,7 +29,7 @@ function formatTokens(millions: number | null): string {
     <div class="mx-auto max-w-[1440px] px-6 md:px-10 xl:px-14">
       <div class="grid gap-10 lg:grid-cols-[.72fr_1.28fr] lg:gap-20">
         <div class="reveal lg:sticky lg:top-28 lg:self-start">
-          <span class="section-kicker">{{ pick('03 / Platform', '03 / 比赛平台') }}</span>
+          <span class="section-kicker">{{ pick('07 / Leaderboard', '07 / 排行榜') }}</span>
           <h2 class="section-title mt-8">{{ t('tracks.title') }}</h2>
           <p class="mt-8 max-w-xl text-sm leading-relaxed text-text-secondary md:text-base">{{ t('tracks.intro') }}</p>
           <p class="mt-6 max-w-xl text-sm leading-relaxed text-text-secondary">

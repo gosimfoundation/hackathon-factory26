@@ -8,7 +8,7 @@ const { t, pick } = useI18n()
     <div class="mx-auto max-w-[1440px] px-6 md:px-10 xl:px-14">
       <div class="grid gap-14 lg:grid-cols-[.85fr_1.15fr] lg:gap-24">
         <div class="reveal">
-          <span class="section-kicker">{{ pick('01 / Vision & Mission', '01 / 愿景与使命') }}</span>
+          <span class="section-kicker">{{ pick('02 / Vision & Mission', '02 / 愿景与使命') }}</span>
           <h2 class="section-title mt-8">{{ t('about.title') }}</h2>
           <blockquote class="mt-12 border-l border-accent pl-5 text-lg font-medium leading-relaxed text-text-primary md:text-2xl">
             {{ t('about.quote') }}

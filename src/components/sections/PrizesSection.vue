@@ -10,7 +10,7 @@ const settled = computed(() => t('awards.settled') as any[])
     <div class="mx-auto max-w-[1440px] px-6 md:px-10 xl:px-14">
       <div class="grid gap-10 lg:grid-cols-[.7fr_1.3fr] lg:gap-20">
         <div class="reveal">
-          <span class="section-kicker !text-white/45">{{ pick('06 / Awards', '06 / 奖项') }}</span>
+          <span class="section-kicker !text-white/45">{{ pick('04 / Prizes', '04 / 奖金') }}</span>
           <h2 class="mt-8 text-[clamp(2.75rem,6vw,6rem)] font-semibold leading-none tracking-[-.06em]">{{ t('awards.title') }}</h2>
           <p class="mt-8 max-w-md leading-relaxed text-white/55">{{ t('awards.subtitle') }}</p>
         </div>

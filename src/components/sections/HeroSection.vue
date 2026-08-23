@@ -52,6 +52,9 @@ const pipeline = computed(() => t('hero.pipeline') as PipelineStep[])
                 <span class="mt-[0.65em] h-1.5 w-1.5 shrink-0 bg-[#c788a1]"></span>
                 <span>{{ t('hero.sponsorNotice') }}</span>
               </p>
+              <p class="mt-3 font-mono text-xs uppercase tracking-[0.1em] text-[#dca6b9]">
+                {{ t('awards.poolLabel') }} · {{ t('awards.poolStatus') }}
+              </p>
             </div>
 
             <div class="flex flex-wrap items-center gap-3 md:justify-end">

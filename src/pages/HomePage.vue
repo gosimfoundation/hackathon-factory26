@@ -2,14 +2,13 @@
 import { useScrollReveal } from '../composables/useScrollReveal'
 import { useVideoAutoplay } from '../composables/useVideoAutoplay'
 import HeroSection from '../components/sections/HeroSection.vue'
+import TaskIntroSection from '../components/sections/TaskIntroSection.vue'
 import AboutSection from '../components/sections/AboutSection.vue'
-import VenueSection from '../components/sections/VenueSection.vue'
 import TracksSection from '../components/sections/TracksSection.vue'
-import TechSection from '../components/sections/TechSection.vue'
-import WhoSection from '../components/sections/WhoSection.vue'
 import PrizesSection from '../components/sections/PrizesSection.vue'
 import ScheduleSection from '../components/sections/ScheduleSection.vue'
 import JudgingSection from '../components/sections/JudgingSection.vue'
+import DeliverablesSection from '../components/sections/DeliverablesSection.vue'
 import TeamsSection from '../components/sections/TeamsSection.vue'
 import FaqSection from '../components/sections/FaqSection.vue'
 import SponsorsSection from '../components/sections/SponsorsSection.vue'
@@ -23,17 +22,16 @@ useVideoAutoplay()
   <!-- Safari banner disabled -->
   <main>
     <HeroSection />
+    <TaskIntroSection />
     <AboutSection />
-    <VenueSection />
-    <TracksSection />
-    <TechSection />
-    <WhoSection />
-    <PrizesSection />
-    <TeamsSection />
     <ScheduleSection />
+    <PrizesSection />
     <JudgingSection />
+    <DeliverablesSection />
+    <TracksSection />
     <SponsorsSection />
     <FaqSection />
+    <TeamsSection />
     <CtaSection />
   </main>
 </template>
