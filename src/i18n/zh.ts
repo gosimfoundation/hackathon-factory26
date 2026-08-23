@@ -13,15 +13,15 @@ export default {
     applyNow: "立即报名",
   },
   hero: {
-    eyebrow: "开放智能体产业联盟（OAIC）、启悟社主办",
-    system: "智能体工厂国际黑客松",
+    eyebrow: "GOSIM 黑客松 · 软件工程 × 智能体",
+    system: "智能体软件工厂国际黑客松",
     pipeline: [
       { label: "研习营", date: "9.7 – 9.20" },
       { label: "初赛", date: "9.21 – 9.30" },
       { label: "决赛", date: "10.1 – 10.7" },
       { label: "颁奖", date: "10.17" },
     ],
-    eventTitle: "From Vibe Coding to Harness Engineering",
+    eventTitle: "开放智能体产业联盟（OAIC）、启悟社主办",
     location: [
       "2026.9.7 – 9.20 · 研习营 · 线上",
       "2026.9.21 – 9.30 · 初赛 · 线上",
@@ -413,7 +413,7 @@ export default {
     location: "2026年9月7日 – 10月17日 · 线上 + 深圳 GOSIM",
   },
   footer: {
-    copyright: "2026 OAIC 智能体工厂国际黑客松和大奖赛系列",
+    copyright: "2026 OAIC 智能体软件工厂国际黑客松和大奖赛系列",
     mainSite: "create.gosim.org",
     register: "报名",
   },
