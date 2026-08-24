@@ -36,6 +36,18 @@ function formatTokens(millions: number | null): string {
             {{ t('tracks.detailsNote') }}
             <a href="http://arc-bench.com" target="_blank" rel="noopener" class="border-b border-accent font-semibold text-text-primary transition-colors hover:text-accent">arc-bench.com ↗</a>
           </p>
+          <a
+            href="http://arc-bench.com/login"
+            target="_blank"
+            rel="noopener"
+            class="mt-7 inline-flex items-center gap-2 bg-btn-bg px-5 py-3 text-xs font-semibold uppercase tracking-widest text-btn-text transition-colors hover:bg-btn-hover"
+          >
+            {{ pick('Login to ARC-Bench', '登录 ARC-Bench') }}
+            <span aria-hidden="true">↗</span>
+          </a>
+          <p class="mt-3 max-w-xl text-xs leading-relaxed text-text-muted">
+            {{ pick('Choose “Hackathon account” and use your Hackathon email and password.', '打开后请选择“Hackathon account”，使用 Hackathon 邮箱和密码登录。') }}
+          </p>
         </div>
 
         <!-- 实时排行榜 · Top 20：与进决赛的名额一致（全量榜单由 ARC-Bench 维护） -->

@@ -431,6 +431,9 @@ async function saveProfile() {
                   <span>{{ pick('My Team', '我的队伍') }}</span>
                   <span v-if="pendingCount > 0" class="text-xs bg-accent-red text-white rounded-full px-1.5 py-0.5 leading-none">{{ pendingCount }}</span>
                 </button>
+                <a href="http://arc-bench.com/login" target="_blank" rel="noopener" class="block w-full px-4 py-2 text-left text-sm text-text-tertiary transition-colors hover:bg-bg-elevated hover:text-text-primary">
+                  {{ pick('Login to ARC-Bench', '登录 ARC-Bench') }} ↗
+                </a>
                 <button @click="handleLogout(); showUserDropdown = false" class="w-full text-left px-4 py-2 text-sm text-text-tertiary hover:text-text-primary hover:bg-bg-elevated transition-colors">
                   {{ pick('Logout', '退出登录') }}
                 </button>
@@ -518,6 +521,9 @@ async function saveProfile() {
           <button @click="openProfileModal(); mobileOpen = false" class="block py-3 text-text-tertiary hover:text-text-primary transition-colors text-sm">
             {{ pick('My Profile', '我的资料') }}
           </button>
+          <a href="http://arc-bench.com/login" target="_blank" rel="noopener" @click="mobileOpen = false" class="block py-3 text-sm text-text-tertiary transition-colors hover:text-text-primary">
+            {{ pick('Login to ARC-Bench', '登录 ARC-Bench') }} ↗
+          </a>
           <button @click="handleLogout" class="block py-3 text-text-tertiary hover:text-text-primary transition-colors text-sm">
             {{ pick('Logout', '退出登录') }}
           </button>
