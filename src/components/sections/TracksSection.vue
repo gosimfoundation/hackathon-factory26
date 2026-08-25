@@ -48,6 +48,9 @@ function formatTokens(millions: number | null): string {
           <p class="mt-3 max-w-xl text-xs leading-relaxed text-text-muted">
             {{ pick('Choose “Hackathon account” and use your Hackathon email and password.', '打开后请选择“Hackathon account”，使用 Hackathon 邮箱和密码登录。') }}
           </p>
+          <p class="mt-2 max-w-xl text-xs font-semibold leading-relaxed text-accent-red">
+            {{ pick('One account per team is enough. Individual team members do not need to create separate accounts.', '每支队伍只需创建一个账号，队员无需各自注册账号。') }}
+          </p>
         </div>
 
         <!-- 实时排行榜 · Top 20：与进决赛的名额一致（全量榜单由 ARC-Bench 维护） -->
