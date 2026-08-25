@@ -31,7 +31,7 @@ async function handleChangePassword() {
   }
 }
 const { isDark, toggleTheme } = useTheme()
-const { createTeam, teams } = useTeams()
+const { teams } = useTeams()
 
 // Registration currently uses one shared account per team.
 const teamMemberFeaturesEnabled = false
@@ -184,20 +184,15 @@ async function submitRegister() {
     linkedin: regLinkedin.value,
     website: regWebsite.value,
     lookingForTeam: false,
-  })
-  if (ok && regTeamName.value.trim()) {
-    await createTeam({
+    team: {
       name: regTeamName.value.trim(),
-      avatar: '',
       githubRepo: regTeamGithubRepo.value.trim(),
       themes: regTeamTracks.value,
       model: regTeamModel.value,
       harness: regTeamHarness.value,
       projectIdea: regTeamProjectIdea.value.trim(),
-      locked: true,
-      maxSize: null,
-    })
-  }
+    },
+  })
   authLoading.value = false
   if (ok) {
     if (isLoggedIn.value) {

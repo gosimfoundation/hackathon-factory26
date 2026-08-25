@@ -46,6 +46,53 @@ const filteredTeams = computed(() => {
   return teams.value.filter(team => (team.themes || []).some(th => th.includes(teamFilter.value)))
 })
 
+// Static examples are deliberately kept out of Supabase and the registration count.
+// They demonstrate what a completed team card can look like without posing as entrants.
+const demoTeams = computed(() => [
+  {
+    id: 'demo-01',
+    name: 'DEMO 01 · Agent Forge',
+    model: 'Kimi',
+    themes: ['repository-lifecycle', 'pull-request-review'],
+    projectIdea: pick('An agent workflow for planning and reviewing repository changes.', '用于规划和审查代码仓库变更的智能体工作流。'),
+  },
+  {
+    id: 'demo-02',
+    name: 'DEMO 02 · Merge Pilot',
+    model: 'GLM',
+    themes: ['issues-forms', 'pull-request-review'],
+    projectIdea: pick('A review assistant that turns issue context into focused pull-request feedback.', '把 Issue 背景转化为精准 PR 反馈的审查助手。'),
+  },
+  {
+    id: 'demo-03',
+    name: 'DEMO 03 · Repo Garden',
+    model: 'MiniMax',
+    themes: ['repository-lifecycle', 'org-permissions-audit'],
+    projectIdea: pick('A maintenance harness for keeping repositories healthy over time.', '让代码仓库长期保持健康的维护型 Harness。'),
+  },
+  {
+    id: 'demo-04',
+    name: 'DEMO 04 · Action Relay',
+    model: 'DeepSeek',
+    themes: ['actions-workflow', 'compute-engine'],
+    projectIdea: pick('A resilient agent that diagnoses and repairs failing CI workflows.', '诊断并修复 CI 工作流故障的可靠智能体。'),
+  },
+  {
+    id: 'demo-05',
+    name: 'DEMO 05 · Session Smith',
+    model: 'Other',
+    themes: ['auth-session', 'org-permissions-audit'],
+    projectIdea: pick('An auditable approach to authentication and permission changes.', '可审计的身份验证与权限变更方案。'),
+  },
+  {
+    id: 'demo-06',
+    name: 'DEMO 06 · Harness Lab',
+    model: 'Kimi',
+    themes: ['compute-engine', 'actions-workflow'],
+    projectIdea: pick('A reusable harness for evaluating software-building agents.', '用于评估软件构建智能体的可复用 Harness。'),
+  },
+])
+
 // Get members for a team from users array
 function getTeamMembers(teamId: string): User[] {
   return users.value.filter(u => u.teamId === teamId)
@@ -562,6 +609,46 @@ onUnmounted(() => window.removeEventListener('open-my-team', handleOpenMyTeam))
 
       <div v-if="!teams.length" class="text-center py-16">
         <p class="text-text-secondary">{{ t('teams.noTeams') }}</p>
+      </div>
+
+      <!-- Clearly labelled examples: never mixed with real registrations. -->
+      <div class="mt-20 pt-10 border-t border-border reveal">
+        <div class="max-w-3xl mb-8">
+          <span class="font-mono text-[11px] uppercase tracking-[.18em] text-accent">{{ pick('Demo · Not registered', '示例 · 非真实报名') }}</span>
+          <h3 class="mt-3 text-2xl md:text-3xl font-bold text-text-primary">{{ pick('Example team cards', '队伍展示示例') }}</h3>
+          <p class="mt-3 text-sm text-text-secondary leading-relaxed">
+            {{ pick('These six cards are layout examples only. They are not registered teams and are not included in the live count above.', '以下六张卡片仅为展示示例，不属于已注册队伍，也不计入上方的实时报名数量。') }}
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <article
+            v-for="team in demoTeams"
+            :key="team.id"
+            class="team-card p-6 pt-7 relative flex flex-col overflow-hidden opacity-80"
+          >
+            <div class="absolute top-0 left-0 right-0 h-[2px] bg-border-strong"></div>
+            <div class="flex items-center justify-between gap-4 mb-4">
+              <div class="flex items-center gap-3 min-w-0">
+                <img :src="assetUrl('/default-team-avatar.svg')" class="w-12 h-12 rounded-full shrink-0 object-cover border-2 border-border dark:invert" alt="" />
+                <div class="min-w-0">
+                  <h4 class="font-bold text-text-primary text-base truncate">{{ team.name }}</h4>
+                  <div class="flex items-center gap-1.5 mt-1">
+                    <template v-for="theme in team.themes" :key="theme">
+                      <img v-if="getTrackIcon(theme)" :src="getTrackIcon(theme)" class="w-5 h-5" :title="getTrackLabel(theme)" />
+                    </template>
+                  </div>
+                </div>
+              </div>
+              <span class="shrink-0 border border-border px-2 py-1 font-mono text-[10px] uppercase tracking-wider text-text-muted">DEMO</span>
+            </div>
+            <p class="text-xs text-text-secondary leading-relaxed flex items-start gap-1.5">
+              <img :src="tw.bulb" class="w-3.5 h-3.5 shrink-0 mt-0.5" alt="" />
+              {{ team.projectIdea }}
+            </p>
+            <div class="mt-4 pt-3 border-t border-border-subtle text-[11px] text-text-muted">{{ team.model }}</div>
+          </article>
+        </div>
       </div>
     </div>
 

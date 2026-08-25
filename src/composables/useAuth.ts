@@ -41,6 +41,14 @@ interface RegisterData {
   linkedin: string
   website: string
   lookingForTeam: boolean
+  team: {
+    name: string
+    githubRepo: string
+    themes: string[]
+    model: string
+    harness: string
+    projectIdea: string
+  }
 }
 
 const AUTH_KEY: InjectionKey<{
@@ -99,6 +107,8 @@ function profileRowToUser(row: Record<string, any>, email?: string): User {
 }
 
 export function provideAuth(pick: <T>(english: T, chinese: T) => T) {
+  const provisioningTeams = new Set<string>()
+
   function friendlyAuthError(message: string): string {
     if (pick(false, true) === false) return message
     const exact: Record<string, string> = {
@@ -135,6 +145,66 @@ export function provideAuth(pick: <T>(english: T, chinese: T) => T) {
     isLoggedIn.value = true
   }
 
+  async function ensureTeamFromRegistration(authUser: any): Promise<boolean> {
+    const pendingTeam = authUser?.user_metadata?.pending_team
+    if (!pendingTeam?.name?.trim() || provisioningTeams.has(authUser.id)) return true
+
+    provisioningTeams.add(authUser.id)
+    try {
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('team_id')
+        .eq('id', authUser.id)
+        .single()
+      if (profileError) { error.value = friendlyAuthError(profileError.message); return false }
+
+      if (profile?.team_id) {
+        await supabase.auth.updateUser({ data: { pending_team: null } })
+        return true
+      }
+
+      const { data: existingTeam } = await supabase
+        .from('teams')
+        .select('id')
+        .eq('leader_id', authUser.id)
+        .maybeSingle()
+
+      let teamId = existingTeam?.id
+      if (!teamId) {
+        const { data: createdTeam, error: teamError } = await supabase
+          .from('teams')
+          .insert({
+            name: pendingTeam.name.trim(),
+            leader_id: authUser.id,
+            avatar: '',
+            github_repo: pendingTeam.githubRepo?.trim() || '',
+            themes: pendingTeam.themes || [],
+            model: pendingTeam.model || '',
+            harness: pendingTeam.harness || '',
+            project_idea: pendingTeam.projectIdea?.trim() || '',
+            contact_email: authUser.email || null,
+            locked: true,
+            max_size: null,
+          })
+          .select('id')
+          .single()
+        if (teamError) { error.value = friendlyAuthError(teamError.message); return false }
+        teamId = createdTeam.id
+      }
+
+      const { error: linkError } = await supabase
+        .from('profiles')
+        .update({ team_id: teamId, looking_for_team: false })
+        .eq('id', authUser.id)
+      if (linkError) { error.value = friendlyAuthError(linkError.message); return false }
+
+      await supabase.auth.updateUser({ data: { pending_team: null } })
+      return true
+    } finally {
+      provisioningTeams.delete(authUser.id)
+    }
+  }
+
   async function register(data: RegisterData): Promise<boolean> {
     error.value = ''
     const { data: authData, error: signUpError } = await supabase.auth.signUp({
@@ -155,6 +225,7 @@ export function provideAuth(pick: <T>(english: T, chinese: T) => T) {
           linkedin: data.linkedin,
           website: data.website,
           looking_for_team: data.lookingForTeam,
+          pending_team: data.team,
         },
         emailRedirectTo: publicSiteUrl(),
       },
@@ -172,6 +243,7 @@ export function provideAuth(pick: <T>(english: T, chinese: T) => T) {
     if (authData.session) {
       await supabase.auth.setSession(authData.session)
       await upsertProfile(authData.user.id, data)
+      await ensureTeamFromRegistration(authData.user)
       await fetchMe()
     }
     // 没 session 说明需要邮件确认，资料已存入 user_metadata，确认后在 SIGNED_IN 事件里创建 profile
@@ -200,8 +272,9 @@ export function provideAuth(pick: <T>(english: T, chinese: T) => T) {
 
   async function login(email: string, password: string): Promise<boolean> {
     error.value = ''
-    const { error: signInError } = await supabase.auth.signInWithPassword({ email, password })
+    const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({ email, password })
     if (signInError) { error.value = friendlyAuthError(signInError.message); return false }
+    if (signInData.user) await ensureTeamFromRegistration(signInData.user)
     await fetchMe()
     if (user.value && !user.value.passwordChanged) {
       showChangePasswordModal.value = true
@@ -298,6 +371,7 @@ export function provideAuth(pick: <T>(english: T, chinese: T) => T) {
                 lookingForTeam: meta.looking_for_team,
               })
             }
+            await ensureTeamFromRegistration(session.user)
           }
           fetchMe()
         } catch (e) {

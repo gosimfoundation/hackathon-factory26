@@ -101,9 +101,14 @@ export function useTeams() {
   })
 
   async function fetchTeams() {
+    const { data: { session } } = await supabase.auth.getSession()
+    const publicTeamColumns = 'id,name,avatar,model,harness,themes,project_idea,github_repo,likes,created_at'
+    const profileRequest = session
+      ? supabase.from('profiles').select('*')
+      : Promise.resolve({ data: [] as Record<string, any>[] })
     const [{ data: profileRows }, { data: teamRows }] = await Promise.all([
-      supabase.from('profiles').select('*'),
-      supabase.from('teams').select('*'),
+      profileRequest,
+      supabase.from('teams').select(session ? '*' : publicTeamColumns),
     ])
     const allUsers = (profileRows ?? []).map(profileRowToUser)
     users.value = allUsers
