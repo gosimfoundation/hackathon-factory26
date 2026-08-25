@@ -31,40 +31,18 @@ async function handleChangePassword() {
   }
 }
 const { isDark, toggleTheme } = useTheme()
-const { createTeam, teams, approveJoin, rejectJoin, cancelJoin } = useTeams()
+const { createTeam, teams } = useTeams()
 
-const myTeam = computed(() =>
-  teams.value.find(t => t.id === user.value?.teamId) ||
-  teams.value.find(t => t.pendingJoins?.includes(user.value?.id ?? ''))
-)
-const myPendingTeams = computed(() =>
-  teams.value.filter(t =>
-    t.pendingJoins?.includes(user.value?.id ?? '') &&
-    t.id !== user.value?.teamId
-  )
-)
-const pendingCount = computed(() => {
-  if (!myTeam.value || myTeam.value.leaderId !== user.value?.id) return 0
-  return myTeam.value.pendingJoins?.length ?? 0
-})
+// Registration currently uses one shared account per team.
+const teamMemberFeaturesEnabled = false
 
+const myTeam = computed(() => teams.value.find(t => t.id === user.value?.teamId))
 const headerToast = ref<{ msg: string; type: 'success' | 'error' } | null>(null)
 let headerToastTimer: number | undefined
 function showHeaderToast(msg: string, type: 'success' | 'error' = 'success') {
   headerToast.value = { msg, type }
   clearTimeout(headerToastTimer)
   headerToastTimer = window.setTimeout(() => headerToast.value = null, 4000)
-}
-
-async function handleApprove(teamId: string, userId: string) {
-  await approveJoin(teamId, userId)
-}
-async function handleReject(teamId: string, userId: string) {
-  await rejectJoin(teamId, userId)
-}
-async function handleCancelJoin(teamId: string) {
-  const ok = await cancelJoin(teamId)
-  showHeaderToast(ok ? pick('Application cancelled.', '申请已取消') : pick('Failed to cancel', '取消失败'), ok ? 'success' : 'error')
 }
 
 const scrolled = ref(false)
@@ -114,15 +92,12 @@ const regTwitter = ref('')
 const regTelegram = ref('')
 const regLinkedin = ref('')
 const regWebsite = ref('')
-const regLookingForTeam = ref(false)
-const regWantCreateTeam = ref(false)
 const regTeamName = ref('')
 const regTeamTracks = ref<string[]>([])
 const regTeamGithubRepo = ref('')
 const regTeamModel = ref('')
 const regTeamHarness = ref('')
 const regTeamProjectIdea = ref('')
-const regTeamLocked = ref(false)
 
 const registrationTrackIds = ['auth-session', 'repository-lifecycle', 'issues-forms', 'pull-request-review', 'actions-workflow', 'org-permissions-audit', 'compute-engine']
 const regTrackOptions = computed(() => (t('tracks.themes') as any[]).map((theme, i) => ({ id: registrationTrackIds[i], label: theme.title })))
@@ -163,15 +138,12 @@ watch(showAuthModal, (open) => {
     regTelegram.value = ''
     regLinkedin.value = ''
     regWebsite.value = ''
-    regLookingForTeam.value = false
-    regWantCreateTeam.value = false
     regTeamName.value = ''
     regTeamTracks.value = []
     regTeamGithubRepo.value = ''
     regTeamModel.value = ''
     regTeamHarness.value = ''
     regTeamProjectIdea.value = ''
-    regTeamLocked.value = false
   }
 })
 
@@ -203,7 +175,7 @@ async function submitRegister() {
     githubId: regGithubId.value,
     role: regRole.value,
     avatar: '',
-    themes: regWantCreateTeam.value ? regTeamTracks.value : [],
+    themes: regTeamTracks.value,
     preferredModel: '',
     bio: '',
     discord: regDiscord.value,
@@ -211,9 +183,9 @@ async function submitRegister() {
     telegram: regTelegram.value,
     linkedin: regLinkedin.value,
     website: regWebsite.value,
-    lookingForTeam: regLookingForTeam.value,
+    lookingForTeam: false,
   })
-  if (ok && regWantCreateTeam.value && regTeamName.value.trim()) {
+  if (ok && regTeamName.value.trim()) {
     await createTeam({
       name: regTeamName.value.trim(),
       avatar: '',
@@ -222,7 +194,7 @@ async function submitRegister() {
       model: regTeamModel.value,
       harness: regTeamHarness.value,
       projectIdea: regTeamProjectIdea.value.trim(),
-      locked: regTeamLocked.value,
+      locked: true,
       maxSize: null,
     })
   }
@@ -339,7 +311,7 @@ async function saveProfile() {
     telegram: profileTelegram.value,
     linkedin: profileLinkedin.value,
     website: profileWebsite.value,
-    lookingForTeam: profileLookingForTeam.value,
+    lookingForTeam: teamMemberFeaturesEnabled ? profileLookingForTeam.value : false,
     confirmedAttendance: profileRSVP.value,
   })
   profileLoading.value = false
@@ -411,7 +383,6 @@ async function saveProfile() {
             <button @click="showUserDropdown = !showUserDropdown" class="relative flex h-10 items-center gap-2 text-sm text-text-secondary transition-colors hover:text-text-primary">
               <span class="relative">
                 <img :src="assetUrl(user.avatar) || (user.githubId ? `https://avatars.githubusercontent.com/${user.githubId.replace('@', '')}` : assetUrl('/default-avatar.svg'))" class="w-7 h-7 rounded-full object-cover border border-border" />
-                <span v-if="pendingCount > 0" class="absolute -top-1 -right-1 flex h-5 min-w-5 items-center justify-center rounded-full border-2 border-bg-primary bg-accent-red px-1 text-xs font-bold leading-none text-white">{{ pendingCount }}</span>
               </span>
               <span class="max-w-[60px] xl:max-w-[80px] truncate text-xs">{{ user.name }}</span>
             </button>
@@ -427,9 +398,8 @@ async function saveProfile() {
                 <button @click="openProfileModal" class="w-full text-left px-4 py-2 text-sm text-text-tertiary hover:text-text-primary hover:bg-bg-elevated transition-colors">
                   {{ pick('My Profile', '我的资料') }}
                 </button>
-                <button v-if="isLoggedIn" @click="goToMyTeam(); showUserDropdown = false" class="w-full text-left px-4 py-2 text-sm text-text-tertiary hover:text-text-primary hover:bg-bg-elevated transition-colors flex items-center justify-between">
+                <button v-if="isLoggedIn" @click="goToMyTeam(); showUserDropdown = false" class="w-full text-left px-4 py-2 text-sm text-text-tertiary hover:text-text-primary hover:bg-bg-elevated transition-colors">
                   <span>{{ pick('My Team', '我的队伍') }}</span>
-                  <span v-if="pendingCount > 0" class="text-xs bg-accent-red text-white rounded-full px-1.5 py-0.5 leading-none">{{ pendingCount }}</span>
                 </button>
                 <a href="http://arc-bench.com/login" target="_blank" rel="noopener" class="block w-full px-4 py-2 text-left text-sm text-text-tertiary transition-colors hover:bg-bg-elevated hover:text-text-primary">
                   {{ pick('Login to ARC-Bench', '登录 ARC-Bench') }} ↗
@@ -606,6 +576,9 @@ async function saveProfile() {
 
           <!-- Register form -->
           <form v-else @submit.prevent="submitRegister" class="space-y-5">
+            <p class="border border-accent/30 bg-accent/5 p-3 text-sm font-semibold text-accent">
+              {{ pick('Create one account for the whole team. Teammates do not need separate accounts.', '每支队伍只需创建一个账号，队员无需各自注册。') }}
+            </p>
             <div>
               <label class="block text-sm text-text-secondary mb-1">{{ pick('Name', '姓名') }} <span class="text-accent-red">*</span></label>
               <input v-model="regName" type="text" required :placeholder="pick('Your name', '你的姓名')" :class="inputClass" />
@@ -633,10 +606,10 @@ async function saveProfile() {
             <div class="bg-accent/5 border border-accent/20 rounded-lg p-4">
               <div class="flex items-center gap-2 mb-2">
                 <svg class="w-4 h-4 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
-                <span class="text-sm font-medium text-text-primary">{{ pick('Connect with teammates', '方便队友联系你') }}</span>
+                <span class="text-sm font-medium text-text-primary">{{ pick('Team contact details', '队伍联系方式') }}</span>
                 <span class="text-xs text-accent bg-accent/10 px-1.5 py-0.5 rounded">{{ pick('recommended', '推荐填写') }}</span>
               </div>
-              <p class="text-xs text-text-tertiary mb-3">{{ pick('Add at least one way for teammates to reach you', '建议至少填写一种联系方式') }}</p>
+              <p class="text-xs text-text-tertiary mb-3">{{ pick('Add at least one way for the organizers to reach your team', '建议至少填写一种方便主办方联系队伍的方式') }}</p>
               <div class="space-y-3">
                 <div class="grid grid-cols-2 gap-3">
                   <div>
@@ -680,27 +653,7 @@ async function saveProfile() {
               </div>
             </div>
 
-            <label class="flex items-center gap-3 cursor-pointer">
-              <div class="relative">
-                <input type="checkbox" v-model="regLookingForTeam" class="sr-only peer" @change="regLookingForTeam && (regWantCreateTeam = false)" />
-                <div class="w-9 h-5 bg-border rounded-full peer-checked:bg-emerald-500 transition-colors"></div>
-                <div class="absolute left-0.5 top-0.5 w-4 h-4 bg-bg-card rounded-full shadow transition-transform peer-checked:translate-x-4"></div>
-              </div>
-              <span class="text-sm text-text-secondary">{{ pick('Looking for a team', '正在寻找队伍') }}</span>
-            </label>
-
-            <!-- Create team option -->
-            <div v-if="!regLookingForTeam">
-              <label class="flex items-center gap-3 cursor-pointer">
-                <div class="relative">
-                  <input type="checkbox" v-model="regWantCreateTeam" class="sr-only peer" />
-                  <div class="w-9 h-5 bg-border rounded-full peer-checked:bg-accent-blue transition-colors"></div>
-                  <div class="absolute left-0.5 top-0.5 w-4 h-4 bg-bg-card rounded-full shadow transition-transform peer-checked:translate-x-4"></div>
-                </div>
-                <span class="text-sm text-text-secondary">{{ pick('Create a team now', '现在创建队伍') }}</span>
-              </label>
-
-              <div v-if="regWantCreateTeam" class="mt-4 space-y-4 pl-4 border-l-2 border-accent-blue/30">
+            <div class="space-y-4 border-l-2 border-accent-blue/30 pl-4">
                 <div>
                   <label class="block text-sm text-text-secondary mb-1">{{ pick('Team Name', '队伍名称') }} <span class="text-accent-red">*</span></label>
                   <input v-model="regTeamName" type="text" required :placeholder="pick('e.g. Team Alpha', '例如：启航队')" :class="inputClass" />
@@ -742,28 +695,14 @@ async function saveProfile() {
                   <label class="block text-sm text-text-secondary mb-1">{{ pick('Project Idea (optional)', '项目想法（选填）') }}</label>
                   <input v-model="regTeamProjectIdea" type="text" :placeholder="pick('One sentence about your idea', '用一句话介绍你的想法')" :class="inputClass" />
                 </div>
-                <div>
-                  <label class="flex items-center gap-3 cursor-pointer">
-                    <div class="relative">
-                      <input type="checkbox" v-model="regTeamLocked" class="sr-only peer" />
-                      <div class="w-9 h-5 bg-border rounded-full peer-checked:bg-accent-blue transition-colors"></div>
-                      <div class="absolute left-0.5 top-0.5 w-4 h-4 bg-bg-card rounded-full shadow transition-transform peer-checked:translate-x-4"></div>
-                    </div>
-                    <span class="text-sm text-text-secondary">{{ pick('Lock team (no join requests)', '锁定队伍（不再接受加入申请）') }}</span>
-                  </label>
-                </div>
-              </div>
             </div>
 
             <div v-if="registerNeedsConfirm" class="p-4 bg-green-900/30 border border-green-500/30 text-green-300 text-sm text-center">
               {{ pick('A confirmation email has been sent to', '确认邮件已发送至') }} <strong>{{ confirmedEmail }}</strong>{{ pick('. Please check your inbox and click the link to activate your account.', '。请检查收件箱并点击邮件中的链接激活账号。') }}
             </div>
             <template v-else>
-              <p v-if="!regLookingForTeam && !regWantCreateTeam" class="text-xs text-badge-warning-text text-center -mt-2">
-                {{ pick('Please choose at least one:', '请至少选择一项：') }} <strong>{{ pick('Looking for a team', '正在寻找队伍') }}</strong> {{ pick('or', '或') }} <strong>{{ pick('Create a team now', '现在创建队伍') }}</strong>。
-              </p>
-              <button type="submit" :disabled="authLoading || (regWantCreateTeam && !regTeamName.trim()) || (!regLookingForTeam && !regWantCreateTeam)" class="w-full py-3 bg-btn-bg text-btn-text text-sm font-semibold tracking-widest uppercase hover:bg-btn-hover transition-colors disabled:opacity-50">
-                {{ authLoading ? pick('Registering...', '正在注册……') : regWantCreateTeam ? pick('Register & Create Team', '注册并创建队伍') : pick('Register', '注册') }}
+              <button type="submit" :disabled="authLoading || !regTeamName.trim()" class="w-full py-3 bg-btn-bg text-btn-text text-sm font-semibold tracking-widest uppercase hover:bg-btn-hover transition-colors disabled:opacity-50">
+                {{ authLoading ? pick('Registering...', '正在注册……') : pick('Register Team Account', '注册队伍账号') }}
               </button>
               <p class="text-center text-xs text-text-secondary">
                 {{ pick('Already have an account?', '已有账号？') }}
@@ -814,7 +753,7 @@ async function saveProfile() {
               <p v-if="user.website" class="text-sm text-text-secondary flex items-center gap-2"><svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/></svg> {{ user.website }}</p>
               <p v-if="!user.githubId && !user.discord && !user.twitter && !user.telegram && !user.linkedin && !user.website" class="text-xs text-text-muted italic">{{ pick('No social links added yet.', '尚未添加公开联系方式。') }}</p>
             </div>
-            <div v-if="user.lookingForTeam && !user.teamId" class="pt-3 border-t border-border-subtle text-xs text-emerald-400">{{ pick('Looking for a team', '正在寻找队伍') }}</div>
+            <div v-if="teamMemberFeaturesEnabled && user.lookingForTeam && !user.teamId" class="pt-3 border-t border-border-subtle text-xs text-emerald-400">{{ pick('Looking for a team', '正在寻找队伍') }}</div>
             <!-- API Credits (checked-in users with team only) -->
             <div v-if="user && user.checkedIn && user.teamId" class="pt-3 border-t border-border-subtle">
               <p class="text-xs text-text-muted uppercase tracking-wider mb-2">{{ pick('API Credits', 'API 额度') }}</p>
@@ -942,7 +881,7 @@ async function saveProfile() {
                 </div>
               </div>
             </div>
-            <label class="flex items-center gap-3 cursor-pointer">
+            <label v-if="teamMemberFeaturesEnabled" class="flex items-center gap-3 cursor-pointer">
               <div class="relative">
                 <input type="checkbox" v-model="profileLookingForTeam" class="sr-only peer" />
                 <div class="w-9 h-5 bg-border rounded-full peer-checked:bg-emerald-500 transition-colors"></div>
@@ -966,92 +905,21 @@ async function saveProfile() {
           <div class="relative bg-bg-card border border-border w-full max-w-md max-h-[80vh] overflow-y-auto">
             <button @click="showMyTeamModal = false" class="absolute top-4 right-4 text-text-secondary hover:text-text-primary">✕</button>
 
-            <!-- Leader 视图 -->
-            <template v-if="myTeam && myTeam.leaderId === user?.id">
-              <div class="p-6">
-                <h3 class="text-lg font-bold text-text-primary mb-1">{{ pick('My Team', '我的队伍') }} — {{ myTeam.name }}</h3>
-                <p class="text-xs text-text-tertiary mb-6">{{ pick('You are the team leader', '你是队长') }}</p>
-
-                <!-- 成员列表 -->
-                <div class="mb-6">
-                  <p class="text-xs text-text-muted uppercase tracking-wider mb-3 font-semibold">{{ pick('Members', '成员') }}（{{ myTeam.members.length }}）</p>
-                  <div class="space-y-2">
-                    <div v-for="m in myTeam.members" :key="m.id" class="flex items-center gap-3 p-2 bg-bg-elevated">
-                      <img :src="m.avatar || `https://avatars.githubusercontent.com/${m.githubId}`" class="w-8 h-8 rounded-full object-cover" />
-                      <span class="text-sm text-text-primary">{{ m.name }}</span>
-                      <span v-if="m.id === myTeam.leaderId" class="text-xs text-badge-warning-text">{{ pick('Lead', '队长') }}</span>
-                    </div>
-                  </div>
+            <div class="p-6">
+              <h3 class="text-lg font-bold text-text-primary mb-1">{{ pick('My Team', '我的队伍') }}</h3>
+              <template v-if="myTeam">
+                <div class="mt-5 flex items-center gap-4">
+                  <img :src="assetUrl(myTeam.avatar) || assetUrl('/default-team-avatar.svg')" class="h-12 w-12 rounded-[10px] object-cover" />
+                  <p class="font-bold text-text-primary">{{ myTeam.name }}</p>
                 </div>
-
-                <!-- 待审批 -->
-                <div v-if="myTeam.pendingUsers?.length">
-                  <p class="text-xs text-badge-warning-text uppercase tracking-wider mb-3 font-semibold">{{ pick('Pending Requests', '待处理申请') }}（{{ myTeam.pendingUsers.length }}）</p>
-                  <div class="space-y-2">
-                    <div v-for="pu in myTeam.pendingUsers" :key="pu.id" class="flex items-center justify-between gap-3 p-2 bg-bg-elevated border border-border-hover">
-                      <div class="flex items-center gap-3">
-                        <img :src="pu.avatar || `https://avatars.githubusercontent.com/${pu.githubId}`" class="w-8 h-8 rounded-full object-cover" />
-                        <div>
-                          <p class="text-sm text-text-primary">{{ pu.name }}</p>
-                          <p class="text-xs text-text-tertiary">{{ roleLabel(pu.role) }}</p>
-                        </div>
-                      </div>
-                      <div class="flex gap-2">
-                        <button @click="handleApprove(myTeam!.id, pu.id)" class="px-3 py-1 text-xs bg-btn-bg text-btn-text hover:bg-btn-hover transition-colors">{{ pick('Approve', '通过') }}</button>
-                        <button @click="handleReject(myTeam!.id, pu.id)" class="px-3 py-1 text-xs border border-border text-text-secondary hover:text-text-primary transition-colors">{{ pick('Decline', '拒绝') }}</button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div v-else class="text-sm text-text-tertiary">{{ pick('No pending requests.', '暂无待处理申请。') }}</div>
-              </div>
-            </template>
-
-            <!-- 成员/Pending 视图 -->
-            <template v-else>
-              <div class="p-6">
-                <h3 class="text-lg font-bold text-text-primary mb-6">{{ pick('My Team', '我的队伍') }}</h3>
-
-                <!-- 已加入的团队 -->
-                <div v-if="user?.teamId && myTeam" class="mb-6">
-                  <div class="flex items-center gap-4 mb-3">
-                    <img :src="assetUrl(myTeam.avatar) || assetUrl('/default-team-avatar.svg')" class="w-12 h-12 rounded-[10px] object-cover dark:invert" />
-                    <div>
-                      <p class="font-bold text-text-primary">{{ myTeam.name }}</p>
-                      <p class="text-xs text-emerald-500 mt-0.5">{{ pick('Member', '成员') }}</p>
-                    </div>
-                  </div>
-                  <div class="space-y-2">
-                    <div v-for="m in myTeam.members" :key="m.id" class="flex items-center gap-3 p-2 bg-bg-elevated">
-                      <img :src="m.avatar || `https://avatars.githubusercontent.com/${m.githubId}`" class="w-8 h-8 rounded-full object-cover" />
-                      <span class="text-sm text-text-primary">{{ m.name }}</span>
-                      <span v-if="m.id === myTeam.leaderId" class="text-xs text-badge-warning-text">{{ pick('Lead', '队长') }}</span>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Pending 申请列表 -->
-                <div v-if="myPendingTeams.length">
-                  <p class="text-xs text-text-muted uppercase tracking-wider mb-3 font-semibold">{{ pick('Pending Applications', '待审批申请') }}</p>
-                  <div class="space-y-3">
-                    <div v-for="t in myPendingTeams" :key="t.id" class="flex items-center justify-between gap-3 p-3 bg-bg-elevated border border-border-hover">
-                      <div class="flex items-center gap-3">
-                        <img :src="assetUrl(t.avatar) || assetUrl('/default-team-avatar.svg')" class="w-10 h-10 rounded-[8px] object-cover dark:invert" />
-                        <div>
-                          <p class="text-sm font-semibold text-text-primary">{{ t.name }}</p>
-                          <p class="text-xs text-badge-warning-text">{{ pick('Pending Approval', '等待审批') }}</p>
-                        </div>
-                      </div>
-                      <button @click="handleCancelJoin(t.id)" class="text-xs text-text-tertiary hover:text-accent-red transition-colors">{{ pick('Cancel', '取消') }}</button>
-                    </div>
-                  </div>
-                </div>
-
-                <div v-if="!user?.teamId && !myPendingTeams.length" class="text-sm text-text-tertiary">
-                  {{ pick("You haven't joined or applied to any team yet.", '你尚未加入或申请任何队伍。') }}
-                </div>
-              </div>
-            </template>
+                <p class="mt-5 border border-accent/30 bg-accent/5 p-3 text-sm text-text-secondary">
+                  {{ pick('This account represents the whole team. Teammates do not need separate accounts.', '这个账号代表整支队伍，队员无需各自注册账号。') }}
+                </p>
+              </template>
+              <p v-else class="mt-5 text-sm text-text-tertiary">
+                {{ pick('No team has been registered with this account yet.', '这个账号还没有注册队伍。') }}
+              </p>
+            </div>
           </div>
         </div>
       </Transition>

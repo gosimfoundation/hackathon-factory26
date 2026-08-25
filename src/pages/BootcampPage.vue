@@ -193,7 +193,7 @@ const purposes = [
 
       <section>
         <h2>{{ isEn ? '5. Do I have to attend?' : '5. 必须参加吗？' }}</h2>
-        <p>{{ isEn ? 'No. The bootcamp is encouraged but never required, and attendance is not part of the scoring in any form. Registration for the series is complete once you create or join a team; the bootcamp sits outside that.' : '不必。研习营鼓励参加，但从不作要求，出席情况也不以任何形式计入评分。报名在你创建或加入一支队伍时即完成，研习营在这之外。' }}</p>
+        <p>{{ isEn ? 'No. The bootcamp is encouraged but never required, and attendance is not part of the scoring in any form. Registration for the series is complete once your team account and team record are created; the bootcamp sits outside that.' : '不必。研习营鼓励参加，但从不作要求，出席情况也不以任何形式计入评分。创建队伍账号和队伍资料后即完成报名，研习营在这之外。' }}</p>
         <p>{{ isEn ? 'If you already know how you intend to build your harness, going straight to the qualifier is a perfectly good plan. If you do not, session 01 is the one to watch.' : '如果你已经清楚自己的 Harness 打算怎么搭，直接去打初赛完全没问题。如果还不清楚，第 01 讲是最该看的那一讲。' }}</p>
       </section>
 

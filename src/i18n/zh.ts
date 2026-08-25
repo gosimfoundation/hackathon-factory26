@@ -345,9 +345,9 @@ export default {
   teams: {
     title: "已注册",
     titleAccent: "队伍",
-    subtitle: "报名已开放。点击队伍加入，或创建你自己的队伍。",
-    registerNote: "加入或创建队伍后才算完成报名。9 月 7 日研习营开营。",
-    registerWarn: "请勿重复注册，否则可能影响参赛资格。",
+    subtitle: "报名已开放。请为整支队伍创建一个共用账号。",
+    registerNote: "每支队伍只需一个账号，队员无需各自注册。9 月 7 日研习营开营。",
+    registerWarn: "同一支队伍请勿重复创建账号。",
     refresh: "刷新",
     teams: "队伍",
     registerBtn: "注册你的队伍",

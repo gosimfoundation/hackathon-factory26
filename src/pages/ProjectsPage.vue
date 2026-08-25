@@ -10,30 +10,15 @@ const loading = ref(true)
 onMounted(async () => {
   const { data: subs } = await supabase.from('submissions').select('team_id, round, github_url, trace_url, demo_url, submitted_at')
   const { data: teams } = await supabase.from('teams').select('id, name, model, avatar, project_idea')
-  const { data: profiles } = await supabase.from('profiles').select('name, avatar, github_id, team_id')
 
   const teamMap = Object.fromEntries((teams || []).map(t => [t.id, t]))
-  const memberMap: Record<string, any[]> = {}
-  for (const p of profiles || []) {
-    if (p.team_id) {
-      if (!memberMap[p.team_id]) memberMap[p.team_id] = []
-      memberMap[p.team_id].push(p)
-    }
-  }
 
   projects.value = (subs || []).map(s => ({
     ...s,
     team: teamMap[s.team_id],
-    members: memberMap[s.team_id] || [],
   })).sort((a, b) => (a.team?.name || '').localeCompare(b.team?.name || ''))
   loading.value = false
 })
-
-function avatarUrl(p: any): string {
-  if (p.avatar) return p.avatar
-  if (p.github_id) return `https://avatars.githubusercontent.com/${p.github_id}`
-  return `https://ui-avatars.com/api/?name=${encodeURIComponent(p.name || '?')}&background=1f2937&color=fff&size=64`
-}
 </script>
 
 <template>
@@ -62,11 +47,6 @@ function avatarUrl(p: any): string {
               </div>
               <p v-if="p.team?.project_idea" class="text-sm text-text-secondary mb-2 line-clamp-2">{{ p.team.project_idea }}</p>
               <p class="text-xs text-accent truncate mb-2">{{ p.github_url }}</p>
-              <div class="flex items-center gap-1">
-                <img v-for="m in p.members.slice(0, 5)" :key="m.name" :src="avatarUrl(m)" :title="m.name"
-                  class="w-6 h-6 rounded-full object-cover border border-border -ml-1 first:ml-0" />
-                <span class="text-[10px] text-text-muted ml-1">{{ p.members.length }} {{ pick(p.members.length === 1 ? 'member' : 'members', '名成员') }}</span>
-              </div>
             </div>
             <svg class="w-5 h-5 text-text-muted shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
           </div>

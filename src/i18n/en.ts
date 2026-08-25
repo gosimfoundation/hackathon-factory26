@@ -240,9 +240,9 @@ export default {
     pending: 'Additional sponsor acknowledgements will appear after authorization is confirmed.',
   },
   teams: {
-    title: 'Registered', titleAccent: 'Teams', subtitle: 'Registration is open. Click a team to join, or create your own.',
-    registerNote: 'You complete registration only after joining or creating a team. The bootcamp begins September 7.',
-    registerWarn: 'Please register only once — duplicate accounts may affect eligibility.',
+    title: 'Registered', titleAccent: 'Teams', subtitle: 'Registration is open. Create one shared account for your whole team.',
+    registerNote: 'One team needs only one account. Teammates do not need separate accounts. The bootcamp begins September 7.',
+    registerWarn: 'Please do not create duplicate accounts for the same team.',
     refresh: 'Refresh', teams: 'teams', registerBtn: 'Register Your Team', closedBtn: 'Registration Closed', noTeams: 'No teams registered yet. Be the first!', createTitle: 'Register Your Team',
     teamName: 'Team Name', teamAvatar: 'Team Avatar', githubRepo: 'GitHub Repository', members: 'Members',
     track: 'Capability Domains', aiModels: 'Open-Source Models You Plan to Use', harness: 'Which harness do you plan to use?', harnessOptions: ['Octos', 'HAgency', 'ARC', 'Claude Code', 'Custom', 'Other'], projectIdea: 'Project Idea', optional: '(optional)',

@@ -5,7 +5,6 @@ import { provideTheme } from './composables/useTheme'
 import AppHeader from './components/layout/AppHeader.vue'
 import AppFooter from './components/layout/AppFooter.vue'
 import AnnouncementBanner from './components/effects/AnnouncementBanner.vue'
-import InvitationsModal from './components/effects/InvitationsModal.vue'
 
 const { pick } = provideI18n()
 provideAuth(pick)
@@ -17,5 +16,4 @@ provideTheme()
   <AnnouncementBanner />
   <router-view />
   <AppFooter />
-  <InvitationsModal />
 </template>

@@ -9,6 +9,8 @@ import { API_BASE, assetUrl } from '../../composables/api'
 
 const { t, pick, roleLabel, trackLabel } = useI18n()
 const { user, isLoggedIn, promptAuth } = useAuth()
+// Registration currently uses one shared account per team.
+const teamMemberFeaturesEnabled = false
 // GitHub avatar helper
 function getGitHubAvatar(githubId?: string): string {
   if (!githubId) return assetUrl('/default-avatar.svg')
@@ -17,15 +19,13 @@ function getGitHubAvatar(githubId?: string): string {
 
 
 const {
-  teams, users, totalMembers, totalRegistered, isFull, cancelJoin, kickMember,
+  teams, users, isFull, cancelJoin, kickMember,
   modelStats, loading, error, lastUpdated,
   fetchTeams, createTeam, editTeam, joinTeam, leaveTeam, likeTeam, approveJoin, rejectJoin
 } = useTeams()
 
 // Animated counters
 const teamsCount = useCountUp(computed(() => teams.value.length))
-const membersCount = useCountUp(totalMembers)
-const registeredCount = useCountUp(totalRegistered)
 
 // Like tracking (localStorage)
 const likedTeams = ref<Set<string>>(new Set(JSON.parse(localStorage.getItem('likedTeams') || '[]')))
@@ -77,15 +77,9 @@ function timeAgoFromString(iso: string) {
   return pick(`${Math.floor(secs / 86400)}d ago`, `${Math.floor(secs / 86400)} 天前`)
 }
 
-// Recent activity for ticker: newest user + newest team
+// Recent activity only shows team registrations while member features are hidden.
 const recentActivity = computed(() => {
   const events: { text: string; time: string }[] = []
-  const recentUsers = [...users.value].sort((a, b) =>
-    new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()
-  ).slice(0, 3)
-  for (const u of recentUsers) {
-    if (u.createdAt) events.push({ text: pick(`${u.name} just joined`, `${u.name} 刚刚加入`), time: timeAgoFromString(u.createdAt) })
-  }
   const recentTeams = [...teams.value].sort((a: any, b: any) =>
     new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()
   ).slice(0, 2)
@@ -252,8 +246,8 @@ async function submitCreate() {
     model: selectedModel.value,
     harness: selectedHarness.value,
     projectIdea: projectIdea.value,
-    locked: teamLocked.value,
-    maxSize: maxSize.value,
+    locked: true,
+    maxSize: null,
   })
   if (ok) {
     showModal.value = false
@@ -271,8 +265,8 @@ async function submitEdit() {
     model: selectedModel.value,
     harness: selectedHarness.value,
     projectIdea: projectIdea.value,
-    locked: teamLocked.value,
-    maxSize: maxSize.value,
+    locked: true,
+    maxSize: null,
   })
   if (ok) {
     showModal.value = false
@@ -346,7 +340,7 @@ async function handleKickMember(teamId: string, userId: string, userName: string
 
 async function handleDeleteTeam() {
   if (!viewingTeam.value) return
-  if (!confirm(pick(`Disband team "${viewingTeam.value.name}"? All members will be removed and this cannot be undone.`, `确定解散队伍“${viewingTeam.value.name}”吗？所有成员都会被移除，且此操作无法撤销。`))) return
+  if (!confirm(pick(`Delete team "${viewingTeam.value.name}"? This cannot be undone.`, `确定删除队伍“${viewingTeam.value.name}”吗？此操作无法撤销。`))) return
   const ok = await leaveTeam(viewingTeam.value.id)
   if (ok) {
     showModal.value = false
@@ -359,7 +353,7 @@ function getModelIcon(model: string) {
 }
 
 function canJoin(team: Team) {
-  return !team.locked && !isFull.value
+  return teamMemberFeaturesEnabled && !team.locked && !isFull.value
 }
 
 function isTeamMember(team: Team): boolean {
@@ -373,10 +367,7 @@ function isTeamLeader(team: Team): boolean {
 }
 
 function userHasTeam(): boolean {
-  if (!user.value) return false
-  if (user.value.teamId) return true
-  // 有任何 pending 申请也算"已绑定"，不能再创建/加入其他队
-  return teams.value.some(t => t.pendingJoins?.includes(user.value!.id))
+  return Boolean(user.value?.teamId)
 }
 
 // function repoName(url: string) {
@@ -395,12 +386,8 @@ function handleOpenMyTeam(e: Event) {
 
 function openMyTeamFromButton() {
   if (!user.value) return
-  // 先找已加入的队伍
-  const joined = teams.value.find(t => t.members?.some(m => m.id === user.value!.id))
+  const joined = teams.value.find(t => t.id === user.value!.teamId)
   if (joined) { openViewModal(joined); return }
-  // 再找 pending 的队伍
-  const pending = teams.value.find(t => t.pendingJoins?.includes(user.value!.id))
-  if (pending) { openViewModal(pending); return }
 }
 
 function openMyProfile() {
@@ -477,9 +464,7 @@ onUnmounted(() => window.removeEventListener('open-my-team', handleOpenMyTeam))
         <div class="flex justify-between text-sm mb-3">
           <span class="text-text-secondary inline-flex items-center gap-1">
             <img :src="tw.fire" class="w-4 h-4" />
-            <span class="text-text-primary font-bold tabular-nums">{{ teamsCount }}</span> {{ t('teams.teams') }} ·
-            <span class="text-text-primary font-bold tabular-nums">{{ membersCount }}</span> {{ pick('in teams', '已加入队伍') }} ·
-            <span class="text-text-primary font-bold tabular-nums">{{ registeredCount }}</span> {{ pick('registered', '已注册') }}
+            <span class="text-text-primary font-bold tabular-nums">{{ teamsCount }}</span> {{ pick('registered teams', '支已注册队伍') }}
           </span>
         </div>
         <div class="flex gap-6 mt-6">
@@ -543,11 +528,10 @@ onUnmounted(() => window.removeEventListener('open-my-team', handleOpenMyTeam))
                 </div>
               </div>
             </div>
-            <span class="text-xs font-mono text-text-muted shrink-0 bg-bg-elevated/80 px-2 py-1 rounded inline-flex items-center gap-1"><img :src="tw.eyes" class="w-3.5 h-3.5" />{{ getTeamMembers(team.id).length }}</span>
           </div>
 
           <!-- Member slots grid -->
-          <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-4">
+          <div v-if="teamMemberFeaturesEnabled" class="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-4">
             <div v-for="member in getTeamMembers(team.id)" :key="member.id" @click.stop="openUserProfile(member)" class="flex items-center gap-2 px-3 py-2.5 bg-bg-elevated/60 border border-border-subtle rounded-lg cursor-pointer hover:border-accent/40 transition-colors">
               <img :src="assetUrl(member.avatar) || getGitHubAvatar(member.githubId)" class="w-7 h-7 rounded-full shrink-0 object-cover" />
               <div class="min-w-0">
@@ -563,7 +547,7 @@ onUnmounted(() => window.removeEventListener('open-my-team', handleOpenMyTeam))
               <a v-if="team.githubRepo" :href="team.githubRepo" target="_blank" @click.stop class="inline-flex items-center gap-1 text-xs text-text-secondary hover:text-accent transition-colors">
                 <img :src="tw.link" class="w-3.5 h-3.5" /> {{ pick('Repo', '仓库') }}
               </a>
-              <span v-if="team.locked" class="inline-flex items-center gap-0.5 text-xs text-text-muted">
+              <span v-if="teamMemberFeaturesEnabled && team.locked" class="inline-flex items-center gap-0.5 text-xs text-text-muted">
                 <img :src="tw.lock" class="w-3 h-3" /> {{ pick('Locked', '已锁定') }}
               </span>
             </div>
@@ -684,13 +668,13 @@ onUnmounted(() => window.removeEventListener('open-my-team', handleOpenMyTeam))
                     <textarea v-model="projectIdea" rows="2" :placeholder="pick('Briefly describe what you plan to build...', '简要描述你计划构建的内容……')" :class="[inputClass, 'resize-none']"></textarea>
                   </div>
 
-                  <!-- Advanced options toggle -->
-                  <button type="button" @click="showAdvanced = !showAdvanced" class="flex items-center gap-1 text-xs text-text-tertiary hover:text-text-secondary transition-colors">
+                  <!-- Team-member settings are hidden while one account represents the whole team. -->
+                  <button v-if="teamMemberFeaturesEnabled" type="button" @click="showAdvanced = !showAdvanced" class="flex items-center gap-1 text-xs text-text-tertiary hover:text-text-secondary transition-colors">
                     <span>{{ showAdvanced ? '▲' : '▼' }}</span>
                     <span>{{ showAdvanced ? pick('Hide advanced options', '收起高级选项') : pick('More options', '更多选项') }}</span>
                   </button>
 
-                  <div v-if="showAdvanced" class="space-y-5">
+                  <div v-if="teamMemberFeaturesEnabled && showAdvanced" class="space-y-5">
                     <!-- Lock toggle -->
                     <label class="flex items-center gap-3 cursor-pointer">
                       <div class="relative">
@@ -786,13 +770,13 @@ onUnmounted(() => window.removeEventListener('open-my-team', handleOpenMyTeam))
                   <textarea v-model="projectIdea" rows="2" :placeholder="pick('Briefly describe what you plan to build...', '简要描述你计划构建的内容……')" :class="[inputClass, 'resize-none']"></textarea>
                 </div>
 
-                <!-- Advanced options toggle -->
-                <button type="button" @click="showAdvanced = !showAdvanced" class="flex items-center gap-1 text-xs text-text-tertiary hover:text-text-secondary transition-colors">
+                <!-- Team-member settings are hidden while one account represents the whole team. -->
+                <button v-if="teamMemberFeaturesEnabled" type="button" @click="showAdvanced = !showAdvanced" class="flex items-center gap-1 text-xs text-text-tertiary hover:text-text-secondary transition-colors">
                   <span>{{ showAdvanced ? '▲' : '▼' }}</span>
                   <span>{{ showAdvanced ? pick('Hide advanced options', '收起高级选项') : pick('More options', '更多选项') }}</span>
                 </button>
 
-                <div v-if="showAdvanced" class="space-y-5">
+                <div v-if="teamMemberFeaturesEnabled && showAdvanced" class="space-y-5">
                   <!-- Lock toggle -->
                   <label class="flex items-center gap-3 cursor-pointer">
                     <div class="relative">
@@ -819,7 +803,7 @@ onUnmounted(() => window.removeEventListener('open-my-team', handleOpenMyTeam))
                 <img :src="assetUrl(viewingTeam.avatar) || assetUrl('/default-avatar.svg')" class="w-16 h-16 rounded-[10px] object-cover border border-border" />
                 <div>
                   <h3 class="text-2xl font-bold text-text-primary">{{ viewingTeam.name }}</h3>
-                  <div class="flex items-center gap-2 mt-1">
+                  <div v-if="teamMemberFeaturesEnabled" class="flex items-center gap-2 mt-1">
                     <span class="text-sm text-text-secondary">{{ getTeamMembers(viewingTeam.id).length }} {{ pick('members', '名成员') }}</span>
                     <span v-if="viewingTeam.locked" class="inline-flex items-center gap-0.5 rounded bg-badge-neutral-bg px-1.5 py-0.5 text-xs text-text-tertiary">
                       <svg class="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" /></svg>
@@ -855,7 +839,7 @@ onUnmounted(() => window.removeEventListener('open-my-team', handleOpenMyTeam))
               </div>
 
               <!-- Members -->
-              <div class="mb-6">
+              <div v-if="teamMemberFeaturesEnabled" class="mb-6">
                 <p class="text-xs text-text-muted uppercase tracking-wider mb-3 font-semibold">{{ t('teams.membersLabel') }}</p>
                 <div class="space-y-3">
                   <div v-for="member in getTeamMembers(viewingTeam.id)" :key="member.id" class="flex items-center gap-3 p-3 bg-bg-elevated">
@@ -893,6 +877,7 @@ onUnmounted(() => window.removeEventListener('open-my-team', handleOpenMyTeam))
                   {{ viewingTeam.likes || 0 }}
                 </button>
 
+                <template v-if="teamMemberFeaturesEnabled">
                 <!-- Join: logged in, team open, user has no team -->
                 <button
                   v-if="isLoggedIn && canJoin(viewingTeam) && !userHasTeam() && !hasPendingRequest(viewingTeam)"
@@ -924,10 +909,11 @@ onUnmounted(() => window.removeEventListener('open-my-team', handleOpenMyTeam))
                 <span v-else-if="viewingTeam.locked" class="flex-[2] py-3 text-center text-sm text-text-muted border border-border">
                   {{ t('teams.notAccepting') }}
                 </span>
+                </template>
               </div>
 
               <!-- Member actions: leave -->
-              <div v-if="isLoggedIn && isTeamMember(viewingTeam) && !isTeamLeader(viewingTeam)" class="mt-3">
+              <div v-if="teamMemberFeaturesEnabled && isLoggedIn && isTeamMember(viewingTeam) && !isTeamLeader(viewingTeam)" class="mt-3">
                 <button
                   @click="handleLeaveTeam"
                   :disabled="loading"
@@ -938,7 +924,7 @@ onUnmounted(() => window.removeEventListener('open-my-team', handleOpenMyTeam))
               </div>
 
               <!-- Pending join requests (leader only) -->
-              <div v-if="isLoggedIn && isTeamLeader(viewingTeam) && viewingTeam.pendingUsers?.length" class="mt-4 p-4 border border-border-hover bg-badge-warning-bg/30">
+              <div v-if="teamMemberFeaturesEnabled && isLoggedIn && isTeamLeader(viewingTeam) && viewingTeam.pendingUsers?.length" class="mt-4 p-4 border border-border-hover bg-badge-warning-bg/30">
                 <p class="text-xs text-badge-warning-text uppercase tracking-wider mb-3 font-semibold">{{ pick('Pending Requests', '待处理申请') }}（{{ viewingTeam.pendingUsers.length }}）</p>
                 <div class="space-y-2">
                   <div v-for="pu in viewingTeam.pendingUsers" :key="pu.id" class="flex items-center justify-between gap-3">
@@ -974,7 +960,7 @@ onUnmounted(() => window.removeEventListener('open-my-team', handleOpenMyTeam))
 
               <!-- Leader leave (dissolve note) -->
               <div v-if="isLoggedIn && isTeamLeader(viewingTeam)" class="mt-2">
-                <p class="text-center text-xs text-text-secondary">{{ pick('As team leader, delete the team to leave.', '队长需要解散队伍后才能退出。') }}</p>
+                <p class="text-center text-xs text-text-secondary">{{ pick('Deleting the team removes its registration.', '删除队伍后将取消该队伍的报名。') }}</p>
               </div>
             </template>
           </div>
@@ -985,7 +971,7 @@ onUnmounted(() => window.removeEventListener('open-my-team', handleOpenMyTeam))
     <!-- User Profile Modal (read-only, for viewing others) -->
     <Teleport to="body">
       <Transition enter-active-class="transition-opacity duration-200" enter-from-class="opacity-0" leave-active-class="transition-opacity duration-150" leave-to-class="opacity-0">
-        <div v-if="showUserProfileModal && viewingUser" class="fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <div v-if="teamMemberFeaturesEnabled && showUserProfileModal && viewingUser" class="fixed inset-0 z-[100] flex items-center justify-center p-4">
           <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" @click="showUserProfileModal = false" />
           <div class="relative w-full max-w-sm p-8 bg-bg-primary border border-border shadow-2xl max-h-[90vh] overflow-y-auto">
             <button @click="showUserProfileModal = false" class="absolute top-4 right-4 text-text-secondary hover:text-text-primary">
