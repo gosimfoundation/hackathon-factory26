@@ -24,15 +24,17 @@ const {
   fetchTeams, createTeam, editTeam, joinTeam, leaveTeam, likeTeam, approveJoin, rejectJoin
 } = useTeams()
 
-// Animated counters
-const teamsCount = useCountUp(computed(() => teams.value.length))
-
 // Like tracking (localStorage)
 const likedTeams = ref<Set<string>>(new Set(JSON.parse(localStorage.getItem('likedTeams') || '[]')))
 
 async function handleLike(teamId: string, e: Event) {
   e.stopPropagation()
   if (likedTeams.value.has(teamId)) return
+  if (showcaseTeams.value.some(team => team.id === teamId)) {
+    likedTeams.value.add(teamId)
+    localStorage.setItem('likedTeams', JSON.stringify([...likedTeams.value]))
+    return
+  }
   const ok = await likeTeam(teamId)
   if (ok) {
     likedTeams.value.add(teamId)
@@ -40,58 +42,140 @@ async function handleLike(teamId: string, e: Event) {
   }
 }
 
-// Theme filter (shared)
-const filteredTeams = computed(() => {
-  if (!teamFilter.value) return teams.value
-  return teams.value.filter(team => (team.themes || []).some(th => th.includes(teamFilter.value)))
-})
+type DisplayTeam = Team & { isShowcase?: boolean }
 
-// Static examples are deliberately kept out of Supabase and the registration count.
-// They demonstrate what a completed team card can look like without posing as entrants.
-const demoTeams = computed(() => [
+// Showcase teams live only in the UI, so registration totals and admin data stay accurate.
+const showcaseTeams = computed<DisplayTeam[]>(() => [
   {
-    id: 'demo-01',
-    name: 'DEMO 01 · Agent Forge',
+    id: 'showcase-run-it-first',
+    name: '先跑起来再说',
+    leaderId: '',
+    avatar: '',
+    githubRepo: '',
     model: 'Kimi',
+    harness: '',
     themes: ['repository-lifecycle', 'pull-request-review'],
-    projectIdea: pick('An agent workflow for planning and reviewing repository changes.', '用于规划和审查代码仓库变更的智能体工作流。'),
+    projectIdea: pick("We kept losing context between issues and PRs, so we're teaching an agent to remember the whole thread.", '我们总在 Issue 和 PR 之间丢上下文，所以想做个能一路记住来龙去脉的智能体。'),
+    locked: true,
+    maxSize: null,
+    likes: 0,
+    members: [],
+    createdAt: '',
+    isShowcase: true,
   },
   {
-    id: 'demo-02',
-    name: 'DEMO 02 · Merge Pilot',
+    id: 'showcase-404',
+    name: '404 Not Found',
+    leaderId: '',
+    avatar: '',
+    githubRepo: '',
     model: 'GLM',
-    themes: ['issues-forms', 'pull-request-review'],
-    projectIdea: pick('A review assistant that turns issue context into focused pull-request feedback.', '把 Issue 背景转化为精准 PR 反馈的审查助手。'),
+    harness: '',
+    themes: [],
+    projectIdea: pick('TBD. Still figuring it out.', '还没想好，TBD。'),
+    locked: true,
+    maxSize: null,
+    likes: 0,
+    members: [],
+    createdAt: '',
+    isShowcase: true,
   },
   {
-    id: 'demo-03',
-    name: 'DEMO 03 · Repo Garden',
+    id: 'showcase-copy-paste',
+    name: 'Ctrl C + Ctrl V',
+    leaderId: '',
+    avatar: '',
+    githubRepo: '',
     model: 'MiniMax',
-    themes: ['repository-lifecycle', 'org-permissions-audit'],
-    projectIdea: pick('A maintenance harness for keeping repositories healthy over time.', '让代码仓库长期保持健康的维护型 Harness。'),
+    harness: '',
+    themes: ['repository-lifecycle'],
+    projectIdea: pick('Probably some repo cleanup stuff.', '大概做点仓库清理相关的东西。'),
+    locked: true,
+    maxSize: null,
+    likes: 0,
+    members: [],
+    createdAt: '',
+    isShowcase: true,
   },
   {
-    id: 'demo-04',
-    name: 'DEMO 04 · Action Relay',
+    id: 'showcase-nanshan-night-owls',
+    name: '南山夜猫子',
+    leaderId: '',
+    avatar: '',
+    githubRepo: '',
     model: 'DeepSeek',
+    harness: '',
     themes: ['actions-workflow', 'compute-engine'],
-    projectIdea: pick('A resilient agent that diagnoses and repairs failing CI workflows.', '诊断并修复 CI 工作流故障的可靠智能体。'),
+    projectIdea: pick('CI red again? This agent reads the logs, tries a small fix, and checks whether the build goes green.', 'CI 又红了？让它先读日志、试个小修复，再看看构建能不能变绿。'),
+    locked: true,
+    maxSize: null,
+    likes: 0,
+    members: [],
+    createdAt: '',
+    isShowcase: true,
   },
   {
-    id: 'demo-05',
-    name: 'DEMO 05 · Session Smith',
+    id: 'showcase-good-enough',
+    name: '差不多得了',
+    leaderId: '',
+    avatar: '',
+    githubRepo: '',
     model: 'Other',
-    themes: ['auth-session', 'org-permissions-audit'],
-    projectIdea: pick('An auditable approach to authentication and permission changes.', '可审计的身份验证与权限变更方案。'),
+    harness: '',
+    themes: [],
+    projectIdea: pick('No idea yet. TBD.', '暂时没想好。TBD。'),
+    locked: true,
+    maxSize: null,
+    likes: 0,
+    members: [],
+    createdAt: '',
+    isShowcase: true,
   },
   {
-    id: 'demo-06',
-    name: 'DEMO 06 · Harness Lab',
+    id: 'showcase-ship-it',
+    name: 'Ship It!',
+    leaderId: '',
+    avatar: '',
+    githubRepo: '',
     model: 'Kimi',
-    themes: ['compute-engine', 'actions-workflow'],
-    projectIdea: pick('A reusable harness for evaluating software-building agents.', '用于评估软件构建智能体的可复用 Harness。'),
+    harness: '',
+    themes: ['compute-engine'],
+    projectIdea: pick('Testing a few coding agents.', '拿几个编程智能体跑跑看。'),
+    locked: true,
+    maxSize: null,
+    likes: 0,
+    members: [],
+    createdAt: '',
+    isShowcase: true,
   },
 ])
+
+// The public registry count includes the six showcase teams displayed in the grid.
+const teamsCount = useCountUp(computed(() => teams.value.length + showcaseTeams.value.length))
+
+// A deterministic shuffle keeps the grid mixed without cards jumping on every update.
+function teamOrderScore(id: string): number {
+  let hash = 2166136261
+  for (const char of `factory26:${id}`) {
+    hash ^= char.charCodeAt(0)
+    hash = Math.imul(hash, 16777619)
+  }
+  return hash >>> 0
+}
+
+// Theme filter (shared) applies equally to registered and showcase teams.
+const filteredTeams = computed<DisplayTeam[]>(() => {
+  const mixedTeams: DisplayTeam[] = [...teams.value, ...showcaseTeams.value]
+  const visibleTeams = teamFilter.value
+    ? mixedTeams.filter(team => (team.themes || []).some(theme => theme.includes(teamFilter.value)))
+    : mixedTeams
+  return [...visibleTeams].sort((a, b) => teamOrderScore(a.id) - teamOrderScore(b.id))
+})
+
+function teamLikeCount(team: DisplayTeam): number {
+  const localShowcaseLike = team.isShowcase && likedTeams.value.has(team.id) ? 1 : 0
+  return (team.likes || 0) + localShowcaseLike
+}
 
 // Get members for a team from users array
 function getTeamMembers(teamId: string): User[] {
@@ -598,7 +682,7 @@ onUnmounted(() => window.removeEventListener('open-my-team', handleOpenMyTeam))
               :class="likedTeams.has(team.id) ? 'text-red-500' : 'text-text-muted hover:text-red-400'"
             >
               <img :src="tw.heart" class="w-4 h-4" :class="likedTeams.has(team.id) ? '' : 'opacity-30 grayscale'" />
-              {{ team.likes || 0 }}
+              {{ teamLikeCount(team) }}
             </button>
           </div>
 
@@ -607,48 +691,8 @@ onUnmounted(() => window.removeEventListener('open-my-team', handleOpenMyTeam))
         </div>
       </div>
 
-      <div v-if="!teams.length" class="text-center py-16">
+      <div v-if="!filteredTeams.length" class="text-center py-16">
         <p class="text-text-secondary">{{ t('teams.noTeams') }}</p>
-      </div>
-
-      <!-- Clearly labelled examples: never mixed with real registrations. -->
-      <div class="mt-20 pt-10 border-t border-border reveal">
-        <div class="max-w-3xl mb-8">
-          <span class="font-mono text-[11px] uppercase tracking-[.18em] text-accent">{{ pick('Demo · Not registered', '示例 · 非真实报名') }}</span>
-          <h3 class="mt-3 text-2xl md:text-3xl font-bold text-text-primary">{{ pick('Example team cards', '队伍展示示例') }}</h3>
-          <p class="mt-3 text-sm text-text-secondary leading-relaxed">
-            {{ pick('These six cards are layout examples only. They are not registered teams and are not included in the live count above.', '以下六张卡片仅为展示示例，不属于已注册队伍，也不计入上方的实时报名数量。') }}
-          </p>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <article
-            v-for="team in demoTeams"
-            :key="team.id"
-            class="team-card p-6 pt-7 relative flex flex-col overflow-hidden opacity-80"
-          >
-            <div class="absolute top-0 left-0 right-0 h-[2px] bg-border-strong"></div>
-            <div class="flex items-center justify-between gap-4 mb-4">
-              <div class="flex items-center gap-3 min-w-0">
-                <img :src="assetUrl('/default-team-avatar.svg')" class="w-12 h-12 rounded-full shrink-0 object-cover border-2 border-border dark:invert" alt="" />
-                <div class="min-w-0">
-                  <h4 class="font-bold text-text-primary text-base truncate">{{ team.name }}</h4>
-                  <div class="flex items-center gap-1.5 mt-1">
-                    <template v-for="theme in team.themes" :key="theme">
-                      <img v-if="getTrackIcon(theme)" :src="getTrackIcon(theme)" class="w-5 h-5" :title="getTrackLabel(theme)" />
-                    </template>
-                  </div>
-                </div>
-              </div>
-              <span class="shrink-0 border border-border px-2 py-1 font-mono text-[10px] uppercase tracking-wider text-text-muted">DEMO</span>
-            </div>
-            <p class="text-xs text-text-secondary leading-relaxed flex items-start gap-1.5">
-              <img :src="tw.bulb" class="w-3.5 h-3.5 shrink-0 mt-0.5" alt="" />
-              {{ team.projectIdea }}
-            </p>
-            <div class="mt-4 pt-3 border-t border-border-subtle text-[11px] text-text-muted">{{ team.model }}</div>
-          </article>
-        </div>
       </div>
     </div>
 
@@ -955,7 +999,7 @@ onUnmounted(() => window.removeEventListener('open-my-team', handleOpenMyTeam))
                   :class="likedTeams.has(viewingTeam.id) ? 'border-accent-red/30 bg-badge-danger-bg text-red-500' : 'border-border text-text-secondary hover:border-border-hover'"
                 >
                   <svg class="w-4 h-4" :fill="likedTeams.has(viewingTeam.id) ? 'currentColor' : 'none'" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" /></svg>
-                  {{ viewingTeam.likes || 0 }}
+                  {{ teamLikeCount(viewingTeam) }}
                 </button>
 
                 <template v-if="teamMemberFeaturesEnabled">
