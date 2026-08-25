@@ -20,7 +20,7 @@ function getGitHubAvatar(githubId?: string): string {
 
 const {
   teams, users, isFull, cancelJoin, kickMember,
-  modelStats, loading, error, lastUpdated,
+  loading, error, lastUpdated,
   fetchTeams, createTeam, editTeam, joinTeam, leaveTeam, likeTeam, approveJoin, rejectJoin
 } = useTeams()
 
@@ -466,12 +466,6 @@ onUnmounted(() => window.removeEventListener('open-my-team', handleOpenMyTeam))
             <img :src="tw.fire" class="w-4 h-4" />
             <span class="text-text-primary font-bold tabular-nums">{{ teamsCount }}</span> {{ pick('registered teams', '支已注册队伍') }}
           </span>
-        </div>
-        <div class="flex gap-6 mt-6">
-          <div v-for="(count, model) in modelStats" :key="model" class="flex items-center gap-2">
-            <img v-if="getModelIcon(model as string)" :src="getModelIcon(model as string)" class="h-5 w-auto max-w-[60px] object-contain rounded-[10px]" :title="(model as string)" />
-            <span class="text-sm font-semibold text-text-primary">{{ count }}</span>
-          </div>
         </div>
       </div>
 
