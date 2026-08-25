@@ -230,12 +230,12 @@ export default {
   sponsors: {
     title: 'Organizers & Sponsors',
     confirmed: [
-      { name: 'OAIC', role: 'Organizer' },
-      { name: 'Qiwoo', role: 'Organizer' },
-      { name: 'CoPhi Group, SJTU School of Computer Science', role: 'Technology partner · ARC / ARC-Bench' },
-      { name: 'China Telecom', role: 'Token sponsor' },
-      { name: 'TaoToken.net', role: 'Token sponsor' },
-      { name: 'ofox.ai', role: 'Token sponsor' },
+      { id: 'oaic', name: 'OAIC', role: 'Organizer', logo: '/sponsors/oaic.png', url: 'https://create.gosim.org/factory26/' },
+      { id: 'qiwoo', name: 'Qiwoo / Open Insight', role: 'Organizer', logo: '/sponsors/qiwoo.svg', url: 'https://qiwoo.edu.cn/' },
+      { id: 'taotoken', name: 'TaoToken.net', role: 'Token sponsor', logo: '/sponsors/taotoken.svg', url: 'https://taotoken.net/' },
+      { id: 'ofox', name: 'ofox.ai', role: 'Token sponsor', logo: '/sponsors/ofox.svg', url: 'https://ofox.ai/' },
+      { id: 'cophi', name: 'CoPhi Group, SJTU School of Computer Science', role: 'Technology partner · ARC / ARC-Bench', logo: '/sponsors/cophi.jpg', url: 'https://github.com/code-philia' },
+      { id: 'china-telecom', name: 'China Telecom', role: 'Token sponsor', logo: '/sponsors/china-telecom.png', url: 'https://www.chinatelecomglobal.com/' },
     ],
     pending: 'Additional sponsor acknowledgements will appear after authorization is confirmed.',
   },

@@ -110,6 +110,12 @@ export function provideAuth(pick: <T>(english: T, chinese: T) => T) {
   const provisioningTeams = new Set<string>()
 
   function friendlyAuthError(message: string): string {
+    if (/load failed|failed to fetch|network request failed|networkerror/i.test(message)) {
+      return pick(
+        'Unable to reach the registration service. Please switch networks or disable request-blocking extensions, then try again. If you may have registered already, try logging in or resetting your password.',
+        '无法连接报名服务。请切换网络或关闭可能拦截请求的插件后重试。如果账号可能已创建，请尝试直接登录或重置密码。',
+      )
+    }
     if (pick(false, true) === false) return message
     const exact: Record<string, string> = {
       'Invalid login credentials': '邮箱或密码错误',

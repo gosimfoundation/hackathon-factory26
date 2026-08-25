@@ -333,12 +333,12 @@ export default {
   sponsors: {
     title: "主办与赞助",
     confirmed: [
-      { name: "OAIC 开放智能体产业联盟", role: "主办" },
-      { name: "启悟学习社区", role: "主办" },
-      { name: "上海交通大学计算机学院 CoPhi Group", role: "技术伙伴 · ARC / ARC-Bench" },
-      { name: "中国电信", role: "Token 赞助方" },
-      { name: "TaoToken.net", role: "Token 赞助方" },
-      { name: "ofox.ai", role: "Token 赞助方" },
+      { id: "oaic", name: "OAIC 开放智能体产业联盟", role: "主办", logo: "/sponsors/oaic.png", url: "https://create.gosim.org/factory26/" },
+      { id: "qiwoo", name: "启悟学习社区", role: "主办", logo: "/sponsors/qiwoo.svg", url: "https://qiwoo.edu.cn/" },
+      { id: "taotoken", name: "TaoToken.net", role: "Token 赞助方", logo: "/sponsors/taotoken.svg", url: "https://taotoken.net/" },
+      { id: "ofox", name: "ofox.ai", role: "Token 赞助方", logo: "/sponsors/ofox.svg", url: "https://ofox.ai/" },
+      { id: "cophi", name: "上海交通大学计算机学院 CoPhi Group", role: "技术伙伴 · ARC / ARC-Bench", logo: "/sponsors/cophi.jpg", url: "https://github.com/code-philia" },
+      { id: "china-telecom", name: "中国电信", role: "Token 赞助方", logo: "/sponsors/china-telecom.png", url: "https://www.chinatelecomglobal.com/" },
     ],
     pending: "更多赞助方将在露出授权确认后公布。",
   },
