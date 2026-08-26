@@ -42,11 +42,9 @@ export default {
   },
   deliverables: {
     title: 'What you deliver',
-    intro: 'Submit more than a demo: a complete result that is runnable, reproducible, and auditable.',
+    intro: 'Teams need to submit only one deliverable.',
     items: [
-      { name: 'Runnable software rebuild', desc: 'Complete source code with clear startup instructions.' },
-      { name: 'Complete production trace', desc: 'Prompts, tool calls, agent iterations, and human intervention points.' },
-      { name: '3–5 minute demo', desc: 'Show the core capabilities, results, and engineering approach.' },
+      { name: 'Agent', desc: 'The agent submitted to the hackathon competition platform.' },
     ],
   },
   about: {
@@ -171,15 +169,16 @@ export default {
   },
   awards: {
     title: 'Prizes & Awards',
-    subtitle: 'The total prize pool is US$5,500 across six cash awards. Every finishing team also receives a completion certificate and a permanent record on this site.',
+    subtitle: 'The total prize pool is US$24,000 across 20 cash awards. Every finishing team also receives a completion certificate and a permanent record on this site.',
     settledTitle: 'Cash awards',
     settled: [
-      { name: 'First Prize', slots: '1 award', desc: 'US$2,000.' },
-      { name: 'Second Prize', slots: '2 awards', desc: 'US$1,000 each.' },
-      { name: 'Third Prize', slots: '3 awards', desc: 'US$500 each.' },
+      { name: 'Grand Prize', slots: '2 awards', desc: 'US$3,000 per team.' },
+      { name: 'First Prize', slots: '4 awards', desc: 'US$2,000 per team.' },
+      { name: 'Second Prize', slots: '6 awards', desc: 'US$1,000 per team.' },
+      { name: 'Third Prize', slots: '8 awards', desc: 'US$500 per team.' },
     ],
     poolLabel: 'Prize pool',
-    poolStatus: 'US$5,500',
+    poolStatus: 'US$24,000',
     poolNoteTitle: 'Additional benefits',
     poolNote: 'Every finishing team receives a completion certificate and a permanent site record. Sponsored open-source model token credits are available during the competition. First- and Second-Prize teams are invited to GOSIM Shenzhen 2026.',
   },
@@ -191,7 +190,7 @@ export default {
     rounds: [
       {
         number: '01', name: 'Bootcamp & Qualifier', dates: 'Bootcamp Sep 7–20 · Qualifier Sep 21–30', format: 'Online',
-        challenge: 'Rebuild selected GitHub + Lark capabilities: Actions, org permissions, audit, and Rulesets.',
+        challenge: 'Rebuild selected GitHub + Spreadsheets capabilities: Actions, org permissions, audit, and Rulesets.',
         participants: 'Open worldwide, no prerequisites — individuals and teams alike.',
       },
       {
@@ -249,12 +248,12 @@ export default {
       { q: 'Who can participate?', a: 'Open worldwide with no prerequisites — individuals and teams alike, and no in-person attendance is required for the qualifier or the Grand Challenge. You do not need prior Harness Engineering experience; the bootcamp begins September 7.' },
       { q: 'When is registration complete?', a: 'The team lead or main contact submits one account for the whole team, then opens the email titled “Confirm Your Signup” and clicks the confirmation link. Only then is the team created. You can later sign in to the registration site with that email and password to view or edit details. ARC-Bench access and login instructions will be announced separately.' },
       { q: 'How do I compete? Is the qualifier required?', a: 'The qualifier is the only way in. The bootcamp runs first (Sep 7–20) and is optional; the qualifier then opens Sep 21 and closes Sep 30, and the top 20 teams on its leaderboard advance to the finals (Oct 1–7).' },
-      { q: 'What is the challenge?', a: 'The qualifier rebuilds selected GitHub and Lark capabilities — Actions, org permissions, audit, and Rulesets. The finals move to a challenge drawn from real, complex enterprise requirements. Full challenge details are on the competition platform, arc-bench.com.' },
+      { q: 'What is the challenge?', a: 'The qualifier rebuilds selected GitHub and Spreadsheets capabilities — Actions, org permissions, audit, and Rulesets. The finals move to a challenge drawn from real, complex enterprise requirements. Full challenge details are on the competition platform, arc-bench.com.' },
       { q: 'Must I use a specific model?', a: 'Compute uses organizer-issued open-source model tokens: Kimi, GLM, MiniMax, and DeepSeek. Every call goes through one metered gateway so token efficiency can be compared.' },
       { q: 'Is the harness restricted?', a: 'No. The competition is open to Octos, HAgency, ARC, Claude Code, custom agents, and others. You may change your harness, but never the tests, gateway metering, or scoring.' },
       { q: 'How is scoring done?', a: 'Three metrics — GUI test pass rate, token efficiency, and completion time — are collected automatically. Every score has inspectable test logs or trace evidence.' },
-      { q: 'What can teams win?', a: 'The US$5,500 pool includes one First Prize of US$2,000, two Second Prizes of US$1,000 each, and three Third Prizes of US$500 each. Every finishing team also receives a certificate and a permanent site record. First- and Second-Prize teams are invited to GOSIM Shenzhen 2026.' },
-      { q: 'What must we submit?', a: 'A runnable rebuild with code and startup instructions, the complete production trace (prompts, tool calls, agent iterations, and human intervention points), and a 3–5 minute demo.' },
+      { q: 'What can teams win?', a: 'The US$24,000 pool includes two Grand Prizes of US$3,000 per team, four First Prizes of US$2,000 per team, six Second Prizes of US$1,000 per team, and eight Third Prizes of US$500 per team. Every finishing team also receives a certificate and a permanent site record. First- and Second-Prize teams are invited to GOSIM Shenzhen 2026.' },
+      { q: 'What must we submit?', a: 'Only the agent submitted to the hackathon competition platform is required. No other materials are needed.' },
     ],
   },
   cta: { title: 'From vibe to harness, from luck to mastery', tagline: 'Software development did not die in the AI wave — it matters more than ever.', location: 'Sep 7 – Oct 17, 2026 · Online + GOSIM Shenzhen' },
