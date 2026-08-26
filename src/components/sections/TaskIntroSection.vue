@@ -4,7 +4,7 @@ const { t, pick } = useI18n()
 </script>
 
 <template>
-  <section class="bg-bg-primary py-20 md:py-28">
+  <section id="challenge" class="scroll-mt-16 bg-bg-primary py-20 md:py-28">
     <div class="mx-auto max-w-[1440px] px-6 md:px-10 xl:px-14">
       <span class="section-kicker">{{ pick('01 / Challenge', '01 / 比赛任务') }}</span>
       <div class="mt-8 grid gap-6 border-t border-border pt-8 lg:grid-cols-[.7fr_1.3fr] lg:gap-20">

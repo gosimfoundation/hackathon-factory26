@@ -5,10 +5,10 @@ import { useTeams, type Team } from '../../composables/useTeams'
 import { useAuth, type User } from '../../composables/useAuth'
 import { useI18n } from '../../composables/useI18n'
 import { teamFilter } from '../../composables/useTeamFilter'
-import { API_BASE, assetUrl } from '../../composables/api'
+import { assetUrl } from '../../composables/api'
 
 const { t, pick, roleLabel, trackLabel } = useI18n()
-const { user, isLoggedIn, promptAuth } = useAuth()
+const { user, isLoggedIn, promptAuth, updateProfile, fetchMe, error: profileError } = useAuth()
 // Registration currently uses one shared account per team.
 const teamMemberFeaturesEnabled = false
 // GitHub avatar helper
@@ -140,7 +140,7 @@ const showcaseTeams = computed<DisplayTeam[]>(() => [
     model: 'Kimi',
     harness: '',
     themes: ['compute-engine'],
-    projectIdea: pick('Testing a few coding agents.', '拿几个编程智能体跑跑看。'),
+    projectIdea: pick('A lightweight harness for comparing coding agents on small repository tasks.', '做个轻量 Harness，用几类小型仓库任务比较编程智能体的表现。'),
     locked: true,
     maxSize: null,
     likes: 0,
@@ -250,7 +250,6 @@ const showModal = ref(false)
 const modalMode = ref<'create' | 'view' | 'edit'>('create')
 const viewingTeam = ref<Team | null>(null)
 const teamLocked = ref(false)
-const showAdvanced = ref(false)
 
 const teamName = ref('')
 const githubRepo = ref('')
@@ -260,6 +259,29 @@ const selectedHarness = ref('')
 const projectIdea = ref('')
 const teamAvatar = ref('')
 const maxSize = ref<number | null>(null)
+
+// The logged-in registration editor mirrors the fields collected at signup.
+const registrationName = ref('')
+const registrationGithubId = ref('')
+const registrationRole = ref('')
+const registrationDiscord = ref('')
+const registrationTwitter = ref('')
+const registrationTelegram = ref('')
+const registrationLinkedin = ref('')
+const registrationWebsite = ref('')
+
+const roleOptions = computed(() => [
+  { value: 'AI Engineer', label: pick('AI Engineer', 'AI 工程师') },
+  { value: 'Full-Stack Developer', label: pick('Full-Stack Developer', '全栈开发者') },
+  { value: 'Frontend Developer', label: pick('Frontend Developer', '前端开发者') },
+  { value: 'Backend Developer', label: pick('Backend Developer', '后端开发者') },
+  { value: 'Researcher', label: pick('Researcher', '研究者') },
+  { value: 'Designer', label: pick('Designer', '设计师') },
+  { value: 'Product Manager', label: pick('Product Manager', '产品经理') },
+  { value: 'Student', label: pick('Student', '学生') },
+  { value: 'Startup Founder', label: pick('Startup Founder', '创业者') },
+  { value: 'Other', label: pick('Other', '其他') },
+])
 
 const trackIds = ['auth-session', 'repository-lifecycle', 'issues-forms', 'pull-request-review', 'actions-workflow', 'org-permissions-audit', 'compute-engine']
 const trackIcons = ['/icons/theme-01.svg', '/icons/theme-02-v2.svg', '/icons/theme-03.svg', '/icons/theme-04.svg', '/icons/theme-05.svg', '/icons/theme-06.svg', '/icons/theme-07.svg']
@@ -287,41 +309,8 @@ const modelOptions = computed<{ id: string; label: string; icon?: string }[]>(()
   { id: 'Other', label: pick('Other', '其他') },
 ])
 
-const avatarPresets: { id: string; label: string; src: string }[] = []
-
-function selectAvatar(preset: { id: string; src: string }) {
-  teamAvatar.value = preset.src
-  selectedModel.value = preset.id
-}
-
-function selectModel(id: string) {
-  if (selectedModel.value === id) {
-    selectedModel.value = ''
-  } else {
-    selectedModel.value = id
-    // 没有自定义头图时，跟随模型
-    const isCustom = teamAvatar.value && !avatarPresets.some(p => p.src === teamAvatar.value)
-    if (!isCustom) {
-      teamAvatar.value = avatarPresets.find(p => p.id === id)?.src ?? ''
-    }
-  }
-}
-
 function defaultAvatar(): string {
   return assetUrl('/default-team-avatar.svg')
-}
-
-async function uploadTeamAvatar(event: Event) {
-  const file = (event.target as HTMLInputElement).files?.[0]
-  if (!file) return
-  const form = new FormData()
-  form.append('avatar', file)
-  try {
-    const res = await fetch(`${API_BASE}/api/upload`, { method: 'POST', body: form })
-    const data = await res.json()
-    if (data.url) teamAvatar.value = `${API_BASE}${data.url}`
-    else showToast(data.error || pick('Upload failed', '上传失败'), 'error')
-  } catch { showToast(pick('Upload failed', '上传失败'), 'error') }
 }
 
 function resetForm() {
@@ -334,13 +323,35 @@ function resetForm() {
   teamAvatar.value = ''
   teamLocked.value = false
   maxSize.value = null
-  showAdvanced.value = false
   error.value = ''
 }
 
+function fillRegistrationContactFields() {
+  registrationName.value = user.value?.name || ''
+  registrationGithubId.value = user.value?.githubId || ''
+  registrationRole.value = user.value?.role || ''
+  registrationDiscord.value = user.value?.discord || ''
+  registrationTwitter.value = user.value?.twitter || ''
+  registrationTelegram.value = user.value?.telegram || ''
+  registrationLinkedin.value = user.value?.linkedin || ''
+  registrationWebsite.value = user.value?.website || ''
+}
+
+const currentUserTeam = computed(() => {
+  if (!user.value) return undefined
+  return teams.value.find(team => team.id === user.value?.teamId || team.leaderId === user.value?.id)
+})
+
 function openCreateModal() {
+  if (currentUserTeam.value) {
+    viewingTeam.value = currentUserTeam.value
+    openEditModal()
+    showModal.value = true
+    return
+  }
   modalMode.value = 'create'
   resetForm()
+  fillRegistrationContactFields()
   showModal.value = true
 }
 
@@ -365,10 +376,39 @@ function openEditModal() {
   teamLocked.value = team.locked
   maxSize.value = team.maxSize
   error.value = ''
+  fillRegistrationContactFields()
+}
+
+async function saveRegistrationContactFields(): Promise<boolean> {
+  if (!user.value) return false
+  return updateProfile({
+    name: registrationName.value,
+    githubId: registrationGithubId.value,
+    role: registrationRole.value,
+    avatar: user.value.avatar,
+    themes: user.value.themes,
+    preferredModel: user.value.preferredModel,
+    bio: user.value.bio,
+    discord: registrationDiscord.value,
+    twitter: registrationTwitter.value,
+    telegram: registrationTelegram.value,
+    linkedin: registrationLinkedin.value,
+    website: registrationWebsite.value,
+    lookingForTeam: false,
+    confirmedAttendance: user.value.confirmedAttendance,
+    teamId: user.value.teamId,
+  })
 }
 
 async function submitCreate() {
   if (!isLoggedIn.value) return
+  if (currentUserTeam.value) {
+    viewingTeam.value = currentUserTeam.value
+    openEditModal()
+    return
+  }
+  const profileOk = await saveRegistrationContactFields()
+  if (!profileOk) return
   const ok = await createTeam({
     name: teamName.value,
     avatar: teamAvatar.value || defaultAvatar(),
@@ -381,13 +421,16 @@ async function submitCreate() {
     maxSize: null,
   })
   if (ok) {
+    await fetchMe()
     showModal.value = false
-    showToast(pick(`Team "${teamName.value}" created! Good luck!`, `队伍“${teamName.value}”创建成功，祝你们好运！`))
+    showToast(pick(`Team "${teamName.value}" registration completed!`, `队伍“${teamName.value}”报名已完成！`))
   }
 }
 
 async function submitEdit() {
   if (!viewingTeam.value) return
+  const profileOk = await saveRegistrationContactFields()
+  if (!profileOk) return
   const ok = await editTeam(viewingTeam.value.id, {
     name: teamName.value,
     avatar: teamAvatar.value || defaultAvatar(),
@@ -401,7 +444,7 @@ async function submitEdit() {
   })
   if (ok) {
     showModal.value = false
-    showToast(pick(`Team "${teamName.value}" updated!`, `队伍“${teamName.value}”已更新！`))
+    showToast(pick(`Registration for "${teamName.value}" updated!`, `队伍“${teamName.value}”的报名信息已更新！`))
   }
 }
 
@@ -498,7 +541,7 @@ function isTeamLeader(team: Team): boolean {
 }
 
 function userHasTeam(): boolean {
-  return Boolean(user.value?.teamId)
+  return Boolean(currentUserTeam.value)
 }
 
 // function repoName(url: string) {
@@ -510,15 +553,35 @@ const inputClass = 'w-full px-4 py-2.5 bg-input-bg border border-input-border te
 
 function handleOpenMyTeam(e: Event) {
   const teamId = (e as CustomEvent).detail?.teamId
+  const mode = (e as CustomEvent).detail?.mode
   if (!teamId) return
   const team = teams.value.find(t => t.id === teamId)
-  if (team) viewingTeam.value = team
+  if (!team) return
+  viewingTeam.value = team
+  if (mode === 'edit' && isTeamLeader(team)) {
+    openEditModal()
+    showModal.value = true
+    return
+  }
+  openViewModal(team)
 }
 
-function openMyTeamFromButton() {
+function openMyRegistration() {
   if (!user.value) return
-  const joined = teams.value.find(t => t.id === user.value!.teamId)
-  if (joined) { openViewModal(joined); return }
+  const joined = currentUserTeam.value
+  if (!joined) { openCreateModal(); return }
+  viewingTeam.value = joined
+  if (isTeamLeader(joined)) {
+    openEditModal()
+    showModal.value = true
+    return
+  }
+  openViewModal(joined)
+}
+
+function handleOpenRegistrationEditor() {
+  if (!isLoggedIn.value) { promptAuth('login'); return }
+  openMyRegistration()
 }
 
 function openMyProfile() {
@@ -537,8 +600,14 @@ function openUserProfile(member: ReturnType<typeof getTeamMembers>[0]) {
   }
 }
 
-onMounted(() => window.addEventListener('open-my-team', handleOpenMyTeam))
-onUnmounted(() => window.removeEventListener('open-my-team', handleOpenMyTeam))
+onMounted(() => {
+  window.addEventListener('open-my-team', handleOpenMyTeam)
+  window.addEventListener('open-registration-editor', handleOpenRegistrationEditor)
+})
+onUnmounted(() => {
+  window.removeEventListener('open-my-team', handleOpenMyTeam)
+  window.removeEventListener('open-registration-editor', handleOpenRegistrationEditor)
+})
 </script>
 
 <template>
@@ -602,20 +671,42 @@ onUnmounted(() => window.removeEventListener('open-my-team', handleOpenMyTeam))
 
       <div class="flex items-center gap-4 flex-wrap mb-12 reveal">
         <template v-if="isLoggedIn">
-          <button v-if="userHasTeam()" @click="openMyTeamFromButton" class="px-8 py-4 bg-btn-bg text-btn-text text-sm font-semibold tracking-widest uppercase hover:bg-btn-hover transition-colors">
-            {{ pick('MY TEAM', '我的队伍') }}
+          <button v-if="userHasTeam()" @click="openMyRegistration" class="px-8 py-4 bg-btn-bg text-btn-text text-sm font-semibold tracking-widest uppercase hover:bg-btn-hover transition-colors">
+            {{ pick('EDIT MY REGISTRATION', '编辑我的报名') }}
           </button>
           <button v-else @click="openCreateModal" :disabled="isFull" class="px-8 py-4 bg-btn-bg text-btn-text text-sm font-semibold tracking-widest uppercase hover:bg-btn-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-            <img v-if="!isFull" :src="tw.rocket" class="w-4 h-4 inline mr-1" />{{ isFull ? t('teams.closedBtn') : t('teams.registerBtn') }}
+            <img v-if="!isFull" :src="tw.rocket" class="w-4 h-4 inline mr-1" />{{ isFull ? t('teams.closedBtn') : pick('COMPLETE TEAM REGISTRATION', '完成队伍报名') }}
           </button>
           <button @click="openMyProfile" class="px-8 py-4 border border-border text-text-secondary text-sm font-semibold tracking-widest uppercase hover:text-text-primary hover:border-accent transition-colors">
             {{ pick('VIEW MY PROFILE', '查看我的资料') }}
           </button>
         </template>
         <template v-else>
-          <button @click="promptAuth('register')" class="px-8 py-4 bg-btn-bg text-btn-text text-sm font-semibold tracking-widest uppercase hover:bg-btn-hover transition-colors">
-            {{ pick('Register Now', '立即注册') }}
-          </button>
+          <div class="w-full max-w-3xl border-y border-border py-5">
+            <p class="mb-4 font-mono text-[11px] uppercase tracking-[.14em] text-text-muted">{{ pick('Three steps to complete registration', '完成报名需要三步') }}</p>
+            <div class="grid gap-4 sm:grid-cols-3">
+              <div class="flex gap-3">
+                <span class="font-mono text-sm font-bold text-accent">01</span>
+                <div><p class="text-sm font-semibold text-text-primary">{{ pick('Submit one team account', '提交一个队伍账号') }}</p><p class="mt-1 text-xs leading-relaxed text-text-muted">{{ pick('The team lead or main contact fills it in.', '由队长或主要联系人填写。') }}</p></div>
+              </div>
+              <div class="flex gap-3">
+                <span class="font-mono text-sm font-bold text-accent">02</span>
+                <div><p class="text-sm font-semibold text-text-primary">{{ pick('Click the email confirmation', '点击邮箱确认链接') }}</p><p class="mt-1 text-xs leading-relaxed text-text-muted">{{ pick('The team is created only after confirmation.', '确认后队伍才会正式创建。') }}</p></div>
+              </div>
+              <div class="flex gap-3">
+                <span class="font-mono text-sm font-bold text-accent">03</span>
+                <div><p class="text-sm font-semibold text-text-primary">{{ pick('Sign in to view or edit', '登录查看或修改') }}</p><p class="mt-1 text-xs leading-relaxed text-text-muted">{{ pick('ARC-Bench access will be announced separately.', 'ARC-Bench 登录方式另行通知。') }}</p></div>
+              </div>
+            </div>
+            <div class="mt-5 flex flex-wrap gap-4">
+              <button @click="promptAuth('register')" class="px-8 py-4 bg-btn-bg text-btn-text text-sm font-semibold tracking-widest uppercase hover:bg-btn-hover transition-colors">
+                {{ pick('Start Registration', '开始报名') }}
+              </button>
+              <button @click="promptAuth('login')" class="px-8 py-4 border border-border text-text-secondary text-sm font-semibold tracking-widest uppercase hover:text-text-primary hover:border-accent transition-colors">
+                {{ pick('Already Registered? Sign In', '已经报名？登录 / 编辑') }}
+              </button>
+            </div>
+          </div>
         </template>
       </div>
 
@@ -707,217 +798,120 @@ onUnmounted(() => window.removeEventListener('open-my-team', handleOpenMyTeam))
               <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
 
-            <!-- CREATE MODE -->
-            <template v-if="modalMode === 'create'">
-              <h3 class="text-2xl font-bold text-text-primary mb-6">{{ t('teams.createTitle') }}</h3>
+            <!-- CREATE / EDIT REGISTRATION: same fields as first signup. -->
+            <template v-if="modalMode === 'create' || (modalMode === 'edit' && viewingTeam)">
+              <h3 class="pr-8 text-2xl font-bold text-text-primary">
+                {{ modalMode === 'create' ? pick('Complete Team Registration', '完成队伍报名') : pick('Edit Registration', '编辑报名信息') }}
+              </h3>
+              <p class="mt-2 mb-6 text-sm leading-relaxed text-text-secondary">
+                {{ modalMode === 'create'
+                  ? pick('Your login account already exists. Complete the team details below—this will not create another account.', '你的登录账号已经存在。现在只需补全队伍资料，不会再次创建账号。')
+                  : pick('These are the same contact and team fields collected during registration.', '这里与首次报名收集的是同一组联系人和队伍字段。') }}
+              </p>
 
-              <!-- Not logged in -->
               <div v-if="!isLoggedIn" class="text-center py-8">
-                <p class="text-text-secondary mb-4">{{ pick('Register to create your team', '注册后即可创建队伍') }}</p>
-                <button @click="showModal = false; promptAuth('register')" class="px-6 py-3 bg-btn-bg text-btn-text text-sm font-semibold tracking-widest uppercase hover:bg-btn-hover transition-colors">
-                  {{ pick('Register', '注册') }}
+                <p class="text-text-secondary mb-4">{{ pick('Please sign in before managing registration.', '请先登录，再管理报名信息。') }}</p>
+                <button @click="showModal = false; promptAuth('login')" class="px-6 py-3 bg-btn-bg text-btn-text text-sm font-semibold tracking-widest uppercase hover:bg-btn-hover transition-colors">
+                  {{ pick('Sign In', '登录') }}
                 </button>
               </div>
 
-              <!-- Logged in: create form -->
-              <template v-else>
-                <div v-if="error" class="mb-4 p-3 bg-badge-danger-bg border border-accent-red/30 text-red-600 text-sm">{{ error }}</div>
+              <form v-else @submit.prevent="modalMode === 'create' ? submitCreate() : submitEdit()" class="space-y-6">
+                <div v-if="error || profileError" class="p-3 bg-badge-danger-bg border border-accent-red/30 text-red-600 text-sm">{{ error || profileError }}</div>
 
-                <form @submit.prevent="submitCreate" class="space-y-5">
+                <section class="space-y-4">
+                  <div class="flex items-start gap-3 border-b border-border pb-3">
+                    <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-accent text-xs font-bold text-white">1</span>
+                    <div>
+                      <h4 class="text-sm font-semibold text-text-primary">{{ pick('Account & contact', '账号与联系人') }}</h4>
+                      <p class="mt-0.5 text-xs text-text-muted">{{ pick('Used for sign-in and organizer communication.', '用于登录以及主办方联系队伍。') }}</p>
+                    </div>
+                  </div>
+                  <div>
+                    <label class="block text-sm text-text-secondary mb-1">{{ pick('Name', '姓名') }} <span class="text-accent-red">*</span></label>
+                    <input v-model="registrationName" type="text" required :class="inputClass" />
+                  </div>
+                  <div>
+                    <label class="block text-sm text-text-secondary mb-1">{{ pick('Email', '邮箱') }}</label>
+                    <input :value="user?.email" type="email" disabled :class="[inputClass, 'cursor-not-allowed opacity-70']" />
+                    <p class="mt-1 text-xs text-text-muted">{{ pick('The login email cannot be changed here.', '登录邮箱不能在这里修改。') }}</p>
+                  </div>
+                  <div>
+                    <label class="block text-sm text-text-secondary mb-1">{{ pick('GitHub Username', 'GitHub 用户名') }} <span class="text-accent-red">*</span></label>
+                    <input v-model="registrationGithubId" type="text" required placeholder="e.g. octocat" :class="inputClass" />
+                  </div>
+                  <div>
+                    <label class="block text-sm text-text-secondary mb-1">{{ pick('Role', '角色') }}</label>
+                    <select v-model="registrationRole" :class="[inputClass, 'appearance-none']">
+                      <option value="">{{ pick('Select role (optional)', '选择角色（选填）') }}</option>
+                      <option v-for="role in roleOptions" :key="role.value" :value="role.value">{{ role.label }}</option>
+                    </select>
+                  </div>
+                  <div class="border border-accent/20 bg-accent/5 p-4">
+                    <p class="text-sm font-medium text-text-primary">{{ pick('Team contact details', '队伍联系方式') }} <span class="text-xs font-normal text-text-muted">{{ pick('(recommended)', '（推荐填写）') }}</span></p>
+                    <div class="mt-3 grid grid-cols-2 gap-3">
+                      <input v-model="registrationDiscord" type="text" placeholder="Discord" :class="inputClass" />
+                      <input v-model="registrationTwitter" type="text" placeholder="Twitter / X" :class="inputClass" />
+                      <input v-model="registrationTelegram" type="text" placeholder="Telegram" :class="inputClass" />
+                      <input v-model="registrationLinkedin" type="text" placeholder="LinkedIn" :class="inputClass" />
+                    </div>
+                    <input v-model="registrationWebsite" type="text" placeholder="https://yoursite.com" :class="[inputClass, 'mt-3']" />
+                  </div>
+                </section>
+
+                <section class="space-y-4">
+                  <div class="flex items-start gap-3 border-b border-border pb-3">
+                    <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-accent text-xs font-bold text-white">2</span>
+                    <div>
+                      <h4 class="text-sm font-semibold text-text-primary">{{ pick('Team details', '队伍资料') }}</h4>
+                      <p class="mt-0.5 text-xs text-text-muted">{{ pick('Only the team name is required. Other fields may be updated later.', '只有队伍名称必填，其余内容之后还可以再改。') }}</p>
+                    </div>
+                  </div>
                   <div>
                     <label class="block text-sm text-text-secondary mb-1">{{ t('teams.teamName') }} <span class="text-accent-red">*</span></label>
                     <input v-model="teamName" type="text" required :placeholder="pick('e.g. AgentX', '例如：AgentX')" :class="inputClass" />
                   </div>
-                  <!-- Team Avatar -->
                   <div>
-                    <label class="block text-sm text-text-secondary mb-2">{{ t('teams.teamAvatar') }}</label>
-                    <div class="flex items-center gap-3">
-                      <div class="w-14 h-14 rounded-[10px] border-2 border-border overflow-hidden shrink-0 flex items-center justify-center bg-bg-card">
-                        <img :src="teamAvatar || defaultAvatar()" class="w-full h-full object-cover rounded-[24px]" :class="(!teamAvatar) ? 'dark:invert' : ''" />
-                      </div>
-                      <div class="flex flex-wrap items-center gap-2">
-                        <button v-if="false" v-for="preset in avatarPresets" :key="preset.id" type="button" @click="selectAvatar(preset)" class="w-10 h-10 rounded-[10px] border-2 overflow-hidden transition-all flex items-center justify-center bg-bg-card p-1" :class="teamAvatar === preset.src ? 'border-accent-red scale-110' : 'border-border hover:border-border-hover'">
-                          <img :src="preset.src" class="max-w-full max-h-full object-contain rounded-[10px]" />
-                        </button>
-                        <label class="w-10 h-10 rounded-[10px] border-2 border-dashed border-border-hover hover:border-border-strong flex items-center justify-center cursor-pointer transition-all overflow-hidden" :class="teamAvatar && !avatarPresets.some(p => p.src === teamAvatar) ? 'border-accent-red' : ''">
-                          <img v-if="teamAvatar && !avatarPresets.some(p => p.src === teamAvatar)" :src="teamAvatar" class="w-full h-full object-cover" />
-                          <span v-else class="text-text-tertiary text-sm">+</span>
-                          <input type="file" accept="image/*" class="hidden" @change="uploadTeamAvatar($event)" />
-                        </label>
-                      </div>
-                    </div>
-                  </div>
-                  <div>
-                    <label class="block text-sm text-text-secondary mb-1">{{ t('teams.githubRepo') }} <span class="text-accent-red">*</span></label>
-                    <input v-model="githubRepo" type="url" required placeholder="https://github.com/your-org/project" :class="inputClass" />
-                  </div>
-
-                  <div>
-                    <label class="block text-sm text-text-secondary mb-2">{{ t('teams.track') }} <span class="text-text-secondary text-xs">{{ pick('(multi-select)', '（可多选）') }}</span></label>
-                    <div class="grid grid-cols-2 gap-2">
+                    <label class="block text-sm text-text-secondary mb-2">{{ t('teams.track') }} {{ t('teams.optional') }}</label>
+                    <div class="flex flex-wrap gap-2">
                       <button
                         v-for="track in tracks"
                         :key="track.id"
                         type="button"
                         @click="toggleTrack(track.id)"
-                        class="flex items-center gap-2 px-3 py-2.5 border text-left transition-all text-sm"
-                        :class="selectedTracks.includes(track.id) ? 'bg-accent/10 border-accent/50 text-text-primary' : 'border-border text-text-secondary hover:border-border-hover'"
+                        class="px-2.5 py-1 text-xs border transition-colors"
+                        :class="selectedTracks.includes(track.id) ? 'bg-btn-bg text-btn-text border-btn-bg' : 'border-border text-text-secondary hover:border-border-hover'"
                       >
-                        <img :src="track.icon" class="w-4 h-4 shrink-0 theme-icon" />
-                        <span class="truncate">{{ track.label }}</span>
+                        {{ track.label }}
                       </button>
                     </div>
                   </div>
-
                   <div>
-                    <label class="block text-sm text-text-secondary mb-1">{{ t('teams.aiModels') }}</label>
-                    <p class="text-xs text-badge-warning-text mb-2">{{ pick('Your team will receive API tokens from the model provider you select.', '你的队伍将获得所选模型服务商提供的 API Token。') }}</p>
-                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                      <button v-for="model in modelOptions" :key="model.id" type="button" @click="selectModel(model.id)" class="flex-1 flex items-center justify-center gap-2 py-3 border transition-all" :class="selectedModel === model.id ? 'bg-accent/10 border-accent/50 text-text-primary' : 'border-border text-text-secondary hover:border-border-hover'">
-                        <img v-if="model.icon" :src="model.icon" class="w-5 h-5 rounded-[10px]" />
-                        <span class="text-sm font-semibold">{{ model.label }}</span>
-                      </button>
-                    </div>
+                    <label class="block text-sm text-text-secondary mb-1">{{ pick('GitHub Repo (optional)', 'GitHub 仓库（选填）') }}</label>
+                    <input v-model="githubRepo" type="url" placeholder="https://github.com/your-org/project" :class="inputClass" />
                   </div>
-
+                  <div>
+                    <label class="block text-sm text-text-secondary mb-1">{{ pick('Model (optional)', '模型（选填）') }}</label>
+                    <select v-model="selectedModel" :class="[inputClass, 'appearance-none']">
+                      <option value="">{{ pick('Select a model', '选择模型') }}</option>
+                      <option v-for="model in modelOptions" :key="model.id" :value="model.id">{{ model.label }}</option>
+                    </select>
+                  </div>
                   <div>
                     <label class="block text-sm text-text-secondary mb-1">{{ t('teams.harness') }}</label>
-                    <select v-model="selectedHarness" :class="inputClass">
+                    <select v-model="selectedHarness" :class="[inputClass, 'appearance-none']">
                       <option value="">{{ t('teams.optional') }}</option>
                       <option v-for="option in (t('teams.harnessOptions') as string[])" :key="option" :value="option">{{ option }}</option>
                     </select>
                   </div>
-
                   <div>
-                    <label class="block text-sm text-text-secondary mb-1">{{ t('teams.projectIdea') }} <span class="text-text-secondary text-xs">{{ t('teams.optional') }}</span></label>
-                    <textarea v-model="projectIdea" rows="2" :placeholder="pick('Briefly describe what you plan to build...', '简要描述你计划构建的内容……')" :class="[inputClass, 'resize-none']"></textarea>
+                    <label class="block text-sm text-text-secondary mb-1">{{ pick('Project Idea (optional)', '项目想法（选填）') }}</label>
+                    <input v-model="projectIdea" type="text" :placeholder="pick('One sentence about your idea', '用一句话介绍你的想法')" :class="inputClass" />
                   </div>
-
-                  <!-- Team-member settings are hidden while one account represents the whole team. -->
-                  <button v-if="teamMemberFeaturesEnabled" type="button" @click="showAdvanced = !showAdvanced" class="flex items-center gap-1 text-xs text-text-tertiary hover:text-text-secondary transition-colors">
-                    <span>{{ showAdvanced ? '▲' : '▼' }}</span>
-                    <span>{{ showAdvanced ? pick('Hide advanced options', '收起高级选项') : pick('More options', '更多选项') }}</span>
-                  </button>
-
-                  <div v-if="teamMemberFeaturesEnabled && showAdvanced" class="space-y-5">
-                    <!-- Lock toggle -->
-                    <label class="flex items-center gap-3 cursor-pointer">
-                      <div class="relative">
-                        <input type="checkbox" v-model="teamLocked" class="sr-only peer" />
-                        <div class="w-9 h-5 bg-border rounded-full peer-checked:bg-accent transition-colors"></div>
-                        <div class="absolute left-0.5 top-0.5 w-4 h-4 bg-bg-card rounded-full shadow transition-transform peer-checked:translate-x-4"></div>
-                      </div>
-                      <div>
-                        <span class="text-sm text-text-primary">{{ t('teams.lockTeam') }}</span>
-                        <p class="text-xs text-text-secondary">{{ t('teams.lockTeamDesc') }}</p>
-                      </div>
-                    </label>
-                  </div>
-
-                  <button type="submit" :disabled="loading" class="w-full py-4 bg-btn-bg text-btn-text text-sm font-semibold tracking-widest uppercase hover:bg-btn-hover transition-colors disabled:opacity-50">
-                    {{ loading ? t('teams.submitting') : t('teams.submitBtn') }}
-                  </button>
-                </form>
-              </template>
-            </template>
-
-            <!-- EDIT MODE -->
-            <template v-else-if="modalMode === 'edit' && viewingTeam">
-              <h3 class="text-2xl font-bold text-text-primary mb-6">{{ pick('Edit Team', '编辑队伍') }}</h3>
-              <div v-if="error" class="mb-4 p-3 bg-badge-danger-bg border border-accent-red/30 text-red-600 text-sm">{{ error }}</div>
-
-              <form @submit.prevent="submitEdit" class="space-y-5">
-                <div>
-                  <label class="block text-sm text-text-secondary mb-1">{{ t('teams.teamName') }} <span class="text-accent-red">*</span></label>
-                  <input v-model="teamName" type="text" required :placeholder="pick('e.g. AgentX', '例如：AgentX')" :class="inputClass" />
-                </div>
-                <!-- Team Avatar -->
-                <div>
-                  <label class="block text-sm text-text-secondary mb-2">{{ t('teams.teamAvatar') }}</label>
-                  <div class="flex items-center gap-3">
-                    <div class="w-14 h-14 rounded-[10px] border-2 border-border overflow-hidden shrink-0 flex items-center justify-center bg-bg-card">
-                      <img :src="teamAvatar || defaultAvatar()" class="max-w-[80%] max-h-[80%] object-contain" />
-                    </div>
-                    <div class="flex flex-wrap items-center gap-2">
-                      <button v-if="false" v-for="preset in avatarPresets" :key="preset.id" type="button" @click="teamAvatar = preset.src" class="w-10 h-10 rounded-[10px] border-2 overflow-hidden transition-all flex items-center justify-center bg-bg-card p-1" :class="teamAvatar === preset.src ? 'border-accent-red scale-110' : 'border-border hover:border-border-hover'">
-                        <img :src="preset.src" class="max-w-full max-h-full object-contain rounded-[10px]" />
-                      </button>
-                      <label class="w-10 h-10 rounded-[10px] border-2 border-dashed border-border-hover hover:border-border-strong flex items-center justify-center cursor-pointer transition-all overflow-hidden" :class="teamAvatar && !avatarPresets.some(p => p.src === teamAvatar) ? 'border-accent-red' : ''">
-                        <img v-if="teamAvatar && !avatarPresets.some(p => p.src === teamAvatar)" :src="teamAvatar" class="w-full h-full object-cover" />
-                        <span v-else class="text-text-tertiary text-sm">+</span>
-                        <input type="file" accept="image/*" class="hidden" @change="uploadTeamAvatar($event)" />
-                      </label>
-                    </div>
-                  </div>
-                </div>
-                <div>
-                  <label class="block text-sm text-text-secondary mb-1">{{ t('teams.githubRepo') }} <span class="text-accent-red">*</span></label>
-                  <input v-model="githubRepo" type="url" required placeholder="https://github.com/your-org/project" :class="inputClass" />
-                </div>
-
-                <div>
-                  <label class="block text-sm text-text-secondary mb-2">{{ t('teams.track') }} <span class="text-text-secondary text-xs">{{ pick('(multi-select)', '（可多选）') }}</span></label>
-                  <div class="grid grid-cols-2 gap-2">
-                    <button
-                      v-for="track in tracks"
-                      :key="track.id"
-                      type="button"
-                      @click="toggleTrack(track.id)"
-                      class="flex items-center gap-2 px-3 py-2.5 border text-left transition-all text-sm"
-                      :class="selectedTracks.includes(track.id) ? 'bg-accent/10 border-accent/50 text-text-primary' : 'border-border text-text-secondary hover:border-border-hover'"
-                    >
-                      <img :src="track.icon" class="w-4 h-4 shrink-0 theme-icon" />
-                      <span class="truncate">{{ track.label }}</span>
-                    </button>
-                  </div>
-                </div>
-
-                <div>
-                  <label class="block text-sm text-text-secondary mb-2">{{ t('teams.aiModels') }}</label>
-                  <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                    <button v-for="model in modelOptions" :key="model.id" type="button" @click="selectModel(model.id)" class="flex-1 flex items-center justify-center gap-2 py-3 border transition-all" :class="selectedModel === model.id ? 'bg-accent/10 border-accent/50 text-text-primary' : 'border-border text-text-secondary hover:border-border-hover'">
-                      <img v-if="model.icon" :src="model.icon" class="w-5 h-5 rounded-[10px]" />
-                      <span class="text-sm font-semibold">{{ model.label }}</span>
-                    </button>
-                  </div>
-                </div>
-
-                <div>
-                  <label class="block text-sm text-text-secondary mb-1">{{ t('teams.harness') }}</label>
-                  <select v-model="selectedHarness" :class="inputClass">
-                    <option value="">{{ t('teams.optional') }}</option>
-                    <option v-for="option in (t('teams.harnessOptions') as string[])" :key="option" :value="option">{{ option }}</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label class="block text-sm text-text-secondary mb-1">{{ t('teams.projectIdea') }} <span class="text-text-secondary text-xs">{{ t('teams.optional') }}</span></label>
-                  <textarea v-model="projectIdea" rows="2" :placeholder="pick('Briefly describe what you plan to build...', '简要描述你计划构建的内容……')" :class="[inputClass, 'resize-none']"></textarea>
-                </div>
-
-                <!-- Team-member settings are hidden while one account represents the whole team. -->
-                <button v-if="teamMemberFeaturesEnabled" type="button" @click="showAdvanced = !showAdvanced" class="flex items-center gap-1 text-xs text-text-tertiary hover:text-text-secondary transition-colors">
-                  <span>{{ showAdvanced ? '▲' : '▼' }}</span>
-                  <span>{{ showAdvanced ? pick('Hide advanced options', '收起高级选项') : pick('More options', '更多选项') }}</span>
-                </button>
-
-                <div v-if="teamMemberFeaturesEnabled && showAdvanced" class="space-y-5">
-                  <!-- Lock toggle -->
-                  <label class="flex items-center gap-3 cursor-pointer">
-                    <div class="relative">
-                      <input type="checkbox" v-model="teamLocked" class="sr-only peer" />
-                      <div class="w-9 h-5 bg-border rounded-full peer-checked:bg-accent transition-colors"></div>
-                      <div class="absolute left-0.5 top-0.5 w-4 h-4 bg-bg-card rounded-full shadow transition-transform peer-checked:translate-x-4"></div>
-                    </div>
-                    <div>
-                      <span class="text-sm text-text-primary">{{ t('teams.lockTeam') }}</span>
-                      <p class="text-xs text-text-secondary">{{ t('teams.lockTeamDesc') }}</p>
-                    </div>
-                  </label>
-                </div>
+                </section>
 
                 <button type="submit" :disabled="loading" class="w-full py-4 bg-btn-bg text-btn-text text-sm font-semibold tracking-widest uppercase hover:bg-btn-hover transition-colors disabled:opacity-50">
-                  {{ loading ? pick('Saving...', '正在保存……') : pick('Save Changes', '保存修改') }}
+                  {{ loading ? pick('Saving...', '正在保存……') : (modalMode === 'create' ? pick('Complete Registration', '完成报名') : pick('Save Registration', '保存报名信息')) }}
                 </button>
               </form>
             </template>
@@ -1072,7 +1066,7 @@ onUnmounted(() => window.removeEventListener('open-my-team', handleOpenMyTeam))
                   @click="openEditModal"
                   class="flex-1 py-3 border border-border text-text-secondary text-sm font-semibold hover:bg-bg-elevated transition-colors"
                 >
-                  {{ pick('Edit Team', '编辑队伍') }}
+                  {{ pick('Edit Registration', '编辑报名信息') }}
                 </button>
                 <button
                   @click="handleDeleteTeam"

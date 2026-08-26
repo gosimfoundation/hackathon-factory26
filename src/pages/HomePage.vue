@@ -28,10 +28,10 @@ useVideoAutoplay()
     <PrizesSection />
     <JudgingSection />
     <DeliverablesSection />
+    <TeamsSection />
     <TracksSection />
     <SponsorsSection />
     <FaqSection />
-    <TeamsSection />
     <CtaSection />
   </main>
 </template>

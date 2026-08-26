@@ -28,7 +28,6 @@ export default {
       "2026.10.1 – 10.7 · 决赛 · 线上",
       "2026.10.17 · 颁奖 · 深圳 GOSIM 大会",
     ],
-    sponsorNotice: "更多赞助方将在露出授权确认后公布。",
     countdownLabel: "9月7日研习营开营",
     days: "天",
     hours: "时",
@@ -38,7 +37,7 @@ export default {
     concluded: "赛程已结束",
   },
   taskIntro: {
-    title: "智能体软件工程",
+    title: "智能体软件工厂",
     text: "在统一模型与沙箱中用智能体实现真实软件功能，用可运行结果比拼正确率、Token 效率与完成速度。",
   },
   deliverables: {
@@ -331,23 +330,20 @@ export default {
     ],
   },
   sponsors: {
-    title: "主办与赞助",
+    title: "合作伙伴",
     confirmed: [
-      { id: "oaic", name: "OAIC 开放智能体产业联盟", role: "主办", logo: "/sponsors/oaic.png", url: "https://create.gosim.org/factory26/" },
-      { id: "qiwoo", name: "启悟学习社区", role: "主办", logo: "/sponsors/qiwoo.svg", url: "https://qiwoo.edu.cn/" },
-      { id: "taotoken", name: "TaoToken.net", role: "Token 赞助方", logo: "/sponsors/taotoken.svg", url: "https://taotoken.net/" },
-      { id: "ofox", name: "ofox.ai", role: "Token 赞助方", logo: "/sponsors/ofox.svg", url: "https://ofox.ai/" },
-      { id: "cophi", name: "上海交通大学计算机学院 CoPhi Group", role: "技术伙伴 · ARC / ARC-Bench", logo: "/sponsors/cophi.jpg", url: "https://github.com/code-philia" },
-      { id: "china-telecom", name: "中国电信", role: "Token 赞助方", logo: "/sponsors/china-telecom.png", url: "https://www.chinatelecomglobal.com/" },
+      { id: "oaic", name: "OAIC 开放智能体产业联盟", role: "合作伙伴", logo: "/sponsors/oaic.png", url: "https://visionforum.ai/#about" },
+      { id: "qiwoo", name: "启悟学习社区", role: "合作伙伴", logo: "/sponsors/qiwoo.svg", url: "https://qiwoo.edu.cn/" },
+      { id: "taotoken", name: "TaoToken.net", role: "合作伙伴", logo: "/sponsors/taotoken.svg", url: "https://taotoken.net/" },
+      { id: "cophi", name: "上海交通大学计算机学院 CoPhi Group", role: "合作伙伴", logo: "/sponsors/cophi.jpg", url: "https://github.com/code-philia" },
     ],
-    pending: "更多赞助方将在露出授权确认后公布。",
   },
   teams: {
     title: "已注册",
     titleAccent: "队伍",
-    subtitle: "报名已开放。请为整支队伍创建一个共用账号。",
-    registerNote: "每支队伍只需一个账号，队员无需各自注册。9 月 7 日研习营开营。",
-    registerWarn: "同一支队伍请勿重复创建账号。",
+    subtitle: "报名已开放。提交资料后，请务必点击邮箱里的确认链接。",
+    registerNote: "每支队伍只需一个账号，建议由队长或主要联系人填写。",
+    registerWarn: "邮箱确认后队伍才会正式创建；ARC-Bench 登录方式另行通知。",
     refresh: "刷新",
     teams: "队伍",
     registerBtn: "注册你的队伍",
@@ -379,6 +375,10 @@ export default {
       {
         q: "谁可以参加？",
         a: "面向全球开放，不设资历门槛，个人与团队均可参加，初赛与大奖赛无需现场到场。你不必已经会 Harness Engineering，9 月 7 日起的研习营就是为此而设。",
+      },
+      {
+        q: "怎样才算完成报名？",
+        a: "由队长或主要联系人为整支队伍提交一个账号，然后打开主题为“Confirm Your Signup”的邮件并点击确认链接。确认后队伍才会正式创建，之后可用报名邮箱和密码登录官网、查看或修改资料。ARC-Bench 的开放与登录方式会另行通知。",
       },
       {
         q: "怎么参赛？要先经过初赛吗？",

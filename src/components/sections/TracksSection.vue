@@ -29,7 +29,7 @@ function formatTokens(millions: number | null): string {
     <div class="mx-auto max-w-[1440px] px-6 md:px-10 xl:px-14">
       <div class="grid gap-10 lg:grid-cols-[.72fr_1.28fr] lg:gap-20">
         <div class="reveal lg:sticky lg:top-28 lg:self-start">
-          <span class="section-kicker">{{ pick('07 / Leaderboard', '07 / 排行榜') }}</span>
+          <span class="section-kicker">{{ pick('08 / Leaderboard', '08 / 排行榜') }}</span>
           <h2 class="section-title mt-8">{{ t('tracks.title') }}</h2>
           <p class="mt-8 max-w-xl text-sm leading-relaxed text-text-secondary md:text-base">{{ t('tracks.intro') }}</p>
           <p class="mt-6 max-w-xl text-sm leading-relaxed text-text-secondary">
@@ -42,14 +42,14 @@ function formatTokens(millions: number | null): string {
             rel="noopener"
             class="mt-7 inline-flex items-center gap-2 bg-btn-bg px-5 py-3 text-xs font-semibold uppercase tracking-widest text-btn-text transition-colors hover:bg-btn-hover"
           >
-            {{ pick('Login to ARC-Bench', '登录 ARC-Bench') }}
+            {{ pick('Open ARC-Bench', '访问 ARC-Bench') }}
             <span aria-hidden="true">↗</span>
           </a>
           <p class="mt-3 max-w-xl text-xs leading-relaxed text-text-muted">
-            {{ pick('Choose “Hackathon account” and use your Hackathon email and password.', '打开后请选择“Hackathon account”，使用 Hackathon 邮箱和密码登录。') }}
+            {{ pick('ARC-Bench access and login instructions will be announced separately. Confirming your registration email only activates your registration-site account.', 'ARC-Bench 的开放与登录方式会另行通知。确认报名邮件只会激活报名官网账号。') }}
           </p>
           <p class="mt-2 max-w-xl text-xs font-semibold leading-relaxed text-accent-red">
-            {{ pick('One account per team is enough. Individual team members do not need to create separate accounts.', '每支队伍只需创建一个账号，队员无需各自注册账号。') }}
+            {{ pick('For now, complete the registration-site email confirmation. No additional ARC-Bench action is required until the organizers notify you.', '目前请先完成报名官网的邮箱确认；收到主办方通知前，无需在 ARC-Bench 进行额外操作。') }}
           </p>
         </div>
 

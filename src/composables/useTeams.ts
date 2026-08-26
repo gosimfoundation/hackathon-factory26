@@ -85,6 +85,7 @@ export function useTeams() {
   const teamNotFound = () => pick('Team not found', '未找到该队伍')
   const teamFull = () => pick('Team is full', '该队伍人数已满')
   const teamLocked = () => pick('Team is locked', '该队伍已锁定')
+  const teamAlreadyExists = () => pick('This account already has a team. Open Edit Registration instead.', '这个账号已经有队伍，请使用“编辑报名信息”。')
   const totalMembers = computed(() => users.value.filter(u => u.teamId).length)
   const totalRegistered = computed(() => users.value.length)
   const maxParticipants = ref<number | null>(null)
@@ -112,7 +113,7 @@ export function useTeams() {
     ])
     const allUsers = (profileRows ?? []).map(profileRowToUser)
     users.value = allUsers
-    teams.value = (teamRows ?? []).map(r => teamRowToTeam(r, allUsers))
+    teams.value = (teamRows ?? []).map(row => teamRowToTeam(row, allUsers))
     lastUpdated.value = new Date()
   }
 
@@ -132,9 +133,17 @@ export function useTeams() {
     const { data: { session } } = await supabase.auth.getSession()
     if (!session) { error.value = notLoggedIn(); loading.value = false; return false }
     try {
+      const [{ data: ownProfile, error: profileError }, { data: ownedTeam, error: ownedTeamError }] = await Promise.all([
+        supabase.from('profiles').select('team_id').eq('id', session.user.id).maybeSingle(),
+        supabase.from('teams').select('id').eq('leader_id', session.user.id).limit(1).maybeSingle(),
+      ])
+      if (profileError || ownedTeamError) { error.value = (profileError || ownedTeamError)?.message || networkError(); return false }
+      if (ownedTeam || ownProfile?.team_id) { error.value = teamAlreadyExists(); return false }
+
       const { data: team, error: insertError } = await supabase.from('teams').insert({
         name: payload.name,
         leader_id: session.user.id,
+        contact_email: session.user.email || null,
         avatar: payload.avatar,
         github_repo: payload.githubRepo,
         themes: payload.themes,

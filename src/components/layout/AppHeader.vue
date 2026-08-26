@@ -13,7 +13,7 @@ const { t, locale, pick, roleLabel, trackLabel, toggleLocale } = useI18n()
 const route = useRoute()
 const router = useRouter()
 const isHome = computed(() => route.path === '/')
-const { user, isLoggedIn, login, register, logout, updateProfile, changePassword, sendPasswordReset, error: authError, showAuthModal, authModalTab, showChangePasswordModal } = useAuth()
+const { user, isLoggedIn, login, register, logout, updateProfile, changePassword, sendPasswordReset, error: authError, showAuthModal, authModalTab, showChangePasswordModal, promptAuth } = useAuth()
 const newPassword = ref('')
 const confirmPassword = ref('')
 const changePwError = ref('')
@@ -36,7 +36,10 @@ const { teams } = useTeams()
 // Registration currently uses one shared account per team.
 const teamMemberFeaturesEnabled = false
 
-const myTeam = computed(() => teams.value.find(t => t.id === user.value?.teamId))
+const myTeam = computed(() => {
+  if (!user.value) return undefined
+  return teams.value.find(team => team.id === user.value?.teamId || team.leaderId === user.value?.id)
+})
 const headerToast = ref<{ msg: string; type: 'success' | 'error' } | null>(null)
 let headerToastTimer: number | undefined
 function showHeaderToast(msg: string, type: 'success' | 'error' = 'success') {
@@ -49,10 +52,10 @@ const scrolled = ref(false)
 const mobileOpen = ref(false)
 
 const navItems = computed(() => [
-  { label: t('nav.about'), href: '#about' },
-  { label: t('nav.themes'), href: '#themes' },
+  { label: pick('Challenge & Vision', '赛题与愿景'), href: '#challenge' },
   { label: t('nav.schedule'), href: '#schedule' },
   { label: t('nav.awards'), href: '#awards' },
+  { label: pick('Registration & Rankings', '报名与排名'), href: '#teams' },
 ])
 
 function onScroll() {
@@ -144,6 +147,9 @@ watch(showAuthModal, (open) => {
     regTeamModel.value = ''
     regTeamHarness.value = ''
     regTeamProjectIdea.value = ''
+    registerNeedsConfirm.value = false
+    confirmedEmail.value = ''
+    forgotSent.value = false
   }
 })
 
@@ -249,7 +255,21 @@ const modelChoices = computed(() => [
 const showMyTeamModal = ref(false)
 
 function goToMyTeam() {
-  showMyTeamModal.value = true
+  openRegistrationEditor()
+}
+
+async function openMyTeamEditor() {
+  showMyTeamModal.value = false
+  await openRegistrationEditor()
+}
+
+async function openRegistrationEditor() {
+  showUserDropdown.value = false
+  showProfileModal.value = false
+  await scrollTo('#teams')
+  window.setTimeout(() => {
+    window.dispatchEvent(new CustomEvent('open-registration-editor'))
+  }, 350)
 }
 
 const profileQr = ref('')
@@ -343,12 +363,6 @@ async function saveProfile() {
           {{ item.label }}
         </a>
         <router-link
-          to="/bootcamp"
-          class="inline-flex h-10 items-center font-mono text-xs uppercase tracking-[0.06em] text-text-tertiary transition-colors hover:text-accent cursor-pointer"
-        >
-          {{ t('nav.bootcamp') }}
-        </router-link>
-        <router-link
           to="/rules"
           class="inline-flex h-10 items-center font-mono text-xs uppercase tracking-[0.06em] text-text-tertiary transition-colors hover:text-accent cursor-pointer"
         >
@@ -394,10 +408,10 @@ async function saveProfile() {
                   {{ pick('My Profile', '我的资料') }}
                 </button>
                 <button v-if="isLoggedIn" @click="goToMyTeam(); showUserDropdown = false" class="w-full text-left px-4 py-2 text-sm text-text-tertiary hover:text-text-primary hover:bg-bg-elevated transition-colors">
-                  <span>{{ pick('My Team', '我的队伍') }}</span>
+                  <span>{{ pick('My Team / Edit Registration', '我的队伍 / 编辑报名') }}</span>
                 </button>
                 <a href="http://arc-bench.com/login" target="_blank" rel="noopener" class="block w-full px-4 py-2 text-left text-sm text-text-tertiary transition-colors hover:bg-bg-elevated hover:text-text-primary">
-                  {{ pick('Login to ARC-Bench', '登录 ARC-Bench') }} ↗
+                  {{ pick('Open ARC-Bench', '访问 ARC-Bench') }} ↗
                 </a>
                 <button @click="handleLogout(); showUserDropdown = false" class="w-full text-left px-4 py-2 text-sm text-text-tertiary hover:text-text-primary hover:bg-bg-elevated transition-colors">
                   {{ pick('Logout', '退出登录') }}
@@ -406,21 +420,37 @@ async function saveProfile() {
             </Transition>
           </div>
         </template>
+        <button
+          v-if="!isLoggedIn"
+          type="button"
+          @click="promptAuth('login')"
+          class="inline-flex h-10 items-center border border-border px-4 py-0 text-xs font-semibold uppercase tracking-widest text-text-secondary transition-colors hover:border-accent hover:text-text-primary whitespace-nowrap"
+        >
+          {{ pick('Login', '登录') }}
+        </button>
         <router-link
-          v-if="isLoggedIn && user?.teamId"
+          v-if="isLoggedIn && myTeam"
           to="/submit"
           class="inline-flex h-10 items-center bg-emerald-600 px-4 py-0 text-xs font-semibold uppercase tracking-widest text-white transition-colors hover:bg-emerald-500 whitespace-nowrap"
         >
           {{ pick('SUBMIT PROJECT', '提交项目') }}
         </router-link>
         <a
-          v-if="!isLoggedIn || !user?.teamId"
+          v-if="!isLoggedIn"
           :href="router.resolve({ path: '/', hash: '#teams' }).href"
           @click.prevent="scrollTo('#teams')"
           class="inline-flex h-10 items-center bg-btn-bg px-4 py-0 text-xs font-semibold uppercase tracking-widest text-btn-text transition-colors hover:bg-btn-hover whitespace-nowrap"
         >
           {{ t('nav.applyNow') }}
         </a>
+        <button
+          v-else-if="!myTeam"
+          type="button"
+          @click="openRegistrationEditor"
+          class="inline-flex h-10 items-center bg-btn-bg px-4 py-0 text-xs font-semibold uppercase tracking-widest text-btn-text transition-colors hover:bg-btn-hover whitespace-nowrap"
+        >
+          {{ pick('Complete Registration', '完成报名') }}
+        </button>
       </nav>
 
       <!-- Mobile Toggle -->
@@ -457,13 +487,6 @@ async function saveProfile() {
           {{ item.label }}
         </a>
         <router-link
-          to="/bootcamp"
-          @click="mobileOpen = false"
-          class="block py-3 text-text-tertiary hover:text-text-primary transition-colors"
-        >
-          {{ t('nav.bootcamp') }}
-        </router-link>
-        <router-link
           to="/rules"
           @click="mobileOpen = false"
           class="block py-3 text-text-tertiary hover:text-text-primary transition-colors"
@@ -486,14 +509,28 @@ async function saveProfile() {
           <button @click="openProfileModal(); mobileOpen = false" class="block py-3 text-text-tertiary hover:text-text-primary transition-colors text-sm">
             {{ pick('My Profile', '我的资料') }}
           </button>
+          <button @click="goToMyTeam(); mobileOpen = false" class="block py-3 text-text-tertiary hover:text-text-primary transition-colors text-sm">
+            {{ pick('My Team / Edit Registration', '我的队伍 / 编辑报名') }}
+          </button>
           <a href="http://arc-bench.com/login" target="_blank" rel="noopener" @click="mobileOpen = false" class="block py-3 text-sm text-text-tertiary transition-colors hover:text-text-primary">
-            {{ pick('Login to ARC-Bench', '登录 ARC-Bench') }} ↗
+            {{ pick('Open ARC-Bench', '访问 ARC-Bench') }} ↗
           </a>
           <button @click="handleLogout" class="block py-3 text-text-tertiary hover:text-text-primary transition-colors text-sm">
             {{ pick('Logout', '退出登录') }}
           </button>
         </template>
-        <a :href="router.resolve({ path: '/', hash: '#teams' }).href" @click.prevent="scrollTo('#teams')" class="mt-4 block text-center px-5 py-3 bg-btn-bg text-btn-text text-xs font-semibold tracking-widest uppercase hover:bg-btn-hover transition-colors">
+        <button
+          v-else
+          type="button"
+          @click="promptAuth('login'); mobileOpen = false"
+          class="block w-full border-t border-border-subtle py-3 text-left text-sm text-text-tertiary transition-colors hover:text-text-primary"
+        >
+          {{ pick('Login / Edit Registration', '登录 / 编辑报名') }}
+        </button>
+        <button v-if="isLoggedIn" type="button" @click="openRegistrationEditor(); mobileOpen = false" class="mt-4 block w-full bg-btn-bg px-5 py-3 text-center text-xs font-semibold uppercase tracking-widest text-btn-text transition-colors hover:bg-btn-hover">
+          {{ myTeam ? pick('Edit Registration', '编辑报名') : pick('Complete Registration', '完成报名') }}
+        </button>
+        <a v-else :href="router.resolve({ path: '/', hash: '#teams' }).href" @click.prevent="scrollTo('#teams')" class="mt-4 block text-center px-5 py-3 bg-btn-bg text-btn-text text-xs font-semibold tracking-widest uppercase hover:bg-btn-hover transition-colors">
           {{ t('nav.applyNow') }}
         </a>
       </div>
@@ -506,7 +543,10 @@ async function saveProfile() {
       <div v-if="showAuthModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4">
         <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" @click="showAuthModal = false"></div>
 
-        <div class="relative w-full max-w-md glass-card p-8 max-h-[90vh] overflow-y-auto border-accent-red/20">
+        <div
+          class="relative w-full glass-card p-5 sm:p-8 max-h-[90vh] overflow-y-auto border-accent-red/20"
+          :class="authModalTab === 'register' ? 'max-w-xl' : 'max-w-md'"
+        >
           <button @click="showAuthModal = false" class="absolute top-4 right-4 text-text-secondary hover:text-text-primary">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
           </button>
@@ -525,7 +565,7 @@ async function saveProfile() {
               class="pb-3 text-sm font-semibold transition-colors border-b-2 -mb-px"
               :class="authModalTab === 'register' ? 'text-text-primary border-accent' : 'text-text-secondary border-transparent hover:text-text-secondary'"
             >
-              {{ pick('Register', '注册') }}
+              {{ pick('Team Registration', '队伍报名') }}
             </button>
           </div>
 
@@ -533,6 +573,12 @@ async function saveProfile() {
 
           <!-- Login form -->
           <form v-if="authModalTab === 'login'" @submit.prevent="submitLogin" class="space-y-5">
+            <div class="border border-accent/25 bg-accent/5 p-3 text-xs leading-relaxed text-text-secondary">
+              {{ pick(
+                'After confirming your registration email, sign in here with the email and password you submitted. You can then edit your profile and team registration.',
+                '完成报名邮件确认后，用报名时填写的邮箱和密码在这里登录。登录后可以修改个人资料和队伍报名信息。',
+              ) }}
+            </div>
             <div>
               <label class="block text-sm text-text-secondary mb-1">{{ pick('Email', '邮箱') }} <span class="text-accent-red">*</span></label>
               <input v-model="loginEmail" type="email" required placeholder="your@email.com" :class="inputClass" />
@@ -571,9 +617,93 @@ async function saveProfile() {
 
           <!-- Register form -->
           <form v-else @submit.prevent="submitRegister" class="space-y-5">
+            <!-- Confirmation is a separate screen so the next action cannot be missed. -->
+            <template v-if="registerNeedsConfirm">
+              <div class="py-2 text-center">
+                <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full border border-green-500/40 bg-green-500/10 text-green-400">
+                  <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8m-16 9h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                </div>
+                <p class="mt-4 font-mono text-[11px] uppercase tracking-[.14em] text-green-400">{{ pick('Registration submitted', '报名资料已提交') }}</p>
+                <h3 class="mt-2 text-xl font-semibold text-text-primary">{{ pick('One more step: confirm your email', '还差一步：确认邮箱') }}</h3>
+                <p class="mx-auto mt-2 max-w-md text-sm leading-relaxed text-text-secondary">
+                  {{ pick('Your team is not active yet. Complete the steps below to finish registration.', '你的队伍目前还没有正式创建。请按下面的步骤完成报名。') }}
+                </p>
+              </div>
+
+              <ol class="border-y border-border py-2 text-left">
+                <li class="flex gap-3 py-3">
+                  <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-accent text-xs font-bold text-white">1</span>
+                  <div>
+                    <p class="text-sm font-semibold text-text-primary">{{ pick('Open your inbox', '打开邮箱') }}</p>
+                    <p class="mt-1 break-all text-xs leading-relaxed text-text-secondary">{{ confirmedEmail }}</p>
+                  </div>
+                </li>
+                <li class="flex gap-3 border-t border-border-subtle py-3">
+                  <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-border text-xs font-bold text-text-secondary">2</span>
+                  <div>
+                    <p class="text-sm font-semibold text-text-primary">{{ pick('Open “Confirm Your Signup” and click the confirmation button', '打开主题为“Confirm Your Signup”的邮件，点击里面的确认按钮') }}</p>
+                    <p class="mt-1 text-xs leading-relaxed text-text-secondary">{{ pick('This is the official hackathon account confirmation—not an admission decision or a promotional email.', '这是黑客松账号确认邮件，不是录取通知，也不是推广邮件。') }}</p>
+                  </div>
+                </li>
+                <li class="flex gap-3 border-t border-border-subtle py-3">
+                  <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-border text-xs font-bold text-text-secondary">3</span>
+                  <div>
+                    <p class="text-sm font-semibold text-text-primary">{{ pick('Return to the site and check your team', '返回官网，确认队伍已经创建') }}</p>
+                    <p class="mt-1 text-xs leading-relaxed text-text-secondary">{{ pick('The confirmation link returns you to the site. You can then sign in and edit your registration at any time.', '确认链接会带你回到官网。之后可以随时登录并修改报名信息。') }}</p>
+                  </div>
+                </li>
+              </ol>
+
+              <div class="border border-amber-500/25 bg-amber-500/5 p-3 text-xs leading-relaxed text-text-secondary">
+                <strong class="text-text-primary">{{ pick('ARC-Bench is separate:', '关于 ARC-Bench：') }}</strong>
+                {{ pick('the competition-platform login will be announced separately. Your registration password is not automatically an ARC-Bench password.', '比赛平台的开放和登录方式会另行通知；这里填写的密码不会自动成为 ARC-Bench 密码。') }}
+              </div>
+
+              <p class="text-xs leading-relaxed text-text-muted">
+                {{ pick('No email? Wait a minute, then check Spam, Junk, or Promotions.', '暂时没收到？请稍等一分钟，并检查垃圾邮件、广告邮件或促销邮件文件夹。') }}
+              </p>
+              <div class="grid gap-3 sm:grid-cols-2">
+                <button type="button" @click="showAuthModal = false" class="w-full border border-border px-4 py-3 text-xs font-semibold uppercase tracking-wider text-text-secondary transition-colors hover:border-accent hover:text-text-primary">
+                  {{ pick('I’ll confirm it now', '我现在去确认') }}
+                </button>
+                <button type="button" @click="authModalTab = 'login'; authError = ''" class="w-full bg-btn-bg px-4 py-3 text-xs font-semibold uppercase tracking-wider text-btn-text transition-colors hover:bg-btn-hover">
+                  {{ pick('Already confirmed? Sign in', '已经确认？去登录') }}
+                </button>
+              </div>
+            </template>
+
+            <template v-else>
+            <div>
+              <p class="font-mono text-[11px] uppercase tracking-[.14em] text-accent">{{ pick('How registration works', '报名前先看流程') }}</p>
+              <div class="mt-3 grid grid-cols-3 border border-border">
+                <div class="p-3">
+                  <span class="text-xs font-bold text-accent">01</span>
+                  <p class="mt-1 text-xs font-semibold leading-snug text-text-primary">{{ pick('Submit team details', '提交队伍资料') }}</p>
+                </div>
+                <div class="border-l border-border p-3">
+                  <span class="text-xs font-bold text-accent">02</span>
+                  <p class="mt-1 text-xs font-semibold leading-snug text-text-primary">{{ pick('Confirm your email', '点击确认邮件') }}</p>
+                </div>
+                <div class="border-l border-border p-3">
+                  <span class="text-xs font-bold text-accent">03</span>
+                  <p class="mt-1 text-xs font-semibold leading-snug text-text-primary">{{ pick('Sign in and edit', '登录并可修改') }}</p>
+                </div>
+              </div>
+              <p class="mt-2 text-xs leading-relaxed text-text-muted">
+                {{ pick('The ARC-Bench competition-platform login is separate and will be announced later.', 'ARC-Bench 比赛平台的登录方式与本次报名分开，后续会另行通知。') }}
+              </p>
+            </div>
+
             <p class="border border-accent/30 bg-accent/5 p-3 text-sm font-semibold text-accent">
-              {{ pick('Create one account for the whole team. Teammates do not need separate accounts.', '每支队伍只需创建一个账号，队员无需各自注册。') }}
+              {{ pick('Create one account for the whole team. Teammates do not need separate accounts.', '每支队伍只需创建一个账号，建议由队长或主要联系人填写；队员无需各自注册。') }}
             </p>
+            <div class="flex items-center gap-3 pt-1">
+              <span class="flex h-7 w-7 items-center justify-center rounded-full bg-accent text-xs font-bold text-white">1</span>
+              <div>
+                <h3 class="text-sm font-semibold text-text-primary">{{ pick('Team account', '队伍账号') }}</h3>
+                <p class="text-xs text-text-muted">{{ pick('Used to confirm, sign in, and edit the registration.', '用于确认报名、登录以及后续修改资料。') }}</p>
+              </div>
+            </div>
             <div>
               <label class="block text-sm text-text-secondary mb-1">{{ pick('Name', '姓名') }} <span class="text-accent-red">*</span></label>
               <input v-model="regName" type="text" required :placeholder="pick('Your name', '你的姓名')" :class="inputClass" />
@@ -649,12 +779,19 @@ async function saveProfile() {
             </div>
 
             <div class="space-y-4 border-l-2 border-accent-blue/30 pl-4">
+                <div class="flex items-center gap-3 -ml-[1.1rem] bg-bg-primary py-1">
+                  <span class="flex h-7 w-7 items-center justify-center rounded-full bg-accent text-xs font-bold text-white">2</span>
+                  <div>
+                    <h3 class="text-sm font-semibold text-text-primary">{{ pick('Team details', '队伍资料') }}</h3>
+                    <p class="text-xs text-text-muted">{{ pick('Only the team name is required. The rest can be updated later.', '只有队伍名称必填，其余内容之后可以再补。') }}</p>
+                  </div>
+                </div>
                 <div>
                   <label class="block text-sm text-text-secondary mb-1">{{ pick('Team Name', '队伍名称') }} <span class="text-accent-red">*</span></label>
                   <input v-model="regTeamName" type="text" required :placeholder="pick('e.g. Team Alpha', '例如：启航队')" :class="inputClass" />
                 </div>
                 <div>
-                  <label class="block text-sm text-text-secondary mb-2">{{ t('teams.track') }} ({{ t('teams.optional') }})</label>
+                  <label class="block text-sm text-text-secondary mb-2">{{ t('teams.track') }} {{ t('teams.optional') }}</label>
                   <div class="flex flex-wrap gap-2">
                     <button
                       v-for="track in regTrackOptions"
@@ -692,17 +829,16 @@ async function saveProfile() {
                 </div>
             </div>
 
-            <div v-if="registerNeedsConfirm" class="p-4 bg-green-900/30 border border-green-500/30 text-green-300 text-sm text-center">
-              {{ pick('A confirmation email has been sent to', '确认邮件已发送至') }} <strong>{{ confirmedEmail }}</strong>{{ pick('. Please check your inbox and click the link to activate your account.', '。请检查收件箱并点击邮件中的链接激活账号。') }}
+            <div class="border border-border bg-bg-secondary/50 p-3 text-xs leading-relaxed text-text-secondary">
+              {{ pick('After submission, we will email you a confirmation link. Registration is complete only after you click it.', '提交后，我们会向上面的邮箱发送确认链接；点击确认链接后，报名才算完成。') }}
             </div>
-            <template v-else>
-              <button type="submit" :disabled="authLoading || !regTeamName.trim()" class="w-full py-3 bg-btn-bg text-btn-text text-sm font-semibold tracking-widest uppercase hover:bg-btn-hover transition-colors disabled:opacity-50">
-                {{ authLoading ? pick('Registering...', '正在注册……') : pick('Register Team Account', '注册队伍账号') }}
-              </button>
-              <p class="text-center text-xs text-text-secondary">
-                {{ pick('Already have an account?', '已有账号？') }}
-                <button type="button" @click="authModalTab = 'login'; authError = ''" class="text-accent hover:underline">{{ pick('Login', '登录') }}</button>
-              </p>
+            <button type="submit" :disabled="authLoading || !regTeamName.trim()" class="w-full py-3 bg-btn-bg text-btn-text text-sm font-semibold tracking-widest uppercase hover:bg-btn-hover transition-colors disabled:opacity-50">
+              {{ authLoading ? pick('Submitting...', '正在提交……') : pick('Submit and Send Confirmation Email', '提交报名并发送确认邮件') }}
+            </button>
+            <p class="text-center text-xs text-text-secondary">
+              {{ pick('Already registered?', '已经报名？') }}
+              <button type="button" @click="authModalTab = 'login'; authError = ''" class="text-accent hover:underline">{{ pick('Sign in to view or edit', '登录查看或修改') }}</button>
+            </p>
             </template>
           </form>
         </div>
@@ -722,7 +858,7 @@ async function saveProfile() {
           </button>
 
           <h3 class="text-lg font-bold text-text-primary mb-1">{{ profileEditing ? pick('Edit Profile', '编辑资料') : pick('My Profile', '我的资料') }}</h3>
-          <button v-if="!profileEditing" @click="profileEditing = true" class="mb-4 px-4 py-1.5 text-xs border border-accent text-accent hover:bg-accent hover:text-black transition-colors uppercase tracking-widest">{{ pick('Edit Profile', '编辑资料') }}</button>
+          <button v-if="!profileEditing" @click="openRegistrationEditor" class="mb-4 px-4 py-1.5 text-xs border border-accent text-accent hover:bg-accent hover:text-black transition-colors uppercase tracking-widest">{{ pick('Edit Registration Details', '编辑报名资料') }}</button>
           <button v-else @click="profileEditing = false" class="mb-4 px-4 py-1.5 text-xs border border-border text-text-muted hover:text-text-primary hover:border-text-secondary transition-colors uppercase tracking-widest">{{ pick('Cancel', '取消') }}</button>
 
           <!-- View Mode -->
@@ -910,6 +1046,13 @@ async function saveProfile() {
                 <p class="mt-5 border border-accent/30 bg-accent/5 p-3 text-sm text-text-secondary">
                   {{ pick('This account represents the whole team. Teammates do not need separate accounts.', '这个账号代表整支队伍，队员无需各自注册账号。') }}
                 </p>
+                <button
+                  type="button"
+                  @click="openMyTeamEditor"
+                  class="mt-4 w-full bg-btn-bg px-5 py-3 text-xs font-semibold uppercase tracking-widest text-btn-text transition-colors hover:bg-btn-hover"
+                >
+                  {{ pick('Edit Registration', '编辑报名信息') }}
+                </button>
               </template>
               <p v-else class="mt-5 text-sm text-text-tertiary">
                 {{ pick('No team has been registered with this account yet.', '这个账号还没有注册队伍。') }}

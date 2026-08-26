@@ -2,10 +2,14 @@
 import { computed } from 'vue'
 import { useCountdown } from '../../composables/useCountdown'
 import { useI18n } from '../../composables/useI18n'
+import { useAuth } from '../../composables/useAuth'
 import { assetUrl } from '../../composables/api'
 
-const { t } = useI18n()
+const { t, pick } = useI18n()
+const { isLoggedIn, promptAuth } = useAuth()
 const locationLines = computed(() => t('hero.location') as string[])
+type HeroPartner = { id: string; name: string; role: string; logo: string; url: string }
+const heroPartners = computed(() => t('sponsors.confirmed') as HeroPartner[])
 const { days, hours, minutes, seconds, isLive, isOver } = useCountdown(
   '2026-09-07T00:00:00+08:00',
   '2026-10-18T00:00:00+08:00',
@@ -24,6 +28,17 @@ const pipeline = computed(() => t('hero.pipeline') as PipelineStep[])
 
 <template>
   <section class="hero-section relative min-h-[760px] h-[100svh] overflow-hidden bg-[#0b0d0c] text-white">
+    <svg class="pointer-events-none absolute h-0 w-0" aria-hidden="true" focusable="false">
+      <filter id="hero-cophi-knockout" color-interpolation-filters="sRGB">
+        <feColorMatrix
+          type="matrix"
+          values="0 0 0 0 1
+                  0 0 0 0 1
+                  0 0 0 0 1
+                 -0.2126 -0.7152 -0.0722 0 1"
+        />
+      </filter>
+    </svg>
     <video autoplay loop muted playsinline preload="auto" :poster="assetUrl('/videos/shenzhen-hero-sz1-poster.jpg')" class="absolute inset-0 h-full w-full object-cover">
       <source :src="assetUrl('/videos/shenzhen-hero-sz1.mp4')" type="video/mp4" />
     </video>
@@ -48,21 +63,50 @@ const pipeline = computed(() => t('hero.pipeline') as PipelineStep[])
               <div class="mt-3 font-mono text-xs uppercase leading-[1.7] tracking-[0.08em] text-white/72 md:text-sm">
                 <p v-for="line in locationLines" :key="line" class="mt-1 first:mt-0">{{ line }}</p>
               </div>
-              <p class="mt-3 flex max-w-2xl items-start gap-2 text-xs leading-[1.7] text-white/78 md:text-sm">
-                <span class="mt-[0.65em] h-1.5 w-1.5 shrink-0 bg-[#c788a1]"></span>
-                <span>{{ t('hero.sponsorNotice') }}</span>
-              </p>
               <p class="mt-3 font-mono text-xs uppercase tracking-[0.1em] text-[#dca6b9]">
                 {{ t('awards.poolLabel') }} · {{ t('awards.poolStatus') }}
               </p>
             </div>
 
             <div class="flex flex-wrap items-center gap-3 md:justify-end">
+              <button
+                v-if="!isLoggedIn"
+                type="button"
+                @click="promptAuth('login')"
+                class="border border-white/50 px-5 py-3 text-xs font-semibold uppercase tracking-[0.14em] text-white transition-colors hover:border-white hover:bg-white hover:text-[#111310]"
+              >
+                {{ pick('Login / Edit Registration', '登录 / 编辑报名') }}
+              </button>
               <a href="#teams" class="bg-[#c788a1] px-5 py-3 text-xs font-semibold uppercase tracking-[0.14em] text-[#111310] transition-colors hover:bg-white">
-                {{ t('nav.applyNow') }} <span class="ml-3">↗</span>
+                {{ isLoggedIn ? pick('Manage Registration', '管理报名') : t('nav.applyNow') }} <span class="ml-3">↗</span>
               </a>
             </div>
           </div>
+        </div>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-x-5 gap-y-3 pb-4" :aria-label="pick('Partners', '合作伙伴')">
+        <span class="shrink-0 font-mono text-xs uppercase tracking-[0.1em] text-white/64">
+          {{ pick('Partners', '合作伙伴') }}
+        </span>
+        <div class="flex min-w-0 flex-1 flex-wrap gap-2">
+          <a
+            v-for="partner in heroPartners"
+            :key="partner.id"
+            :href="partner.url"
+            target="_blank"
+            rel="noopener noreferrer"
+            :aria-label="partner.name"
+            class="hero-partner group flex h-12 min-w-[8rem] max-w-[10rem] flex-1 items-center justify-center gap-2 px-3 py-2 sm:w-40 sm:flex-none"
+          >
+            <img
+              :src="assetUrl(partner.logo)"
+              :alt="partner.name"
+              :class="['hero-partner-logo max-h-8 max-w-full object-contain', { 'hero-partner-logo--cophi': partner.id === 'cophi' }]"
+            />
+            <span v-if="partner.id === 'qiwoo'" class="hero-partner-wordmark text-xs font-semibold leading-tight">{{ partner.name }}</span>
+            <span v-else-if="partner.id === 'cophi'" class="hero-partner-wordmark text-xs font-semibold">CoPhi</span>
+          </a>
         </div>
       </div>
 
@@ -94,6 +138,44 @@ const pipeline = computed(() => t('hero.pipeline') as PipelineStep[])
   background: #4b1f3c;
   mix-blend-mode: color;
   opacity: .82;
+}
+
+.hero-partner {
+  background: transparent;
+  transition: background-color .2s ease;
+}
+
+.hero-partner-logo {
+  filter: grayscale(1) brightness(0) invert(1);
+  opacity: .82;
+  transition: filter .2s ease, opacity .2s ease;
+}
+
+.hero-partner-logo--cophi {
+  filter: url('#hero-cophi-knockout');
+}
+
+.hero-partner-wordmark {
+  color: rgba(255, 255, 255, .82);
+  transition: color .2s ease;
+}
+
+.hero-partner:hover,
+.hero-partner:focus-visible {
+  background: #fff;
+  outline: none;
+}
+
+.hero-partner:hover .hero-partner-logo,
+.hero-partner:focus-visible .hero-partner-logo {
+  filter: none;
+  mix-blend-mode: normal;
+  opacity: 1;
+}
+
+.hero-partner:hover .hero-partner-wordmark,
+.hero-partner:focus-visible .hero-partner-wordmark {
+  color: #0f172a;
 }
 
 @media (max-width: 767px) {
