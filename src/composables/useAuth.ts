@@ -72,10 +72,10 @@ const user = ref<User | null>(null)
 const isLoggedIn = ref(false)
 const error = ref('')
 const showAuthModal = ref(false)
-const authModalTab = ref<'login' | 'register' | 'forgot'>('register')
+const authModalTab = ref<'login' | 'register' | 'forgot'>('login')
 const showChangePasswordModal = ref(false)
 
-function promptAuth(tab: 'login' | 'register' = 'register') {
+function promptAuth(tab: 'login' | 'register' = 'login') {
   authModalTab.value = tab
   error.value = ''
   showAuthModal.value = true

@@ -21,7 +21,7 @@ export default {
       { label: "决赛", date: "10.1 – 10.7" },
       { label: "颁奖", date: "10.17" },
     ],
-    eventTitle: "开放智能体产业联盟（OAIC）、启悟社主办",
+    eventTitle: "开放智能体产业联盟（OAIC）主办 · 启悟社区（教育部支持）认证",
     location: [
       "2026.9.7 – 9.20 · 研习营 · 线上",
       "2026.9.21 – 9.30 · 初赛 · 线上",
@@ -335,7 +335,6 @@ export default {
       { id: "oaic", name: "OAIC 开放智能体产业联盟", role: "合作伙伴", logo: "/sponsors/oaic.png", url: "https://visionforum.ai/#about" },
       { id: "qiwoo", name: "启悟学习社区", role: "合作伙伴", logo: "/sponsors/qiwoo.svg", url: "https://qiwoo.edu.cn/" },
       { id: "taotoken", name: "TaoToken.net", role: "合作伙伴", logo: "/sponsors/taotoken.svg", url: "https://taotoken.net/" },
-      { id: "cophi", name: "上海交通大学计算机学院 CoPhi Group", role: "合作伙伴", logo: "/sponsors/cophi.jpg", url: "https://github.com/code-philia" },
     ],
   },
   teams: {
@@ -418,6 +417,6 @@ export default {
   footer: {
     copyright: "2026 OAIC 智能体软件工厂国际黑客松和大奖赛系列",
     mainSite: "create.gosim.org",
-    register: "报名",
+    register: "报名/登录",
   },
 };

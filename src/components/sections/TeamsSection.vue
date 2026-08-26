@@ -659,31 +659,28 @@ onUnmounted(() => {
         </div>
       </div>
 
-      <!-- Stats bar -->
-      <div class="max-w-3xl mb-12 reveal border-y border-border py-5">
-        <div class="flex justify-between text-sm mb-3">
+      <!-- Registration count, followed by one divider and the next action. -->
+      <div class="max-w-3xl mb-12 reveal">
+        <div class="flex justify-between pb-5 text-sm">
           <span class="text-text-secondary inline-flex items-center gap-1">
             <img :src="tw.fire" class="w-4 h-4" />
             <span class="text-text-primary font-bold tabular-nums">{{ teamsCount }}</span> {{ pick('registered teams', '支已注册队伍') }}
           </span>
         </div>
-      </div>
-
-      <div class="flex items-center gap-4 flex-wrap mb-12 reveal">
-        <template v-if="isLoggedIn">
-          <button v-if="userHasTeam()" @click="openMyRegistration" class="px-8 py-4 bg-btn-bg text-btn-text text-sm font-semibold tracking-widest uppercase hover:bg-btn-hover transition-colors">
-            {{ pick('EDIT MY REGISTRATION', '编辑我的报名') }}
-          </button>
-          <button v-else @click="openCreateModal" :disabled="isFull" class="px-8 py-4 bg-btn-bg text-btn-text text-sm font-semibold tracking-widest uppercase hover:bg-btn-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-            <img v-if="!isFull" :src="tw.rocket" class="w-4 h-4 inline mr-1" />{{ isFull ? t('teams.closedBtn') : pick('COMPLETE TEAM REGISTRATION', '完成队伍报名') }}
-          </button>
-          <button @click="openMyProfile" class="px-8 py-4 border border-border text-text-secondary text-sm font-semibold tracking-widest uppercase hover:text-text-primary hover:border-accent transition-colors">
-            {{ pick('VIEW MY PROFILE', '查看我的资料') }}
-          </button>
-        </template>
-        <template v-else>
-          <div class="w-full max-w-3xl border-y border-border py-5">
-            <p class="mb-4 font-mono text-[11px] uppercase tracking-[.14em] text-text-muted">{{ pick('Three steps to complete registration', '完成报名需要三步') }}</p>
+        <div class="border-t border-border pt-6">
+          <div v-if="isLoggedIn" class="flex flex-wrap gap-4">
+            <button v-if="userHasTeam()" @click="openMyRegistration" class="px-8 py-4 bg-btn-bg text-btn-text text-sm font-semibold tracking-widest uppercase hover:bg-btn-hover transition-colors">
+              {{ pick('REGISTER / SIGN IN', '报名/登录') }}
+            </button>
+            <button v-else @click="openCreateModal" :disabled="isFull" class="px-8 py-4 bg-btn-bg text-btn-text text-sm font-semibold tracking-widest uppercase hover:bg-btn-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+              <img v-if="!isFull" :src="tw.rocket" class="w-4 h-4 inline mr-1" />{{ isFull ? t('teams.closedBtn') : pick('REGISTER / SIGN IN', '报名/登录') }}
+            </button>
+            <button @click="openMyProfile" class="px-8 py-4 border border-border text-text-secondary text-sm font-semibold tracking-widest uppercase hover:text-text-primary hover:border-accent transition-colors">
+              {{ pick('VIEW MY PROFILE', '查看我的资料') }}
+            </button>
+          </div>
+          <template v-else>
+            <p class="mb-4 font-mono text-[11px] uppercase tracking-[.14em] text-text-muted">{{ pick('Registration takes three steps', '报名需要 3 步') }}</p>
             <div class="grid gap-4 sm:grid-cols-3">
               <div class="flex gap-3">
                 <span class="font-mono text-sm font-bold text-accent">01</span>
@@ -698,16 +695,13 @@ onUnmounted(() => {
                 <div><p class="text-sm font-semibold text-text-primary">{{ pick('Sign in to view or edit', '登录查看或修改') }}</p><p class="mt-1 text-xs leading-relaxed text-text-muted">{{ pick('ARC-Bench access will be announced separately.', 'ARC-Bench 登录方式另行通知。') }}</p></div>
               </div>
             </div>
-            <div class="mt-5 flex flex-wrap gap-4">
-              <button @click="promptAuth('register')" class="px-8 py-4 bg-btn-bg text-btn-text text-sm font-semibold tracking-widest uppercase hover:bg-btn-hover transition-colors">
-                {{ pick('Start Registration', '开始报名') }}
-              </button>
-              <button @click="promptAuth('login')" class="px-8 py-4 border border-border text-text-secondary text-sm font-semibold tracking-widest uppercase hover:text-text-primary hover:border-accent transition-colors">
-                {{ pick('Already Registered? Sign In', '已经报名？登录 / 编辑') }}
+            <div class="mt-5">
+              <button @click="promptAuth('login')" class="px-8 py-4 bg-btn-bg text-btn-text text-sm font-semibold tracking-widest uppercase hover:bg-btn-hover transition-colors">
+                {{ pick('Register / Sign In', '报名/登录') }}
               </button>
             </div>
-          </div>
-        </template>
+          </template>
+        </div>
       </div>
 
       <!-- Filter chips -->

@@ -69,7 +69,8 @@ async function scrollTo(href: string) {
   window.requestAnimationFrame(() => {
     const el = document.querySelector(href)
     if (!el) return
-    const top = el.getBoundingClientRect().top + window.scrollY - 64
+    const headerHeight = document.querySelector('header')?.getBoundingClientRect().height || 64
+    const top = el.getBoundingClientRect().top + window.scrollY - headerHeight
     window.scrollTo({ top, behavior: 'smooth' })
   })
 }
@@ -408,7 +409,7 @@ async function saveProfile() {
                   {{ pick('My Profile', '我的资料') }}
                 </button>
                 <button v-if="isLoggedIn" @click="goToMyTeam(); showUserDropdown = false" class="w-full text-left px-4 py-2 text-sm text-text-tertiary hover:text-text-primary hover:bg-bg-elevated transition-colors">
-                  <span>{{ pick('My Team / Edit Registration', '我的队伍 / 编辑报名') }}</span>
+                  <span>{{ pick('My Team', '我的队伍') }}</span>
                 </button>
                 <a href="http://arc-bench.com/login" target="_blank" rel="noopener" class="block w-full px-4 py-2 text-left text-sm text-text-tertiary transition-colors hover:bg-bg-elevated hover:text-text-primary">
                   {{ pick('Open ARC-Bench', '访问 ARC-Bench') }} ↗
@@ -424,9 +425,9 @@ async function saveProfile() {
           v-if="!isLoggedIn"
           type="button"
           @click="promptAuth('login')"
-          class="inline-flex h-10 items-center border border-border px-4 py-0 text-xs font-semibold uppercase tracking-widest text-text-secondary transition-colors hover:border-accent hover:text-text-primary whitespace-nowrap"
+          class="inline-flex h-10 items-center bg-btn-bg px-4 py-0 text-xs font-semibold uppercase tracking-widest text-btn-text transition-colors hover:bg-btn-hover whitespace-nowrap"
         >
-          {{ pick('Login', '登录') }}
+          {{ pick('Register / Sign In', '报名/登录') }}
         </button>
         <router-link
           v-if="isLoggedIn && myTeam"
@@ -435,21 +436,13 @@ async function saveProfile() {
         >
           {{ pick('SUBMIT PROJECT', '提交项目') }}
         </router-link>
-        <a
-          v-if="!isLoggedIn"
-          :href="router.resolve({ path: '/', hash: '#teams' }).href"
-          @click.prevent="scrollTo('#teams')"
-          class="inline-flex h-10 items-center bg-btn-bg px-4 py-0 text-xs font-semibold uppercase tracking-widest text-btn-text transition-colors hover:bg-btn-hover whitespace-nowrap"
-        >
-          {{ t('nav.applyNow') }}
-        </a>
         <button
-          v-else-if="!myTeam"
+          v-if="isLoggedIn && !myTeam"
           type="button"
           @click="openRegistrationEditor"
           class="inline-flex h-10 items-center bg-btn-bg px-4 py-0 text-xs font-semibold uppercase tracking-widest text-btn-text transition-colors hover:bg-btn-hover whitespace-nowrap"
         >
-          {{ pick('Complete Registration', '完成报名') }}
+          {{ pick('Register / Sign In', '报名/登录') }}
         </button>
       </nav>
 
@@ -466,6 +459,28 @@ async function saveProfile() {
         </svg>
       </button>
     </div>
+
+    <button
+      v-if="isHome"
+      type="button"
+      @click="isLoggedIn ? openRegistrationEditor() : promptAuth('login')"
+      class="registration-announcement block h-11 w-full overflow-hidden bg-[#8b4962] text-left text-white shadow-[0_8px_24px_rgba(75,31,60,.24)] transition-colors hover:bg-[#743b51]"
+      :aria-label="pick('Registration is now open. Register or sign in.', '报名现已开放，前往报名或登录。')"
+    >
+      <span aria-hidden="true" class="registration-announcement__track h-full items-center">
+        <span v-for="set in 2" :key="set" class="registration-announcement__set h-full items-center">
+          <span v-for="copy in 6" :key="copy" class="registration-announcement__item h-full items-center">
+            <span class="inline-flex items-center gap-2 font-semibold">
+              <span class="h-2 w-2 animate-pulse rounded-full bg-[#ffd2df]"></span>
+              {{ pick('REGISTRATION IS NOW OPEN', '报名现已开放') }}
+            </span>
+            <span class="text-white/75">·</span>
+            <span>{{ pick('One shared account per team', '每支队伍只需一个账号') }}</span>
+            <span class="font-semibold">{{ pick('Register / Sign in', '报名/登录') }} →</span>
+          </span>
+        </span>
+      </span>
+    </button>
 
     <!-- Mobile Menu -->
     <Transition
@@ -510,7 +525,7 @@ async function saveProfile() {
             {{ pick('My Profile', '我的资料') }}
           </button>
           <button @click="goToMyTeam(); mobileOpen = false" class="block py-3 text-text-tertiary hover:text-text-primary transition-colors text-sm">
-            {{ pick('My Team / Edit Registration', '我的队伍 / 编辑报名') }}
+            {{ pick('My Team', '我的队伍') }}
           </button>
           <a href="http://arc-bench.com/login" target="_blank" rel="noopener" @click="mobileOpen = false" class="block py-3 text-sm text-text-tertiary transition-colors hover:text-text-primary">
             {{ pick('Open ARC-Bench', '访问 ARC-Bench') }} ↗
@@ -519,20 +534,12 @@ async function saveProfile() {
             {{ pick('Logout', '退出登录') }}
           </button>
         </template>
-        <button
-          v-else
-          type="button"
-          @click="promptAuth('login'); mobileOpen = false"
-          class="block w-full border-t border-border-subtle py-3 text-left text-sm text-text-tertiary transition-colors hover:text-text-primary"
-        >
-          {{ pick('Login / Edit Registration', '登录 / 编辑报名') }}
-        </button>
         <button v-if="isLoggedIn" type="button" @click="openRegistrationEditor(); mobileOpen = false" class="mt-4 block w-full bg-btn-bg px-5 py-3 text-center text-xs font-semibold uppercase tracking-widest text-btn-text transition-colors hover:bg-btn-hover">
-          {{ myTeam ? pick('Edit Registration', '编辑报名') : pick('Complete Registration', '完成报名') }}
+          {{ pick('Register / Sign In', '报名/登录') }}
         </button>
-        <a v-else :href="router.resolve({ path: '/', hash: '#teams' }).href" @click.prevent="scrollTo('#teams')" class="mt-4 block text-center px-5 py-3 bg-btn-bg text-btn-text text-xs font-semibold tracking-widest uppercase hover:bg-btn-hover transition-colors">
-          {{ t('nav.applyNow') }}
-        </a>
+        <button v-else type="button" @click="promptAuth('login'); mobileOpen = false" class="mt-4 block w-full bg-btn-bg px-5 py-3 text-center text-xs font-semibold uppercase tracking-widest text-btn-text transition-colors hover:bg-btn-hover">
+          {{ pick('Register / Sign In', '报名/登录') }}
+        </button>
       </div>
     </Transition>
   </header>
@@ -593,10 +600,12 @@ async function saveProfile() {
             <p class="text-center text-xs text-text-secondary mt-1">
               <button type="button" @click="authModalTab = 'forgot'; authError = ''" class="text-accent hover:underline">{{ pick('Forgot password?', '忘记密码？') }}</button>
             </p>
-            <p class="text-center text-xs text-text-secondary">
-              {{ pick("Don't have an account?", '还没有账号？') }}
-              <button type="button" @click="authModalTab = 'register'; authError = ''" class="text-accent hover:underline">{{ pick('Register', '注册') }}</button>
-            </p>
+            <div class="border-t border-border pt-4 text-center">
+              <p class="mb-3 text-xs text-text-secondary">{{ pick("Don't have an account yet?", '还没有报名账号？') }}</p>
+              <button type="button" @click="authModalTab = 'register'; authError = ''" class="w-full border border-accent px-4 py-3 text-xs font-semibold uppercase tracking-wider text-accent transition-colors hover:bg-accent hover:text-white">
+                {{ pick('Register Now', '立即报名') }}
+              </button>
+            </div>
           </form>
 
           <!-- Forgot password form -->
@@ -1099,3 +1108,38 @@ async function saveProfile() {
     </Transition>
   </Teleport>
 </template>
+
+<style scoped>
+.registration-announcement__track {
+  animation: registration-announcement-marquee 54s linear infinite;
+  display: flex;
+  width: max-content;
+  will-change: transform;
+}
+
+.registration-announcement__set {
+  display: flex;
+  flex: none;
+}
+
+.registration-announcement__item {
+  display: inline-flex;
+  flex: none;
+  gap: .8rem;
+  padding-right: 6rem;
+  white-space: nowrap;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: .82rem;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+@keyframes registration-announcement-marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .registration-announcement__track { animation: none; }
+}
+</style>

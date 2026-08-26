@@ -2,7 +2,15 @@
 import { useI18n } from '../../composables/useI18n'
 import { useAuth } from '../../composables/useAuth'
 const { t, pick } = useI18n()
-const { isLoggedIn } = useAuth()
+const { isLoggedIn, promptAuth } = useAuth()
+
+function handleRegistrationAccess() {
+  if (!isLoggedIn.value) {
+    promptAuth('login')
+    return
+  }
+  document.querySelector('#teams')?.scrollIntoView({ behavior: 'smooth' })
+}
 </script>
 
 <template>
@@ -14,9 +22,9 @@ const { isLoggedIn } = useAuth()
         <p class="mt-8 max-w-2xl text-base font-medium leading-relaxed md:text-xl">{{ t('cta.tagline') }}</p>
         <p class="mono-label mt-4">{{ t('cta.location') }}</p>
       </div>
-      <a href="#teams" class="inline-flex min-w-48 items-center justify-between border border-white bg-white px-6 py-4 text-xs font-semibold uppercase tracking-[.14em] text-[#4b1f3c] transition-colors hover:bg-transparent hover:text-white">
-        {{ isLoggedIn ? pick('Manage Registration', '管理报名') : t('nav.applyNow') }} <span class="ml-8">↗</span>
-      </a>
+      <button type="button" @click="handleRegistrationAccess" class="inline-flex min-w-48 items-center justify-between border border-white bg-white px-6 py-4 text-xs font-semibold uppercase tracking-[.14em] text-[#4b1f3c] transition-colors hover:bg-transparent hover:text-white">
+        {{ pick('Register / Sign In', '报名/登录') }} <span class="ml-8">↗</span>
+      </button>
     </div>
   </section>
 </template>

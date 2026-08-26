@@ -13,7 +13,7 @@ export default {
     applyNow: 'Register Now',
   },
   hero: {
-    eyebrow: 'Organized by OAIC and Qiwoo',
+    eyebrow: 'Organized by OAIC · Certified by Qiwoo Community (supported by the Ministry of Education)',
     system: 'Intl. Hackathon for Agentic Factory',
     pipeline: [
       { label: 'Camp', date: 'Sep 7–20' },
@@ -232,7 +232,6 @@ export default {
       { id: 'oaic', name: 'OAIC', role: 'Partner', logo: '/sponsors/oaic.png', url: 'https://visionforum.ai/#about' },
       { id: 'qiwoo', name: 'Qiwoo / Open Insight', role: 'Partner', logo: '/sponsors/qiwoo.svg', url: 'https://qiwoo.edu.cn/' },
       { id: 'taotoken', name: 'TaoToken.net', role: 'Partner', logo: '/sponsors/taotoken.svg', url: 'https://taotoken.net/' },
-      { id: 'cophi', name: 'CoPhi Group, SJTU School of Computer Science', role: 'Partner', logo: '/sponsors/cophi.jpg', url: 'https://github.com/code-philia' },
     ],
   },
   teams: {
@@ -259,5 +258,5 @@ export default {
     ],
   },
   cta: { title: 'From vibe to harness, from luck to mastery', tagline: 'Software development did not die in the AI wave — it matters more than ever.', location: 'Sep 7 – Oct 17, 2026 · Online + GOSIM Shenzhen' },
-  footer: { copyright: '2026 OAIC International Hackathon for Agentic Factory and Grand Challenge Series', mainSite: 'ARC-Bench', register: 'Register' },
+  footer: { copyright: '2026 OAIC International Hackathon for Agentic Factory and Grand Challenge Series', mainSite: 'ARC-Bench', register: 'Register / Sign In' },
 }

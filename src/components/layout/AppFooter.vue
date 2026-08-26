@@ -1,7 +1,19 @@
 <script setup lang="ts">
 import { useI18n } from '../../composables/useI18n'
+import { useRouter } from 'vue-router'
+import { useAuth } from '../../composables/useAuth'
 
 const { t } = useI18n()
+const router = useRouter()
+const { isLoggedIn, promptAuth } = useAuth()
+
+async function handleRegistrationAccess() {
+  if (!isLoggedIn.value) {
+    promptAuth('login')
+    return
+  }
+  await router.push({ path: '/', hash: '#teams' })
+}
 </script>
 
 <template>
@@ -16,9 +28,9 @@ const { t } = useI18n()
           <a href="http://arc-bench.com" target="_blank" rel="noopener" class="font-mono text-xs uppercase tracking-[.12em] text-white/60 hover:text-white transition-colors">
             {{ t('footer.mainSite') }}
           </a>
-          <router-link :to="{ path: '/', hash: '#teams' }" class="font-mono text-xs uppercase tracking-[.12em] text-[#dca6b9] hover:text-white transition-colors">
+          <button type="button" @click="handleRegistrationAccess" class="font-mono text-xs uppercase tracking-[.12em] text-[#dca6b9] hover:text-white transition-colors">
             {{ t('footer.register') }} ↗
-          </router-link>
+          </button>
         </div>
       </div>
     </div>

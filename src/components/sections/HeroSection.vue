@@ -24,6 +24,14 @@ const timeUnits = [
 
 type PipelineStep = { label: string; date: string }
 const pipeline = computed(() => t('hero.pipeline') as PipelineStep[])
+
+function handleRegistrationAccess() {
+  if (!isLoggedIn.value) {
+    promptAuth('login')
+    return
+  }
+  document.querySelector('#teams')?.scrollIntoView({ behavior: 'smooth' })
+}
 </script>
 
 <template>
@@ -69,17 +77,9 @@ const pipeline = computed(() => t('hero.pipeline') as PipelineStep[])
             </div>
 
             <div class="flex flex-wrap items-center gap-3 md:justify-end">
-              <button
-                v-if="!isLoggedIn"
-                type="button"
-                @click="promptAuth('login')"
-                class="border border-white/50 px-5 py-3 text-xs font-semibold uppercase tracking-[0.14em] text-white transition-colors hover:border-white hover:bg-white hover:text-[#111310]"
-              >
-                {{ pick('Login / Edit Registration', '登录 / 编辑报名') }}
+              <button type="button" @click="handleRegistrationAccess" class="bg-[#c788a1] px-5 py-3 text-xs font-semibold uppercase tracking-[0.14em] text-[#111310] transition-colors hover:bg-white">
+                {{ pick('Register / Sign In', '报名/登录') }} <span class="ml-3">↗</span>
               </button>
-              <a href="#teams" class="bg-[#c788a1] px-5 py-3 text-xs font-semibold uppercase tracking-[0.14em] text-[#111310] transition-colors hover:bg-white">
-                {{ isLoggedIn ? pick('Manage Registration', '管理报名') : t('nav.applyNow') }} <span class="ml-3">↗</span>
-              </a>
             </div>
           </div>
         </div>
