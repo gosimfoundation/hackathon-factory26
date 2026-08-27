@@ -13,15 +13,15 @@ export default {
     applyNow: 'Register Now',
   },
   hero: {
-    eyebrow: 'Organized by OAIC · Certified by Qiwoo Community (supported by the Ministry of Education)',
-    system: 'Intl. Hackathon for Agentic Factory',
+    eyebrow: 'GOSIM Hackathon · Software Engineering × Agent',
+    system: 'Agentic Software Factory',
     pipeline: [
       { label: 'Camp', date: 'Sep 7–20' },
       { label: 'Qualifier', date: 'Sep 21–30' },
       { label: 'Finals', date: 'Oct 1–7' },
       { label: 'Awards', date: 'Oct 17' },
     ],
-    eventTitle: '2026 OAIC International Hackathon for Agentic Factory and Grand Challenge Series',
+    eventTitle: 'Organized by OAIC · Certified by Qiwoo Community (supported by the Ministry of Education)',
     location: [
       'Sep 7 – Sep 20, 2026 · Bootcamp · Online',
       'Sep 21 – Sep 30, 2026 · Qualifier · Online',
