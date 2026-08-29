@@ -89,8 +89,12 @@ const loginPassword = ref('')
 const regName = ref('')
 const regEmail = ref('')
 const regPassword = ref('')
+const regWechat = ref('')
 const regGithubId = ref('')
 const regRole = ref('')
+const regLocation = ref('')
+const regOrganization = ref('')
+const regAgeRange = ref('')
 const regDiscord = ref('')
 const regTwitter = ref('')
 const regTelegram = ref('')
@@ -106,12 +110,6 @@ const regTeamProjectIdea = ref('')
 const registrationTrackIds = ['auth-session', 'repository-lifecycle', 'issues-forms', 'pull-request-review', 'actions-workflow', 'org-permissions-audit', 'compute-engine']
 const regTrackOptions = computed(() => (t('tracks.themes') as any[]).map((theme, i) => ({ id: registrationTrackIds[i], label: theme.title })))
 
-function toggleRegTrack(id: string) {
-  const idx = regTeamTracks.value.indexOf(id)
-  if (idx >= 0) regTeamTracks.value.splice(idx, 1)
-  else regTeamTracks.value.push(id)
-}
-
 const roleOptions = computed(() => [
   { value: 'AI Engineer', label: pick('AI Engineer', 'AI 工程师') },
   { value: 'Full-Stack Developer', label: pick('Full-Stack Developer', '全栈开发者') },
@@ -125,6 +123,18 @@ const roleOptions = computed(() => [
   { value: 'Other', label: pick('Other', '其他') },
 ])
 
+const ageRangeOptions = ['18-22', '23-28', '29-35', '36+']
+
+function splitLocation(value: string): { city: string; country: string } {
+  const normalized = value.trim()
+  const separator = Math.max(normalized.lastIndexOf(','), normalized.lastIndexOf('，'))
+  if (separator < 0) return { city: normalized, country: '' }
+  return {
+    city: normalized.slice(0, separator).trim(),
+    country: normalized.slice(separator + 1).trim(),
+  }
+}
+
 const authLoading = ref(false)
 
 watch(showAuthModal, (open) => {
@@ -135,8 +145,12 @@ watch(showAuthModal, (open) => {
     regName.value = ''
     regEmail.value = ''
     regPassword.value = ''
+    regWechat.value = ''
     regGithubId.value = ''
     regRole.value = ''
+    regLocation.value = ''
+    regOrganization.value = ''
+    regAgeRange.value = ''
     regDiscord.value = ''
     regTwitter.value = ''
     regTelegram.value = ''
@@ -175,10 +189,12 @@ async function submitForgot() {
 
 async function submitRegister() {
   authLoading.value = true
+  const location = splitLocation(regLocation.value)
   const ok = await register({
     name: regName.value,
     email: regEmail.value,
     password: regPassword.value,
+    wechat: regWechat.value.trim(),
     githubId: regGithubId.value,
     role: regRole.value,
     avatar: '',
@@ -190,6 +206,10 @@ async function submitRegister() {
     telegram: regTelegram.value,
     linkedin: regLinkedin.value,
     website: regWebsite.value,
+    country: location.country,
+    city: location.city,
+    organization: regOrganization.value.trim(),
+    ageRange: regAgeRange.value,
     lookingForTeam: false,
     team: {
       name: regTeamName.value.trim(),
@@ -582,8 +602,8 @@ async function saveProfile() {
           <form v-if="authModalTab === 'login'" @submit.prevent="submitLogin" class="space-y-5">
             <div class="border border-accent/25 bg-accent/5 p-3 text-xs leading-relaxed text-text-secondary">
               {{ pick(
-                'After confirming your registration email, sign in here with the email and password you submitted. You can then edit your profile and team registration.',
-                '完成报名邮件确认后，用报名时填写的邮箱和密码在这里登录。登录后可以修改个人资料和队伍报名信息。',
+                'Sign in here with the email and password you submitted. You can then edit your profile and team registration.',
+                '用报名时填写的邮箱和密码在这里登录。登录后可以修改个人资料和队伍报名信息。',
               ) }}
             </div>
             <div>
@@ -684,17 +704,13 @@ async function saveProfile() {
             <template v-else>
             <div>
               <p class="font-mono text-[11px] uppercase tracking-[.14em] text-accent">{{ pick('How registration works', '报名前先看流程') }}</p>
-              <div class="mt-3 grid grid-cols-3 border border-border">
+              <div class="mt-3 grid grid-cols-2 border border-border">
                 <div class="p-3">
                   <span class="text-xs font-bold text-accent">01</span>
                   <p class="mt-1 text-xs font-semibold leading-snug text-text-primary">{{ pick('Submit team details', '提交队伍资料') }}</p>
                 </div>
                 <div class="border-l border-border p-3">
                   <span class="text-xs font-bold text-accent">02</span>
-                  <p class="mt-1 text-xs font-semibold leading-snug text-text-primary">{{ pick('Confirm your email', '点击确认邮件') }}</p>
-                </div>
-                <div class="border-l border-border p-3">
-                  <span class="text-xs font-bold text-accent">03</span>
                   <p class="mt-1 text-xs font-semibold leading-snug text-text-primary">{{ pick('Sign in and edit', '登录并可修改') }}</p>
                 </div>
               </div>
@@ -710,7 +726,7 @@ async function saveProfile() {
               <span class="flex h-7 w-7 items-center justify-center rounded-full bg-accent text-xs font-bold text-white">1</span>
               <div>
                 <h3 class="text-sm font-semibold text-text-primary">{{ pick('Team account', '队伍账号') }}</h3>
-                <p class="text-xs text-text-muted">{{ pick('Used to confirm, sign in, and edit the registration.', '用于确认报名、登录以及后续修改资料。') }}</p>
+                <p class="text-xs text-text-muted">{{ pick('Used to sign in and edit the registration.', '用于登录以及后续修改报名资料。') }}</p>
               </div>
             </div>
             <div>
@@ -726,6 +742,10 @@ async function saveProfile() {
               <input v-model="regPassword" type="password" required :placeholder="pick('Password', '密码')" :class="inputClass" />
             </div>
             <div>
+              <label class="block text-sm text-text-secondary mb-1">{{ pick('WeChat ID (optional)', '微信号（选填）') }}</label>
+              <input v-model="regWechat" type="text" :placeholder="pick('Your WeChat ID', '你的微信号')" autocomplete="off" :class="inputClass" />
+            </div>
+            <div>
               <label class="block text-sm text-text-secondary mb-1">{{ pick('GitHub Username', 'GitHub 用户名') }} <span class="text-accent-red">*</span></label>
               <input v-model="regGithubId" type="text" required placeholder="e.g. octocat" :class="inputClass" />
             </div>
@@ -736,16 +756,31 @@ async function saveProfile() {
                 <option v-for="r in roleOptions" :key="r.value" :value="r.value" class="bg-bg-primary">{{ r.label }}</option>
               </select>
             </div>
-            <!-- Social links with stronger guidance -->
+            <div>
+              <label class="block text-sm text-text-secondary mb-1">{{ pick('Organization / School (optional)', '单位 / 学校（选填）') }}</label>
+              <input v-model="regOrganization" type="text" :placeholder="pick('Company, university, or school', '公司、高校或学校名称')" :class="inputClass" />
+            </div>
+            <div>
+              <label class="block text-sm text-text-secondary mb-1">{{ pick('City, Country', '城市，国家') }} <span class="text-accent-red">*</span></label>
+              <input v-model="regLocation" type="text" required pattern=".+[,，].+" :title="pick('Enter city and country, separated by a comma', '请用逗号分隔城市和国家')" :placeholder="pick('e.g. Shenzhen, China', '例如：深圳，中国')" :class="inputClass" />
+            </div>
+            <div>
+              <label class="block text-sm text-text-secondary mb-1">{{ pick('Age Range', '年龄段') }} <span class="text-accent-red">*</span></label>
+              <select v-model="regAgeRange" required :class="[inputClass, 'appearance-none']">
+                <option value="">{{ pick('Select age range', '选择年龄段') }}</option>
+                <option v-for="range in ageRangeOptions" :key="range" :value="range">{{ range }}</option>
+              </select>
+            </div>
+            <!-- Keep optional public links concise; legacy contact values remain in Supabase. -->
             <div class="bg-accent/5 border border-accent/20 rounded-lg p-4">
               <div class="flex items-center gap-2 mb-2">
                 <svg class="w-4 h-4 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
-                <span class="text-sm font-medium text-text-primary">{{ pick('Team contact details', '队伍联系方式') }}</span>
+                <span class="text-sm font-medium text-text-primary">{{ pick('Additional links', '其他链接') }}</span>
                 <span class="text-xs text-accent bg-accent/10 px-1.5 py-0.5 rounded">{{ pick('recommended', '推荐填写') }}</span>
               </div>
-              <p class="text-xs text-text-tertiary mb-3">{{ pick('Add at least one way for the organizers to reach your team', '建议至少填写一种方便主办方联系队伍的方式') }}</p>
+              <p class="text-xs text-text-tertiary mb-3">{{ pick('Share a professional profile or website if useful', '如有需要，可填写职业主页或个人网站') }}</p>
               <div class="space-y-3">
-                <div class="grid grid-cols-2 gap-3">
+                <div v-if="false" class="grid grid-cols-2 gap-3">
                   <div>
                     <label class="flex items-center gap-1.5 text-xs text-text-secondary mb-1">
                       <svg class="w-3.5 h-3.5 text-[#5865F2]" fill="currentColor" viewBox="0 0 24 24"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>
@@ -761,8 +796,8 @@ async function saveProfile() {
                     <input v-model="regTwitter" type="text" placeholder="@handle" :class="[inputClass, regTwitter ? 'border-emerald-500/50' : '']" />
                   </div>
                 </div>
-                <div class="grid grid-cols-2 gap-3">
-                  <div>
+                <div class="grid grid-cols-1 gap-3">
+                  <div v-if="false">
                     <label class="flex items-center gap-1.5 text-xs text-text-secondary mb-1">
                       <svg class="w-3.5 h-3.5 text-[#0088cc]" fill="currentColor" viewBox="0 0 24 24"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
                       Telegram
@@ -800,37 +835,8 @@ async function saveProfile() {
                   <input v-model="regTeamName" type="text" required :placeholder="pick('e.g. Team Alpha', '例如：启航队')" :class="inputClass" />
                 </div>
                 <div>
-                  <label class="block text-sm text-text-secondary mb-2">{{ t('teams.track') }} {{ t('teams.optional') }}</label>
-                  <div class="flex flex-wrap gap-2">
-                    <button
-                      v-for="track in regTrackOptions"
-                      :key="track.id"
-                      type="button"
-                      @click="toggleRegTrack(track.id)"
-                      class="px-2.5 py-1 text-xs border transition-colors"
-                      :class="regTeamTracks.includes(track.id) ? 'bg-btn-bg text-btn-text border-btn-bg' : 'border-border text-text-secondary hover:border-border-hover'"
-                    >
-                      {{ track.label }}
-                    </button>
-                  </div>
-                </div>
-                <div>
                   <label class="block text-sm text-text-secondary mb-1">{{ pick('GitHub Repo (optional)', 'GitHub 仓库（选填）') }}</label>
                   <input v-model="regTeamGithubRepo" type="text" placeholder="https://github.com/..." :class="inputClass" />
-                </div>
-                <div>
-                  <label class="block text-sm text-text-secondary mb-1">{{ pick('Model (optional)', '模型（选填）') }}</label>
-                  <select v-model="regTeamModel" :class="[inputClass, 'appearance-none']">
-                    <option value="">{{ pick('Select a model', '选择模型') }}</option>
-                    <option v-for="m in modelChoices" :key="m.value" :value="m.value">{{ m.label }}</option>
-                  </select>
-                </div>
-                <div>
-                  <label class="block text-sm text-text-secondary mb-1">{{ t('teams.harness') }}</label>
-                  <select v-model="regTeamHarness" :class="[inputClass, 'appearance-none']">
-                    <option value="">{{ t('teams.optional') }}</option>
-                    <option v-for="option in (t('teams.harnessOptions') as string[])" :key="option" :value="option">{{ option }}</option>
-                  </select>
                 </div>
                 <div>
                   <label class="block text-sm text-text-secondary mb-1">{{ pick('Project Idea (optional)', '项目想法（选填）') }}</label>
@@ -839,10 +845,10 @@ async function saveProfile() {
             </div>
 
             <div class="border border-border bg-bg-secondary/50 p-3 text-xs leading-relaxed text-text-secondary">
-              {{ pick('After submission, we will email you a confirmation link. Registration is complete only after you click it.', '提交后，我们会向上面的邮箱发送确认链接；点击确认链接后，报名才算完成。') }}
+              {{ pick('Registration is complete immediately after submission. No confirmation email is required.', '提交后报名立即完成，无需点击邮箱确认链接。') }}
             </div>
             <button type="submit" :disabled="authLoading || !regTeamName.trim()" class="w-full py-3 bg-btn-bg text-btn-text text-sm font-semibold tracking-widest uppercase hover:bg-btn-hover transition-colors disabled:opacity-50">
-              {{ authLoading ? pick('Submitting...', '正在提交……') : pick('Submit and Send Confirmation Email', '提交报名并发送确认邮件') }}
+              {{ authLoading ? pick('Submitting...', '正在提交……') : pick('Submit Registration', '提交报名') }}
             </button>
             <p class="text-center text-xs text-text-secondary">
               {{ pick('Already registered?', '已经报名？') }}

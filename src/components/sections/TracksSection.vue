@@ -46,10 +46,10 @@ function formatTokens(millions: number | null): string {
             <span aria-hidden="true">↗</span>
           </a>
           <p class="mt-3 max-w-xl text-xs leading-relaxed text-text-muted">
-            {{ pick('ARC-Bench access and login instructions will be announced separately. Confirming your registration email only activates your registration-site account.', 'ARC-Bench 的开放与登录方式会另行通知。确认报名邮件只会激活报名官网账号。') }}
+            {{ pick('ARC-Bench access and login instructions will be announced separately. Your registration-site account is available immediately after signup.', 'ARC-Bench 的开放与登录方式会另行通知。报名官网账号在提交后立即可用。') }}
           </p>
           <p class="mt-2 max-w-xl text-xs font-semibold leading-relaxed text-accent-red">
-            {{ pick('For now, complete the registration-site email confirmation. No additional ARC-Bench action is required until the organizers notify you.', '目前请先完成报名官网的邮箱确认；收到主办方通知前，无需在 ARC-Bench 进行额外操作。') }}
+            {{ pick('No additional ARC-Bench action is required until the organizers notify you.', '收到主办方通知前，无需在 ARC-Bench 进行额外操作。') }}
           </p>
         </div>
 

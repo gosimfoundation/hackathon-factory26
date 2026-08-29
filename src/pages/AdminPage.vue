@@ -49,7 +49,7 @@ const hoveredDay = ref(-1)
 
 // Edit modal
 const editingUser = ref<any>(null)
-const editFields = ref({ name: '', email: '', role: '', bio: '', github_id: '', discord: '', twitter: '', telegram: '', admin_notes: '' })
+const editFields = ref({ name: '', email: '', wechat: '', role: '', bio: '', github_id: '', country: '', city: '', organization: '', age_range: '', discord: '', twitter: '', telegram: '', admin_notes: '' })
 
 // QR modal
 const qrUser = ref<any>(null)
@@ -161,7 +161,12 @@ const fieldRates = computed(() => {
   const total = profiles.value.length || 1
   const fields = [
     { label: pick('Email', '邮箱'), key: 'email' },
+    { label: pick('WeChat', '微信'), key: 'wechat' },
     { label: pick('Role', '角色'), key: 'role' },
+    { label: pick('Country', '国家'), key: 'country' },
+    { label: pick('City', '城市'), key: 'city' },
+    { label: pick('Organization', '单位'), key: 'organization' },
+    { label: pick('Age', '年龄段'), key: 'age_range' },
     { label: 'GitHub', key: 'github_id' },
     { label: pick('Bio', '个人简介'), key: 'bio' },
     { label: 'Discord', key: 'discord' },
@@ -227,7 +232,11 @@ const filteredUsers = computed(() => {
   const q = search.value.toLowerCase()
   return profiles.value.filter(p =>
     (p.name || '').toLowerCase().includes(q) ||
-    (p.email || '').toLowerCase().includes(q)
+    (p.email || '').toLowerCase().includes(q) ||
+    (p.wechat || '').toLowerCase().includes(q) ||
+    (p.country || '').toLowerCase().includes(q) ||
+    (p.city || '').toLowerCase().includes(q) ||
+    (p.organization || '').toLowerCase().includes(q)
   )
 })
 
@@ -270,10 +279,10 @@ function downloadBackup(format: string) {
     downloadFile(JSON.stringify(data, null, 2), `hackathon-backup-${date}.json`, 'application/json')
   } else if (format === 'csv') {
     const teamMap = Object.fromEntries(teams.value.map((t: any) => [t.id, t]))
-    const header = ['Name','Email','Role','GitHub','Team','Model','Discord','Telegram','Checked In','Approved','Registered']
+    const header = ['Name','Email','WeChat','Role','GitHub','Country','City','Organization / School','Age Range','Team','Model','Discord','Telegram','Checked In','Approved','Registered']
     const rows = profiles.value.map((p: any) => {
       const t = teamMap[p.team_id] || {}
-      return [p.name, p.email||'', p.role||'', p.github_id||'', t.name||'', t.model||'', p.discord||'', p.telegram||'', p.checked_in?'Yes':'No', p.approved?'Yes':'No', (p.created_at||'').slice(0,10)]
+      return [p.name, p.email||'', p.wechat||'', p.role||'', p.github_id||'', p.country||'', p.city||'', p.organization||'', p.age_range||'', t.name||'', t.model||'', p.discord||'', p.telegram||'', p.checked_in?'Yes':'No', p.approved?'Yes':'No', (p.created_at||'').slice(0,10)]
     })
     const csv = [header, ...rows].map(r => r.map((c: string) => `"${(c||'').replace(/"/g,'""')}"`).join(',')).join('\n')
     downloadFile(csv, `hackathon-roster-${date}.csv`, 'text/csv')
@@ -299,10 +308,10 @@ function exportPDF(date: string) {
   doc.text(`${profiles.value.length} participants · ${teams.value.length} teams · Exported ${date}`, 14, 22)
 
   const teamMap = Object.fromEntries(teams.value.map((t: any) => [t.id, t]))
-  const head = [['#', 'Name', 'Email', 'Role', 'GitHub', 'Team', 'Model', 'Checked In', 'Approved', 'Registered']]
+  const head = [['#', 'Name', 'Email', 'WeChat', 'Role', 'GitHub', 'Country', 'City', 'Organization', 'Age', 'Team', 'Model', 'Checked In', 'Approved', 'Registered']]
   const body = profiles.value.map((p: any, i: number) => {
     const t = teamMap[p.team_id] || {}
-    return [i+1, p.name||'', p.email||'—', p.role||'—', p.github_id||'—', t.name||'—', t.model||'—', p.checked_in?'Yes':'No', p.approved?'Yes':'No', (p.created_at||'').slice(0,10)]
+    return [i+1, p.name||'', p.email||'—', p.wechat||'—', p.role||'—', p.github_id||'—', p.country||'—', p.city||'—', p.organization||'—', p.age_range||'—', t.name||'—', t.model||'—', p.checked_in?'Yes':'No', p.approved?'Yes':'No', (p.created_at||'').slice(0,10)]
   })
   autoTable(doc, { head, body, startY: 28, styles: { fontSize: 7, cellPadding: 2 }, headStyles: { fillColor: [26, 26, 46] } })
   doc.save(`hackathon-roster-${date}.pdf`)
@@ -313,9 +322,14 @@ function openEdit(user: any) {
   editFields.value = {
     name: user.name || '',
     email: user.email || '',
+    wechat: user.wechat || '',
     role: user.role || '',
     bio: user.bio || '',
     github_id: user.github_id || '',
+    country: user.country || '',
+    city: user.city || '',
+    organization: user.organization || '',
+    age_range: user.age_range || '',
     discord: user.discord || '',
     twitter: user.twitter || '',
     telegram: user.telegram || '',
@@ -695,7 +709,10 @@ onMounted(() => { if (authed.value) { loadData(); loadAnnouncement(); loadSubmis
               <tr class="text-left text-xs text-gray-500 uppercase border-b border-gray-800">
                 <th class="py-3 px-3">{{ pick('User', '用户') }}</th>
                 <th class="py-3 px-3">{{ pick('Email', '邮箱') }}</th>
+                <th class="py-3 px-3">{{ pick('WeChat', '微信') }}</th>
                 <th class="py-3 px-3">{{ pick('Role', '角色') }}</th>
+                <th class="py-3 px-3">{{ pick('Location', '地区') }}</th>
+                <th class="py-3 px-3">{{ pick('Organization / Age', '单位 / 年龄段') }}</th>
                 <th class="py-3 px-3">{{ pick('Team', '队伍') }}</th>
                 <th class="py-3 px-3 text-center">{{ pick('Approved', '已批准') }}</th>
                 <th class="py-3 px-3 text-center">{{ pick('Check-in', '签到') }}</th>
@@ -715,7 +732,10 @@ onMounted(() => { if (authed.value) { loadData(); loadAnnouncement(); loadSubmis
                   </div>
                 </td>
                 <td class="py-3 px-3 text-gray-400">{{ p.email || '—' }}</td>
+                <td class="py-3 px-3 text-gray-400">{{ p.wechat || '—' }}</td>
                 <td class="py-3 px-3 text-gray-400">{{ roleLabel(p.role) || '—' }}</td>
+                <td class="py-3 px-3 text-gray-400">{{ [p.city, p.country].filter(Boolean).join(', ') || '—' }}</td>
+                <td class="py-3 px-3 text-gray-400"><span>{{ p.organization || '—' }}</span><span v-if="p.age_range" class="ml-1 text-gray-600">· {{ p.age_range }}</span></td>
                 <td class="py-3 px-3 text-gray-400">{{ getTeamName(p.team_id) }}</td>
                 <td class="py-3 px-3 text-center">
                   <button @click="toggleApproved(p)" class="w-6 h-6 border-2 rounded inline-flex items-center justify-center transition-colors"
@@ -818,12 +838,37 @@ onMounted(() => { if (authed.value) { loadData(); loadAnnouncement(); loadSubmis
                 <input v-model="editFields.email" class="w-full px-3 py-2 bg-gray-800 border border-gray-700 text-white text-sm focus:border-amber-500 focus:outline-none" />
               </div>
               <div>
+                <label class="block text-xs text-gray-500 mb-1">{{ pick('WeChat ID', '微信号') }}</label>
+                <input v-model="editFields.wechat" class="w-full px-3 py-2 bg-gray-800 border border-gray-700 text-white text-sm focus:border-amber-500 focus:outline-none" />
+              </div>
+              <div>
                 <label class="block text-xs text-gray-500 mb-1">{{ pick('Role', '角色') }}</label>
                 <input v-model="editFields.role" class="w-full px-3 py-2 bg-gray-800 border border-gray-700 text-white text-sm focus:border-amber-500 focus:outline-none" />
               </div>
               <div>
                 <label class="block text-xs text-gray-500 mb-1">{{ pick('Bio', '个人简介') }}</label>
                 <textarea v-model="editFields.bio" rows="2" class="w-full px-3 py-2 bg-gray-800 border border-gray-700 text-white text-sm focus:border-amber-500 focus:outline-none resize-none"></textarea>
+              </div>
+              <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <div>
+                  <label class="block text-xs text-gray-500 mb-1">{{ pick('Country', '国家') }}</label>
+                  <input v-model="editFields.country" class="w-full px-3 py-2 bg-gray-800 border border-gray-700 text-white text-sm focus:border-amber-500 focus:outline-none" />
+                </div>
+                <div>
+                  <label class="block text-xs text-gray-500 mb-1">{{ pick('City', '城市') }}</label>
+                  <input v-model="editFields.city" class="w-full px-3 py-2 bg-gray-800 border border-gray-700 text-white text-sm focus:border-amber-500 focus:outline-none" />
+                </div>
+              </div>
+              <div>
+                <label class="block text-xs text-gray-500 mb-1">{{ pick('Organization / School', '单位 / 学校') }}</label>
+                <input v-model="editFields.organization" class="w-full px-3 py-2 bg-gray-800 border border-gray-700 text-white text-sm focus:border-amber-500 focus:outline-none" />
+              </div>
+              <div>
+                <label class="block text-xs text-gray-500 mb-1">{{ pick('Age Range', '年龄段') }}</label>
+                <select v-model="editFields.age_range" class="w-full px-3 py-2 bg-gray-800 border border-gray-700 text-white text-sm focus:border-amber-500 focus:outline-none">
+                  <option value="">—</option>
+                  <option v-for="range in ['18-22', '23-28', '29-35', '36+']" :key="range" :value="range">{{ range }}</option>
+                </select>
               </div>
               <div class="grid grid-cols-2 gap-3">
                 <div>

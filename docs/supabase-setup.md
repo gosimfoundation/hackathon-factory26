@@ -14,8 +14,13 @@ CREATE TABLE public.profiles (
   id uuid PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   name text,
   email text,
+  wechat text,
   github_id text,
   role text,
+  country text,
+  city text,
+  organization text,
+  age_range text CHECK (age_range IS NULL OR age_range IN ('18-22', '23-28', '29-35', '36+')),
   avatar text,
   themes text[],
   preferred_model text,
@@ -146,6 +151,25 @@ In Supabase Dashboard > Database > Replication, enable realtime for:
 ## 6. Auth Settings
 
 In Supabase Dashboard > Authentication > Settings:
-- Enable email confirmations (or disable for development)
+- Disable **Confirm Email** so registrations become active immediately
 - Set your site URL for redirect
-- Optionally enable auto-confirm for development
+
+### Confirmation email limits
+
+Supabase's built-in email provider is intended for testing and is limited to two
+authentication emails per hour across the project. For a public registration
+site, configure a custom SMTP provider in Authentication > Email Templates /
+SMTP Settings, then review Authentication > Rate Limits.
+
+This project intentionally disables **Confirm Email**. Registration email
+addresses are therefore not verified. Password-reset emails still require an
+email provider and remain subject to the configured rate limits.
+
+## 7. Registration Demographics
+
+Run `supabase/migrations/20260828_00_registration_demographics.sql` to add the
+country, city, organization/school, and age-range fields used by the registration
+form, admin roster, and exports.
+
+Run `supabase/migrations/20260829_00_registration_wechat.sql` to add the optional
+WeChat contact field and Auth metadata synchronization.

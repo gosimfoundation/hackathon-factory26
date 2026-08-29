@@ -27,12 +27,20 @@ async function checkPass() {
 
 async function loadData() {
   loading.value = true
-  const { data: profiles } = await supabase.from('profiles').select('name, email, team_id').not('team_id', 'is', null)
+  const { data: profiles } = await supabase
+    .from('profiles')
+    .select('name, email, wechat, country, city, organization, age_range, team_id')
+    .not('team_id', 'is', null)
   const { data: teams } = await supabase.from('teams').select('id, name, model')
   const teamMap = Object.fromEntries((teams || []).map(t => [t.id, t]))
   rows.value = (profiles || []).map(p => ({
     name: p.name || '',
     email: p.email || '',
+    wechat: p.wechat || '',
+    country: p.country || '',
+    city: p.city || '',
+    organization: p.organization || '',
+    ageRange: p.age_range || '',
     team: teamMap[p.team_id]?.name || '',
     model: teamMap[p.team_id]?.model || '',
   })).sort((a, b) => a.team.localeCompare(b.team) || a.name.localeCompare(b.name))
@@ -40,9 +48,10 @@ async function loadData() {
 }
 
 function exportCSV() {
-  const header = 'Name,Email,Team,Model'
-  const lines = rows.value.map(r => `"${r.name}","${r.email}","${r.team}","${r.model}"`)
-  const csv = [header, ...lines].join('\n')
+  const csvCell = (value: unknown) => `"${String(value ?? '').replace(/"/g, '""')}"`
+  const header = ['Name', 'Email', 'WeChat', 'Country', 'City', 'Organization / School', 'Age Range', 'Team', 'Model']
+  const lines = rows.value.map(r => [r.name, r.email, r.wechat, r.country, r.city, r.organization, r.ageRange, r.team, r.model].map(csvCell).join(','))
+  const csv = [header.map(csvCell).join(','), ...lines].join('\n')
   const blob = new Blob([csv], { type: 'text/csv' })
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
@@ -70,7 +79,7 @@ function exportJSON() {
       </form>
     </div>
 
-    <div v-else class="w-full max-w-4xl">
+    <div v-else class="w-full max-w-7xl">
       <div class="flex items-center justify-between mb-6">
         <div>
           <h1 class="text-2xl font-bold">{{ pick('Team Members', '队伍成员') }}</h1>
@@ -89,6 +98,10 @@ function exportJSON() {
             <th class="py-3 px-3">#</th>
             <th class="py-3 px-3">{{ pick('Name', '姓名') }}</th>
             <th class="py-3 px-3">{{ pick('Email', '邮箱') }}</th>
+            <th class="py-3 px-3">{{ pick('WeChat', '微信') }}</th>
+            <th class="py-3 px-3">{{ pick('Location', '地区') }}</th>
+            <th class="py-3 px-3">{{ pick('Organization / School', '单位 / 学校') }}</th>
+            <th class="py-3 px-3">{{ pick('Age Range', '年龄段') }}</th>
             <th class="py-3 px-3">{{ pick('Team', '队伍') }}</th>
             <th class="py-3 px-3">{{ pick('Model', '模型') }}</th>
           </tr>
@@ -98,6 +111,10 @@ function exportJSON() {
             <td class="py-2 px-3 text-gray-600">{{ i + 1 }}</td>
             <td class="py-2 px-3">{{ r.name }}</td>
             <td class="py-2 px-3 text-gray-400">{{ r.email }}</td>
+            <td class="py-2 px-3 text-gray-400">{{ r.wechat || '—' }}</td>
+            <td class="py-2 px-3 text-gray-400">{{ [r.city, r.country].filter(Boolean).join(', ') || '—' }}</td>
+            <td class="py-2 px-3 text-gray-400">{{ r.organization || '—' }}</td>
+            <td class="py-2 px-3 text-gray-500">{{ r.ageRange || '—' }}</td>
             <td class="py-2 px-3 text-gray-400">{{ r.team }}</td>
             <td class="py-2 px-3 text-gray-500">{{ r.model }}</td>
           </tr>

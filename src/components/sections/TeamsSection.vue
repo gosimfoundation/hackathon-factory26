@@ -262,8 +262,12 @@ const maxSize = ref<number | null>(null)
 
 // The logged-in registration editor mirrors the fields collected at signup.
 const registrationName = ref('')
+const registrationWechat = ref('')
 const registrationGithubId = ref('')
 const registrationRole = ref('')
+const registrationLocation = ref('')
+const registrationOrganization = ref('')
+const registrationAgeRange = ref('')
 const registrationDiscord = ref('')
 const registrationTwitter = ref('')
 const registrationTelegram = ref('')
@@ -283,15 +287,21 @@ const roleOptions = computed(() => [
   { value: 'Other', label: pick('Other', '其他') },
 ])
 
+const ageRangeOptions = ['18-22', '23-28', '29-35', '36+']
+
+function splitLocation(value: string): { city: string; country: string } {
+  const normalized = value.trim()
+  const separator = Math.max(normalized.lastIndexOf(','), normalized.lastIndexOf('，'))
+  if (separator < 0) return { city: normalized, country: '' }
+  return {
+    city: normalized.slice(0, separator).trim(),
+    country: normalized.slice(separator + 1).trim(),
+  }
+}
+
 const trackIds = ['auth-session', 'repository-lifecycle', 'issues-forms', 'pull-request-review', 'actions-workflow', 'org-permissions-audit', 'compute-engine']
 const trackIcons = ['/icons/theme-01.svg', '/icons/theme-02-v2.svg', '/icons/theme-03.svg', '/icons/theme-04.svg', '/icons/theme-05.svg', '/icons/theme-06.svg', '/icons/theme-07.svg']
 const tracks = computed(() => (t('tracks.themes') as any[]).map((theme, i) => ({ id: trackIds[i], label: theme.title, icon: assetUrl(trackIcons[i]) })))
-
-function toggleTrack(id: string) {
-  const idx = selectedTracks.value.indexOf(id)
-  if (idx >= 0) selectedTracks.value.splice(idx, 1)
-  else selectedTracks.value.push(id)
-}
 
 function getTrackIcon(trackId: string) {
   return tracks.value.find(track => track.id === trackId || track.label === trackId)?.icon
@@ -328,8 +338,12 @@ function resetForm() {
 
 function fillRegistrationContactFields() {
   registrationName.value = user.value?.name || ''
+  registrationWechat.value = user.value?.wechat || ''
   registrationGithubId.value = user.value?.githubId || ''
   registrationRole.value = user.value?.role || ''
+  registrationLocation.value = [user.value?.city, user.value?.country].filter(Boolean).join(', ')
+  registrationOrganization.value = user.value?.organization || ''
+  registrationAgeRange.value = user.value?.ageRange || ''
   registrationDiscord.value = user.value?.discord || ''
   registrationTwitter.value = user.value?.twitter || ''
   registrationTelegram.value = user.value?.telegram || ''
@@ -381,8 +395,10 @@ function openEditModal() {
 
 async function saveRegistrationContactFields(): Promise<boolean> {
   if (!user.value) return false
+  const location = splitLocation(registrationLocation.value)
   return updateProfile({
     name: registrationName.value,
+    wechat: registrationWechat.value.trim(),
     githubId: registrationGithubId.value,
     role: registrationRole.value,
     avatar: user.value.avatar,
@@ -394,6 +410,10 @@ async function saveRegistrationContactFields(): Promise<boolean> {
     telegram: registrationTelegram.value,
     linkedin: registrationLinkedin.value,
     website: registrationWebsite.value,
+    country: location.country,
+    city: location.city,
+    organization: registrationOrganization.value.trim(),
+    ageRange: registrationAgeRange.value,
     lookingForTeam: false,
     confirmedAttendance: user.value.confirmedAttendance,
     teamId: user.value.teamId,
@@ -680,18 +700,14 @@ onUnmounted(() => {
             </button>
           </div>
           <template v-else>
-            <p class="mb-4 font-mono text-[11px] uppercase tracking-[.14em] text-text-muted">{{ pick('Registration takes three steps', '报名需要 3 步') }}</p>
-            <div class="grid gap-4 sm:grid-cols-3">
+            <p class="mb-4 font-mono text-[11px] uppercase tracking-[.14em] text-text-muted">{{ pick('Registration takes two steps', '报名需要 2 步') }}</p>
+            <div class="grid gap-4 sm:grid-cols-2">
               <div class="flex gap-3">
                 <span class="font-mono text-sm font-bold text-accent">01</span>
                 <div><p class="text-sm font-semibold text-text-primary">{{ pick('Submit one team account', '提交一个队伍账号') }}</p><p class="mt-1 text-xs leading-relaxed text-text-muted">{{ pick('The team lead or main contact fills it in.', '由队长或主要联系人填写。') }}</p></div>
               </div>
               <div class="flex gap-3">
                 <span class="font-mono text-sm font-bold text-accent">02</span>
-                <div><p class="text-sm font-semibold text-text-primary">{{ pick('Click the email confirmation', '点击邮箱确认链接') }}</p><p class="mt-1 text-xs leading-relaxed text-text-muted">{{ pick('The team is created only after confirmation.', '确认后队伍才会正式创建。') }}</p></div>
-              </div>
-              <div class="flex gap-3">
-                <span class="font-mono text-sm font-bold text-accent">03</span>
                 <div><p class="text-sm font-semibold text-text-primary">{{ pick('Sign in to view or edit', '登录查看或修改') }}</p><p class="mt-1 text-xs leading-relaxed text-text-muted">{{ pick('ARC-Bench access will be announced separately.', 'ARC-Bench 登录方式另行通知。') }}</p></div>
               </div>
             </div>
@@ -831,6 +847,10 @@ onUnmounted(() => {
                     <p class="mt-1 text-xs text-text-muted">{{ pick('The login email cannot be changed here.', '登录邮箱不能在这里修改。') }}</p>
                   </div>
                   <div>
+                    <label class="block text-sm text-text-secondary mb-1">{{ pick('WeChat ID (optional)', '微信号（选填）') }}</label>
+                    <input v-model="registrationWechat" type="text" :placeholder="pick('Your WeChat ID', '你的微信号')" autocomplete="off" :class="inputClass" />
+                  </div>
+                  <div>
                     <label class="block text-sm text-text-secondary mb-1">{{ pick('GitHub Username', 'GitHub 用户名') }} <span class="text-accent-red">*</span></label>
                     <input v-model="registrationGithubId" type="text" required placeholder="e.g. octocat" :class="inputClass" />
                   </div>
@@ -841,12 +861,24 @@ onUnmounted(() => {
                       <option v-for="role in roleOptions" :key="role.value" :value="role.value">{{ role.label }}</option>
                     </select>
                   </div>
+                  <div>
+                    <label class="block text-sm text-text-secondary mb-1">{{ pick('Organization / School (optional)', '单位 / 学校（选填）') }}</label>
+                    <input v-model="registrationOrganization" type="text" :placeholder="pick('Company, university, or school', '公司、高校或学校名称')" :class="inputClass" />
+                  </div>
+                  <div>
+                    <label class="block text-sm text-text-secondary mb-1">{{ pick('City, Country', '城市，国家') }} <span class="text-accent-red">*</span></label>
+                    <input v-model="registrationLocation" type="text" required pattern=".+[,，].+" :title="pick('Enter city and country, separated by a comma', '请用逗号分隔城市和国家')" :placeholder="pick('e.g. Shenzhen, China', '例如：深圳，中国')" :class="inputClass" />
+                  </div>
+                  <div>
+                    <label class="block text-sm text-text-secondary mb-1">{{ pick('Age Range', '年龄段') }} <span class="text-accent-red">*</span></label>
+                    <select v-model="registrationAgeRange" required :class="[inputClass, 'appearance-none']">
+                      <option value="">{{ pick('Select age range', '选择年龄段') }}</option>
+                      <option v-for="range in ageRangeOptions" :key="range" :value="range">{{ range }}</option>
+                    </select>
+                  </div>
                   <div class="border border-accent/20 bg-accent/5 p-4">
-                    <p class="text-sm font-medium text-text-primary">{{ pick('Team contact details', '队伍联系方式') }} <span class="text-xs font-normal text-text-muted">{{ pick('(recommended)', '（推荐填写）') }}</span></p>
-                    <div class="mt-3 grid grid-cols-2 gap-3">
-                      <input v-model="registrationDiscord" type="text" placeholder="Discord" :class="inputClass" />
-                      <input v-model="registrationTwitter" type="text" placeholder="Twitter / X" :class="inputClass" />
-                      <input v-model="registrationTelegram" type="text" placeholder="Telegram" :class="inputClass" />
+                    <p class="text-sm font-medium text-text-primary">{{ pick('Additional links', '其他链接') }} <span class="text-xs font-normal text-text-muted">{{ pick('(optional)', '（选填）') }}</span></p>
+                    <div class="mt-3">
                       <input v-model="registrationLinkedin" type="text" placeholder="LinkedIn" :class="inputClass" />
                     </div>
                     <input v-model="registrationWebsite" type="text" placeholder="https://yoursite.com" :class="[inputClass, 'mt-3']" />
@@ -866,37 +898,8 @@ onUnmounted(() => {
                     <input v-model="teamName" type="text" required :placeholder="pick('e.g. AgentX', '例如：AgentX')" :class="inputClass" />
                   </div>
                   <div>
-                    <label class="block text-sm text-text-secondary mb-2">{{ t('teams.track') }} {{ t('teams.optional') }}</label>
-                    <div class="flex flex-wrap gap-2">
-                      <button
-                        v-for="track in tracks"
-                        :key="track.id"
-                        type="button"
-                        @click="toggleTrack(track.id)"
-                        class="px-2.5 py-1 text-xs border transition-colors"
-                        :class="selectedTracks.includes(track.id) ? 'bg-btn-bg text-btn-text border-btn-bg' : 'border-border text-text-secondary hover:border-border-hover'"
-                      >
-                        {{ track.label }}
-                      </button>
-                    </div>
-                  </div>
-                  <div>
                     <label class="block text-sm text-text-secondary mb-1">{{ pick('GitHub Repo (optional)', 'GitHub 仓库（选填）') }}</label>
                     <input v-model="githubRepo" type="url" placeholder="https://github.com/your-org/project" :class="inputClass" />
-                  </div>
-                  <div>
-                    <label class="block text-sm text-text-secondary mb-1">{{ pick('Model (optional)', '模型（选填）') }}</label>
-                    <select v-model="selectedModel" :class="[inputClass, 'appearance-none']">
-                      <option value="">{{ pick('Select a model', '选择模型') }}</option>
-                      <option v-for="model in modelOptions" :key="model.id" :value="model.id">{{ model.label }}</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label class="block text-sm text-text-secondary mb-1">{{ t('teams.harness') }}</label>
-                    <select v-model="selectedHarness" :class="[inputClass, 'appearance-none']">
-                      <option value="">{{ t('teams.optional') }}</option>
-                      <option v-for="option in (t('teams.harnessOptions') as string[])" :key="option" :value="option">{{ option }}</option>
-                    </select>
                   </div>
                   <div>
                     <label class="block text-sm text-text-secondary mb-1">{{ pick('Project Idea (optional)', '项目想法（选填）') }}</label>

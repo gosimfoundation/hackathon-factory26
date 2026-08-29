@@ -236,9 +236,9 @@ export default {
     ],
   },
   teams: {
-    title: 'Registered', titleAccent: 'Teams', subtitle: 'Registration is open. After submitting, you must click the confirmation link in your email.',
+    title: 'Registered', titleAccent: 'Teams', subtitle: 'Registration is open. Your registration is complete immediately after submission.',
     registerNote: 'One team needs only one account, completed by the team lead or main contact.',
-    registerWarn: 'Your team is created after email confirmation. ARC-Bench login instructions will be announced separately.',
+    registerWarn: 'Your team is created immediately after submission. ARC-Bench login instructions will be announced separately.',
     refresh: 'Refresh', teams: 'teams', registerBtn: 'Register Your Team', closedBtn: 'Registration Closed', noTeams: 'No teams registered yet. Be the first!', createTitle: 'Register Your Team',
     teamName: 'Team Name', teamAvatar: 'Team Avatar', githubRepo: 'GitHub Repository', members: 'Members',
     track: 'Capability Domains', aiModels: 'Open-Source Models You Plan to Use', harness: 'Which harness do you plan to use?', harnessOptions: ['Octos', 'HAgency', 'ARC', 'Claude Code', 'Custom', 'Other'], projectIdea: 'Project Idea', optional: '(optional)',
@@ -248,7 +248,7 @@ export default {
     title: 'FAQ',
     items: [
       { q: 'Who can participate?', a: 'Open worldwide with no prerequisites — individuals and teams alike, and no in-person attendance is required for the qualifier or the Grand Challenge. You do not need prior Harness Engineering experience; the bootcamp begins September 7.' },
-      { q: 'When is registration complete?', a: 'The team lead or main contact submits one account for the whole team, then opens the email titled “Confirm Your Signup” and clicks the confirmation link. Only then is the team created. You can later sign in to the registration site with that email and password to view or edit details. ARC-Bench access and login instructions will be announced separately.' },
+      { q: 'When is registration complete?', a: 'The team lead or main contact submits one account for the whole team. The team is created immediately after a successful submission. You can later sign in to the registration site with that email and password to view or edit details. ARC-Bench access and login instructions will be announced separately.' },
       { q: 'How do I compete? Is the qualifier required?', a: 'The qualifier is the only way in. The bootcamp runs first (Sep 7–20) and is optional; the qualifier then opens Sep 21 and closes Sep 30, and the top 20 teams on its leaderboard advance to the finals (Oct 1–7).' },
       { q: 'What is the challenge?', a: 'The qualifier rebuilds selected GitHub and Spreadsheets capabilities — Actions, org permissions, audit, and Rulesets. The finals move to a challenge drawn from real, complex enterprise requirements. Full challenge details are on the competition platform, arc-bench.com.' },
       { q: 'Must I use a specific model?', a: 'Compute uses organizer-issued open-source model tokens: Kimi, GLM, MiniMax, and DeepSeek. Every call goes through one metered gateway so token efficiency can be compared.' },

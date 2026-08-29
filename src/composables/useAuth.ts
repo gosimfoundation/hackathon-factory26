@@ -6,6 +6,7 @@ export interface User {
   id: string
   name: string
   email?: string
+  wechat: string
   githubId: string
   role: string
   avatar: string
@@ -17,6 +18,10 @@ export interface User {
   telegram: string
   linkedin: string
   website: string
+  country: string
+  city: string
+  organization: string
+  ageRange: string
   teamId: string | null
   lookingForTeam: boolean
   passwordChanged: boolean
@@ -29,6 +34,7 @@ interface RegisterData {
   name: string
   email: string
   password: string
+  wechat: string
   githubId: string
   role: string
   avatar: string
@@ -40,6 +46,10 @@ interface RegisterData {
   telegram: string
   linkedin: string
   website: string
+  country: string
+  city: string
+  organization: string
+  ageRange: string
   lookingForTeam: boolean
   team: {
     name: string
@@ -86,6 +96,7 @@ function profileRowToUser(row: Record<string, any>, email?: string): User {
     id: row.id,
     name: row.name,
     email: email ?? '',
+    wechat: row.wechat ?? '',
     githubId: row.github_id ?? '',
     role: row.role ?? '',
     avatar: row.avatar ?? '',
@@ -97,6 +108,10 @@ function profileRowToUser(row: Record<string, any>, email?: string): User {
     telegram: row.telegram ?? '',
     linkedin: row.linkedin ?? '',
     website: row.website ?? '',
+    country: row.country ?? '',
+    city: row.city ?? '',
+    organization: row.organization ?? '',
+    ageRange: row.age_range ?? '',
     teamId: row.team_id ?? null,
     lookingForTeam: row.looking_for_team ?? false,
     passwordChanged: row.password_changed ?? false,
@@ -114,6 +129,12 @@ export function provideAuth(pick: <T>(english: T, chinese: T) => T) {
       return pick(
         'Unable to reach the registration service. Please switch networks or disable request-blocking extensions, then try again. If you may have registered already, try logging in or resetting your password.',
         '无法连接报名服务。请切换网络或关闭可能拦截请求的插件后重试。如果账号可能已创建，请尝试直接登录或重置密码。',
+      )
+    }
+    if (/email rate limit exceeded|over_email_send_rate_limit|rate limit.*email/i.test(message)) {
+      return pick(
+        'The confirmation-email limit has been reached. Please wait and try again later, or contact the organizers if registration is urgent.',
+        '确认邮件发送额度已用完，请稍后再试；如需紧急报名，请联系主办方。',
       )
     }
     if (pick(false, true) === false) return message
@@ -143,8 +164,9 @@ export function provideAuth(pick: <T>(english: T, chinese: T) => T) {
         id: session.user.id,
         name: session.user.user_metadata?.name ?? session.user.email?.split('@')[0] ?? '',
         email: session.user.email,
-        githubId: '', role: '', avatar: '', themes: [], preferredModel: '',
+        wechat: '', githubId: '', role: '', avatar: '', themes: [], preferredModel: '',
         bio: '', discord: '', twitter: '', telegram: '', linkedin: '', website: '',
+        country: '', city: '', organization: '', ageRange: '',
         teamId: null, lookingForTeam: false, passwordChanged: true, confirmedAttendance: null, checkedIn: false, createdAt: session.user.created_at,
       }
     }
@@ -219,6 +241,7 @@ export function provideAuth(pick: <T>(english: T, chinese: T) => T) {
       options: {
         data: {
           name: data.name,
+          wechat: data.wechat,
           github_id: data.githubId,
           role: data.role,
           avatar: data.avatar,
@@ -230,6 +253,10 @@ export function provideAuth(pick: <T>(english: T, chinese: T) => T) {
           telegram: data.telegram,
           linkedin: data.linkedin,
           website: data.website,
+          country: data.country,
+          city: data.city,
+          organization: data.organization,
+          age_range: data.ageRange,
           looking_for_team: data.lookingForTeam,
           pending_team: data.team,
         },
@@ -261,6 +288,7 @@ export function provideAuth(pick: <T>(english: T, chinese: T) => T) {
       id: userId,
       email: data.email,
       name: data.name,
+      wechat: data.wechat,
       github_id: data.githubId,
       role: data.role,
       avatar: data.avatar,
@@ -272,6 +300,10 @@ export function provideAuth(pick: <T>(english: T, chinese: T) => T) {
       telegram: data.telegram,
       linkedin: data.linkedin,
       website: data.website,
+      country: data.country,
+      city: data.city,
+      organization: data.organization,
+      age_range: data.ageRange,
       looking_for_team: data.lookingForTeam,
     })
   }
@@ -320,6 +352,7 @@ export function provideAuth(pick: <T>(english: T, chinese: T) => T) {
     error.value = ''
     const { error: updateError } = await supabase.from('profiles').update({
       name: data.name,
+      wechat: data.wechat,
       github_id: data.githubId,
       role: data.role,
       avatar: data.avatar,
@@ -331,6 +364,10 @@ export function provideAuth(pick: <T>(english: T, chinese: T) => T) {
       telegram: data.telegram,
       linkedin: data.linkedin,
       website: data.website,
+      country: data.country,
+      city: data.city,
+      organization: data.organization,
+      age_range: data.ageRange,
       looking_for_team: data.lookingForTeam,
       confirmed_attendance: data.confirmedAttendance,
       team_id: data.teamId,
@@ -363,6 +400,7 @@ export function provideAuth(pick: <T>(english: T, chinese: T) => T) {
               await upsertProfile(session.user.id, {
                 email: session.user.email,
                 name: meta.name,
+                wechat: meta.wechat,
                 githubId: meta.github_id,
                 role: meta.role,
                 avatar: meta.avatar,
@@ -374,6 +412,10 @@ export function provideAuth(pick: <T>(english: T, chinese: T) => T) {
                 telegram: meta.telegram,
                 linkedin: meta.linkedin,
                 website: meta.website,
+                country: meta.country,
+                city: meta.city,
+                organization: meta.organization,
+                ageRange: meta.age_range,
                 lookingForTeam: meta.looking_for_team,
               })
             }
