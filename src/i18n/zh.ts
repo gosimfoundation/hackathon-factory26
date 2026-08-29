@@ -338,6 +338,8 @@ export default {
       { id: "oaic", name: "OAIC 开放智能体产业联盟", role: "合作伙伴", logo: "/sponsors/oaic.png", url: "https://visionforum.ai/#about" },
       { id: "qiwoo", name: "启悟学习社区", role: "合作伙伴", logo: "/sponsors/qiwoo.svg", url: "https://qiwoo.edu.cn/" },
       { id: "taotoken", name: "TaoToken.net", role: "合作伙伴", logo: "/sponsors/taotoken.svg", url: "https://taotoken.net/" },
+      { id: "ajcif", name: "全法中国青年科创协会", role: "支持单位", logo: "/sponsors/ajcif-clean.png" },
+      { id: "huawei-cloud", name: "华为云", role: "支持单位", logo: "/sponsors/huawei-cloud-zh-clean.png", url: "https://www.huaweicloud.com/" },
     ],
   },
   teams: {

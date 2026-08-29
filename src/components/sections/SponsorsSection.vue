@@ -16,13 +16,14 @@ const confirmed = computed(() => t('sponsors.confirmed') as any[])
         </div>
         <div class="reveal reveal-delay-1">
           <div class="grid gap-4 sm:grid-cols-2">
-            <a
+            <component
               v-for="(item, i) in confirmed"
               :key="item.id"
-              :href="item.url"
-              target="_blank"
-              rel="noopener noreferrer"
-              :aria-label="`${item.name} — ${pick('visit website', '访问网站')}`"
+              :is="item.url ? 'a' : 'div'"
+              :href="item.url || undefined"
+              :target="item.url ? '_blank' : undefined"
+              :rel="item.url ? 'noopener noreferrer' : undefined"
+              :aria-label="item.url ? `${item.name} — ${pick('visit website', '访问网站')}` : item.name"
               class="sponsor-logo-card group border border-border bg-bg-card transition-colors hover:border-accent focus-visible:border-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
             >
               <div class="flex h-32 items-center justify-center bg-white px-7 py-5">
@@ -44,9 +45,9 @@ const confirmed = computed(() => t('sponsors.confirmed') as any[])
                   <h3 class="text-sm font-semibold leading-snug text-text-primary">{{ item.name }}</h3>
                   <p class="mono-label mt-1 text-text-muted">{{ item.role }}</p>
                 </div>
-                <span class="text-base text-text-muted transition-colors group-hover:text-accent" aria-hidden="true">↗</span>
+                <span v-if="item.url" class="text-base text-text-muted transition-colors group-hover:text-accent" aria-hidden="true">↗</span>
               </div>
-            </a>
+            </component>
           </div>
         </div>
       </div>

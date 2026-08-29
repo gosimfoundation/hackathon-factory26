@@ -8,7 +8,7 @@ import { assetUrl } from '../../composables/api'
 const { t, pick } = useI18n()
 const { isLoggedIn, promptAuth } = useAuth()
 const locationLines = computed(() => t('hero.location') as string[])
-type HeroPartner = { id: string; name: string; role: string; logo: string; url: string }
+type HeroPartner = { id: string; name: string; shortName?: string; role: string; logo?: string; url?: string }
 const heroPartners = computed(() => t('sponsors.confirmed') as HeroPartner[])
 const { days, hours, minutes, seconds, isLive, isOver } = useCountdown(
   '2026-09-07T00:00:00+08:00',
@@ -85,28 +85,31 @@ function handleRegistrationAccess() {
         </div>
       </div>
 
-      <div class="flex flex-wrap items-center gap-x-5 gap-y-3 pb-4" :aria-label="pick('Partners', '合作伙伴')">
+      <div class="flex flex-col items-start gap-3 pb-4 md:flex-row md:items-center md:gap-x-5 md:gap-y-3" :aria-label="pick('Partners', '合作伙伴')">
         <span class="shrink-0 font-mono text-xs uppercase tracking-[0.1em] text-white/64">
           {{ pick('Partners', '合作伙伴') }}
         </span>
-        <div class="flex min-w-0 flex-1 flex-wrap gap-2">
-          <a
+        <div class="grid w-full grid-cols-2 gap-2 md:flex md:min-w-0 md:flex-1 md:flex-wrap">
+          <component
             v-for="partner in heroPartners"
             :key="partner.id"
-            :href="partner.url"
-            target="_blank"
-            rel="noopener noreferrer"
+            :is="partner.url ? 'a' : 'div'"
+            :href="partner.url || undefined"
+            :target="partner.url ? '_blank' : undefined"
+            :rel="partner.url ? 'noopener noreferrer' : undefined"
             :aria-label="partner.name"
-            class="hero-partner group flex h-12 min-w-[8rem] max-w-[10rem] flex-1 items-center justify-center gap-2 px-3 py-2 sm:w-40 sm:flex-none"
+            class="hero-partner group flex h-11 min-w-0 max-w-none items-center justify-center gap-2 px-3 py-2 md:h-12 md:w-40 md:min-w-[8rem] md:max-w-[10rem] md:flex-1"
           >
             <img
+              v-if="partner.logo"
               :src="assetUrl(partner.logo)"
               :alt="partner.name"
               :class="['hero-partner-logo max-h-8 max-w-full object-contain', { 'hero-partner-logo--cophi': partner.id === 'cophi' }]"
             />
             <span v-if="partner.id === 'qiwoo'" class="hero-partner-wordmark text-xs font-semibold leading-tight">{{ partner.name }}</span>
             <span v-else-if="partner.id === 'cophi'" class="hero-partner-wordmark text-xs font-semibold">CoPhi</span>
-          </a>
+            <span v-else-if="!partner.logo" class="hero-partner-wordmark text-center text-xs font-semibold leading-tight">{{ partner.shortName || partner.name }}</span>
+          </component>
         </div>
       </div>
 
