@@ -1,4 +1,5 @@
 import { ref, provide, inject, type InjectionKey, type Ref, onMounted } from 'vue'
+import type { Session } from '@supabase/supabase-js'
 import { supabase } from '../lib/supabase'
 import { publicSiteUrl } from './api'
 
@@ -137,6 +138,12 @@ export function provideAuth(pick: <T>(english: T, chinese: T) => T) {
         '确认邮件发送额度已用完，请稍后再试；如需紧急报名，请联系主办方。',
       )
     }
+    if (/jwt.*expired|token.*expired|pgrst301/i.test(message)) {
+      return pick(
+        'Your session expired. Please sign in again and retry. Your form entries are still here.',
+        '登录状态已过期，请重新登录后再试。当前表单内容仍会保留。',
+      )
+    }
     if (pick(false, true) === false) return message
     const exact: Record<string, string> = {
       'Invalid login credentials': '邮箱或密码错误',
@@ -148,8 +155,57 @@ export function provideAuth(pick: <T>(english: T, chinese: T) => T) {
     }
     return exact[message] || message
   }
+
+  function isJwtExpiredError(message?: string): boolean {
+    return /jwt.*expired|token.*expired|pgrst301/i.test(message || '')
+  }
+
+  async function clearExpiredSession(promptForLogin: boolean) {
+    await supabase.auth.signOut({ scope: 'local' })
+    user.value = null
+    isLoggedIn.value = false
+    error.value = pick(
+      'Your session expired. Please sign in again and retry. Your form entries are still here.',
+      '登录状态已过期，请重新登录后再试。当前表单内容仍会保留。',
+    )
+    if (promptForLogin) {
+      authModalTab.value = 'login'
+      showAuthModal.value = true
+    }
+  }
+
+  async function getFreshSession(promptForLogin = false, forceRefresh = false): Promise<Session | null> {
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+    if (sessionError) {
+      error.value = friendlyAuthError(sessionError.message)
+      return null
+    }
+    if (!session) {
+      user.value = null
+      isLoggedIn.value = false
+      if (promptForLogin) {
+        error.value = pick('Please sign in and try again.', '请重新登录后再试。')
+        authModalTab.value = 'login'
+        showAuthModal.value = true
+      }
+      return null
+    }
+
+    const expiresSoon = !session.expires_at || session.expires_at * 1000 <= Date.now() + 60_000
+    if (!forceRefresh && !expiresSoon) return session
+
+    const { data: refreshed, error: refreshError } = await supabase.auth.refreshSession()
+    if (refreshed.session) return refreshed.session
+    if (refreshError && /load failed|failed to fetch|network request failed|networkerror/i.test(refreshError.message)) {
+      error.value = friendlyAuthError(refreshError.message)
+      return null
+    }
+    await clearExpiredSession(promptForLogin)
+    return null
+  }
+
   async function fetchMe() {
-    const { data: { session } } = await supabase.auth.getSession()
+    const session = await getFreshSession()
     if (!session) return
     const { data: profile } = await supabase
       .from('profiles')
@@ -350,7 +406,10 @@ export function provideAuth(pick: <T>(english: T, chinese: T) => T) {
   async function updateProfile(data: Partial<User>): Promise<boolean> {
     if (!user.value) return false
     error.value = ''
-    const { error: updateError } = await supabase.from('profiles').update({
+    let session = await getFreshSession(true)
+    if (!session) return false
+
+    const profileUpdate = {
       name: data.name,
       wechat: data.wechat,
       github_id: data.githubId,
@@ -371,7 +430,16 @@ export function provideAuth(pick: <T>(english: T, chinese: T) => T) {
       looking_for_team: data.lookingForTeam,
       confirmed_attendance: data.confirmedAttendance,
       team_id: data.teamId,
-    }).eq('id', user.value.id)
+    }
+    const writeProfile = (userId: string) => supabase.from('profiles').update(profileUpdate).eq('id', userId)
+
+    let { error: updateError } = await writeProfile(session.user.id)
+    if (isJwtExpiredError(updateError?.message)) {
+      session = await getFreshSession(true, true)
+      if (!session) return false
+      const retry = await writeProfile(session.user.id)
+      updateError = retry.error
+    }
     if (updateError) { error.value = friendlyAuthError(updateError.message); return false }
     await fetchMe()
     return true
