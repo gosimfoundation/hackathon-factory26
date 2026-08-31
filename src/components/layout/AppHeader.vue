@@ -95,6 +95,7 @@ const regRole = ref('')
 const regLocation = ref('')
 const regOrganization = ref('')
 const regAgeRange = ref('')
+const regReferralSource = ref('')
 const regDiscord = ref('')
 const regTwitter = ref('')
 const regTelegram = ref('')
@@ -151,6 +152,7 @@ watch(showAuthModal, (open) => {
     regLocation.value = ''
     regOrganization.value = ''
     regAgeRange.value = ''
+    regReferralSource.value = ''
     regDiscord.value = ''
     regTwitter.value = ''
     regTelegram.value = ''
@@ -210,6 +212,7 @@ async function submitRegister() {
     city: location.city,
     organization: regOrganization.value.trim(),
     ageRange: regAgeRange.value,
+    referralSource: regReferralSource.value.trim(),
     lookingForTeam: false,
     team: {
       name: regTeamName.value.trim(),
@@ -770,6 +773,10 @@ async function saveProfile() {
                 <option value="">{{ pick('Select age range', '选择年龄段') }}</option>
                 <option v-for="range in ageRangeOptions" :key="range" :value="range">{{ range }}</option>
               </select>
+            </div>
+            <div>
+              <label class="block text-sm text-text-secondary mb-1">{{ pick('Where do you hear from us? (optional)', '你从哪里了解到我们？（选填）') }}</label>
+              <input v-model="regReferralSource" type="text" :placeholder="pick('Community, friend, social media…', '社群、朋友、社交媒体等')" :class="inputClass" />
             </div>
             <!-- Keep optional public links concise; legacy contact values remain in Supabase. -->
             <div class="bg-accent/5 border border-accent/20 rounded-lg p-4">

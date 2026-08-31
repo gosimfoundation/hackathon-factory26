@@ -23,6 +23,7 @@ export interface User {
   city: string
   organization: string
   ageRange: string
+  referralSource: string
   teamId: string | null
   lookingForTeam: boolean
   passwordChanged: boolean
@@ -51,6 +52,7 @@ interface RegisterData {
   city: string
   organization: string
   ageRange: string
+  referralSource: string
   lookingForTeam: boolean
   team: {
     name: string
@@ -113,6 +115,7 @@ function profileRowToUser(row: Record<string, any>, email?: string): User {
     city: row.city ?? '',
     organization: row.organization ?? '',
     ageRange: row.age_range ?? '',
+    referralSource: row.referral_source ?? '',
     teamId: row.team_id ?? null,
     lookingForTeam: row.looking_for_team ?? false,
     passwordChanged: row.password_changed ?? false,
@@ -222,7 +225,7 @@ export function provideAuth(pick: <T>(english: T, chinese: T) => T) {
         email: session.user.email,
         wechat: '', githubId: '', role: '', avatar: '', themes: [], preferredModel: '',
         bio: '', discord: '', twitter: '', telegram: '', linkedin: '', website: '',
-        country: '', city: '', organization: '', ageRange: '',
+        country: '', city: '', organization: '', ageRange: '', referralSource: '',
         teamId: null, lookingForTeam: false, passwordChanged: true, confirmedAttendance: null, checkedIn: false, createdAt: session.user.created_at,
       }
     }
@@ -313,6 +316,7 @@ export function provideAuth(pick: <T>(english: T, chinese: T) => T) {
           city: data.city,
           organization: data.organization,
           age_range: data.ageRange,
+          referral_source: data.referralSource,
           looking_for_team: data.lookingForTeam,
           pending_team: data.team,
         },
@@ -360,6 +364,7 @@ export function provideAuth(pick: <T>(english: T, chinese: T) => T) {
       city: data.city,
       organization: data.organization,
       age_range: data.ageRange,
+      referral_source: data.referralSource,
       looking_for_team: data.lookingForTeam,
     })
   }
@@ -427,6 +432,7 @@ export function provideAuth(pick: <T>(english: T, chinese: T) => T) {
       city: data.city,
       organization: data.organization,
       age_range: data.ageRange,
+      referral_source: data.referralSource,
       looking_for_team: data.lookingForTeam,
       confirmed_attendance: data.confirmedAttendance,
       team_id: data.teamId,
@@ -484,6 +490,7 @@ export function provideAuth(pick: <T>(english: T, chinese: T) => T) {
                 city: meta.city,
                 organization: meta.organization,
                 ageRange: meta.age_range,
+                referralSource: meta.referral_source,
                 lookingForTeam: meta.looking_for_team,
               })
             }

@@ -49,7 +49,7 @@ const hoveredDay = ref(-1)
 
 // Edit modal
 const editingUser = ref<any>(null)
-const editFields = ref({ name: '', email: '', wechat: '', role: '', bio: '', github_id: '', country: '', city: '', organization: '', age_range: '', discord: '', twitter: '', telegram: '', admin_notes: '' })
+const editFields = ref({ name: '', email: '', wechat: '', role: '', bio: '', github_id: '', country: '', city: '', organization: '', age_range: '', referral_source: '', discord: '', twitter: '', telegram: '', admin_notes: '' })
 
 // QR modal
 const qrUser = ref<any>(null)
@@ -236,7 +236,8 @@ const filteredUsers = computed(() => {
     (p.wechat || '').toLowerCase().includes(q) ||
     (p.country || '').toLowerCase().includes(q) ||
     (p.city || '').toLowerCase().includes(q) ||
-    (p.organization || '').toLowerCase().includes(q)
+    (p.organization || '').toLowerCase().includes(q) ||
+    (p.referral_source || '').toLowerCase().includes(q)
   )
 })
 
@@ -279,10 +280,10 @@ function downloadBackup(format: string) {
     downloadFile(JSON.stringify(data, null, 2), `hackathon-backup-${date}.json`, 'application/json')
   } else if (format === 'csv') {
     const teamMap = Object.fromEntries(teams.value.map((t: any) => [t.id, t]))
-    const header = ['Name','Email','WeChat','Role','GitHub','Country','City','Organization / School','Age Range','Team','Model','Discord','Telegram','Checked In','Approved','Registered']
+    const header = ['Name','Email','WeChat','Role','GitHub','Country','City','Organization / School','Age Range','Where do you hear from us?','Team','Model','Discord','Telegram','Checked In','Approved','Registered']
     const rows = profiles.value.map((p: any) => {
       const t = teamMap[p.team_id] || {}
-      return [p.name, p.email||'', p.wechat||'', p.role||'', p.github_id||'', p.country||'', p.city||'', p.organization||'', p.age_range||'', t.name||'', t.model||'', p.discord||'', p.telegram||'', p.checked_in?'Yes':'No', p.approved?'Yes':'No', (p.created_at||'').slice(0,10)]
+      return [p.name, p.email||'', p.wechat||'', p.role||'', p.github_id||'', p.country||'', p.city||'', p.organization||'', p.age_range||'', p.referral_source||'', t.name||'', t.model||'', p.discord||'', p.telegram||'', p.checked_in?'Yes':'No', p.approved?'Yes':'No', (p.created_at||'').slice(0,10)]
     })
     const csv = [header, ...rows].map(r => r.map((c: string) => `"${(c||'').replace(/"/g,'""')}"`).join(',')).join('\n')
     downloadFile(csv, `hackathon-roster-${date}.csv`, 'text/csv')
@@ -330,6 +331,7 @@ function openEdit(user: any) {
     city: user.city || '',
     organization: user.organization || '',
     age_range: user.age_range || '',
+    referral_source: user.referral_source || '',
     discord: user.discord || '',
     twitter: user.twitter || '',
     telegram: user.telegram || '',
@@ -869,6 +871,10 @@ onMounted(() => { if (authed.value) { loadData(); loadAnnouncement(); loadSubmis
                   <option value="">—</option>
                   <option v-for="range in ['18-22', '23-28', '29-35', '36+']" :key="range" :value="range">{{ range }}</option>
                 </select>
+              </div>
+              <div>
+                <label class="block text-xs text-gray-500 mb-1">{{ pick('Where do you hear from us?', '你从哪里了解到我们？') }}</label>
+                <input v-model="editFields.referral_source" class="w-full px-3 py-2 bg-gray-800 border border-gray-700 text-white text-sm focus:border-amber-500 focus:outline-none" />
               </div>
               <div class="grid grid-cols-2 gap-3">
                 <div>

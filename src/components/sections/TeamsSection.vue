@@ -268,6 +268,7 @@ const registrationRole = ref('')
 const registrationLocation = ref('')
 const registrationOrganization = ref('')
 const registrationAgeRange = ref('')
+const registrationReferralSource = ref('')
 const registrationDiscord = ref('')
 const registrationTwitter = ref('')
 const registrationTelegram = ref('')
@@ -344,6 +345,7 @@ function fillRegistrationContactFields() {
   registrationLocation.value = [user.value?.city, user.value?.country].filter(Boolean).join(', ')
   registrationOrganization.value = user.value?.organization || ''
   registrationAgeRange.value = user.value?.ageRange || ''
+  registrationReferralSource.value = user.value?.referralSource || ''
   registrationDiscord.value = user.value?.discord || ''
   registrationTwitter.value = user.value?.twitter || ''
   registrationTelegram.value = user.value?.telegram || ''
@@ -414,6 +416,7 @@ async function saveRegistrationContactFields(): Promise<boolean> {
     city: location.city,
     organization: registrationOrganization.value.trim(),
     ageRange: registrationAgeRange.value,
+    referralSource: registrationReferralSource.value.trim(),
     lookingForTeam: false,
     confirmedAttendance: user.value.confirmedAttendance,
     teamId: user.value.teamId,
@@ -875,6 +878,10 @@ onUnmounted(() => {
                       <option value="">{{ pick('Select age range', '选择年龄段') }}</option>
                       <option v-for="range in ageRangeOptions" :key="range" :value="range">{{ range }}</option>
                     </select>
+                  </div>
+                  <div>
+                    <label class="block text-sm text-text-secondary mb-1">{{ pick('Where do you hear from us? (optional)', '你从哪里了解到我们？（选填）') }}</label>
+                    <input v-model="registrationReferralSource" type="text" :placeholder="pick('Community, friend, social media…', '社群、朋友、社交媒体等')" :class="inputClass" />
                   </div>
                   <div class="border border-accent/20 bg-accent/5 p-4">
                     <p class="text-sm font-medium text-text-primary">{{ pick('Additional links', '其他链接') }} <span class="text-xs font-normal text-text-muted">{{ pick('(optional)', '（选填）') }}</span></p>

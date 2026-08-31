@@ -51,6 +51,7 @@ function profileRowToUser(row: Record<string, any>): User {
     city: row.city ?? '',
     organization: row.organization ?? '',
     ageRange: row.age_range ?? '',
+    referralSource: row.referral_source ?? '',
     teamId: row.team_id ?? null,
     lookingForTeam: row.looking_for_team ?? false,
     passwordChanged: row.password_changed ?? false,

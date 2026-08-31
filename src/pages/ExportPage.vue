@@ -29,7 +29,7 @@ async function loadData() {
   loading.value = true
   const { data: profiles } = await supabase
     .from('profiles')
-    .select('name, email, wechat, country, city, organization, age_range, team_id')
+    .select('name, email, wechat, country, city, organization, age_range, referral_source, team_id')
     .not('team_id', 'is', null)
   const { data: teams } = await supabase.from('teams').select('id, name, model')
   const teamMap = Object.fromEntries((teams || []).map(t => [t.id, t]))
@@ -41,6 +41,7 @@ async function loadData() {
     city: p.city || '',
     organization: p.organization || '',
     ageRange: p.age_range || '',
+    referralSource: p.referral_source || '',
     team: teamMap[p.team_id]?.name || '',
     model: teamMap[p.team_id]?.model || '',
   })).sort((a, b) => a.team.localeCompare(b.team) || a.name.localeCompare(b.name))
@@ -49,8 +50,8 @@ async function loadData() {
 
 function exportCSV() {
   const csvCell = (value: unknown) => `"${String(value ?? '').replace(/"/g, '""')}"`
-  const header = ['Name', 'Email', 'WeChat', 'Country', 'City', 'Organization / School', 'Age Range', 'Team', 'Model']
-  const lines = rows.value.map(r => [r.name, r.email, r.wechat, r.country, r.city, r.organization, r.ageRange, r.team, r.model].map(csvCell).join(','))
+  const header = ['Name', 'Email', 'WeChat', 'Country', 'City', 'Organization / School', 'Age Range', 'Where do you hear from us?', 'Team', 'Model']
+  const lines = rows.value.map(r => [r.name, r.email, r.wechat, r.country, r.city, r.organization, r.ageRange, r.referralSource, r.team, r.model].map(csvCell).join(','))
   const csv = [header.map(csvCell).join(','), ...lines].join('\n')
   const blob = new Blob([csv], { type: 'text/csv' })
   const url = URL.createObjectURL(blob)
@@ -102,6 +103,7 @@ function exportJSON() {
             <th class="py-3 px-3">{{ pick('Location', '地区') }}</th>
             <th class="py-3 px-3">{{ pick('Organization / School', '单位 / 学校') }}</th>
             <th class="py-3 px-3">{{ pick('Age Range', '年龄段') }}</th>
+            <th class="py-3 px-3">{{ pick('Where do you hear from us?', '获知渠道') }}</th>
             <th class="py-3 px-3">{{ pick('Team', '队伍') }}</th>
             <th class="py-3 px-3">{{ pick('Model', '模型') }}</th>
           </tr>
@@ -115,6 +117,7 @@ function exportJSON() {
             <td class="py-2 px-3 text-gray-400">{{ [r.city, r.country].filter(Boolean).join(', ') || '—' }}</td>
             <td class="py-2 px-3 text-gray-400">{{ r.organization || '—' }}</td>
             <td class="py-2 px-3 text-gray-500">{{ r.ageRange || '—' }}</td>
+            <td class="py-2 px-3 text-gray-500">{{ r.referralSource || '—' }}</td>
             <td class="py-2 px-3 text-gray-400">{{ r.team }}</td>
             <td class="py-2 px-3 text-gray-500">{{ r.model }}</td>
           </tr>
