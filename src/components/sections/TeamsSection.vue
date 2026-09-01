@@ -30,11 +30,6 @@ const likedTeams = ref<Set<string>>(new Set(JSON.parse(localStorage.getItem('lik
 async function handleLike(teamId: string, e: Event) {
   e.stopPropagation()
   if (likedTeams.value.has(teamId)) return
-  if (showcaseTeams.value.some(team => team.id === teamId)) {
-    likedTeams.value.add(teamId)
-    localStorage.setItem('likedTeams', JSON.stringify([...likedTeams.value]))
-    return
-  }
   const ok = await likeTeam(teamId)
   if (ok) {
     likedTeams.value.add(teamId)
@@ -42,140 +37,13 @@ async function handleLike(teamId: string, e: Event) {
   }
 }
 
-type DisplayTeam = Team & { isShowcase?: boolean }
+// Registration totals and cards come directly from the live team registry.
+const teamsCount = useCountUp(computed(() => teams.value.length))
 
-// Showcase teams live only in the UI, so registration totals and admin data stay accurate.
-const showcaseTeams = computed<DisplayTeam[]>(() => [
-  {
-    id: 'showcase-run-it-first',
-    name: '先跑起来再说',
-    leaderId: '',
-    avatar: '',
-    githubRepo: '',
-    model: 'Kimi',
-    harness: '',
-    themes: ['repository-lifecycle', 'pull-request-review'],
-    projectIdea: pick("We kept losing context between issues and PRs, so we're teaching an agent to remember the whole thread.", '我们总在 Issue 和 PR 之间丢上下文，所以想做个能一路记住来龙去脉的智能体。'),
-    locked: true,
-    maxSize: null,
-    likes: 0,
-    members: [],
-    createdAt: '',
-    isShowcase: true,
-  },
-  {
-    id: 'showcase-404',
-    name: '404 Not Found',
-    leaderId: '',
-    avatar: '',
-    githubRepo: '',
-    model: 'GLM',
-    harness: '',
-    themes: [],
-    projectIdea: pick('TBD. Still figuring it out.', '还没想好，TBD。'),
-    locked: true,
-    maxSize: null,
-    likes: 0,
-    members: [],
-    createdAt: '',
-    isShowcase: true,
-  },
-  {
-    id: 'showcase-copy-paste',
-    name: 'Ctrl C + Ctrl V',
-    leaderId: '',
-    avatar: '',
-    githubRepo: '',
-    model: 'MiniMax',
-    harness: '',
-    themes: ['repository-lifecycle'],
-    projectIdea: pick('Probably some repo cleanup stuff.', '大概做点仓库清理相关的东西。'),
-    locked: true,
-    maxSize: null,
-    likes: 0,
-    members: [],
-    createdAt: '',
-    isShowcase: true,
-  },
-  {
-    id: 'showcase-nanshan-night-owls',
-    name: '南山夜猫子',
-    leaderId: '',
-    avatar: '',
-    githubRepo: '',
-    model: 'DeepSeek',
-    harness: '',
-    themes: ['actions-workflow', 'compute-engine'],
-    projectIdea: pick('CI red again? This agent reads the logs, tries a small fix, and checks whether the build goes green.', 'CI 又红了？让它先读日志、试个小修复，再看看构建能不能变绿。'),
-    locked: true,
-    maxSize: null,
-    likes: 0,
-    members: [],
-    createdAt: '',
-    isShowcase: true,
-  },
-  {
-    id: 'showcase-good-enough',
-    name: '差不多得了',
-    leaderId: '',
-    avatar: '',
-    githubRepo: '',
-    model: 'Other',
-    harness: '',
-    themes: [],
-    projectIdea: pick('No idea yet. TBD.', '暂时没想好。TBD。'),
-    locked: true,
-    maxSize: null,
-    likes: 0,
-    members: [],
-    createdAt: '',
-    isShowcase: true,
-  },
-  {
-    id: 'showcase-ship-it',
-    name: 'Ship It!',
-    leaderId: '',
-    avatar: '',
-    githubRepo: '',
-    model: 'Kimi',
-    harness: '',
-    themes: ['compute-engine'],
-    projectIdea: pick('A lightweight harness for comparing coding agents on small repository tasks.', '做个轻量 Harness，用几类小型仓库任务比较编程智能体的表现。'),
-    locked: true,
-    maxSize: null,
-    likes: 0,
-    members: [],
-    createdAt: '',
-    isShowcase: true,
-  },
-])
-
-// The public registry count includes the six showcase teams displayed in the grid.
-const teamsCount = useCountUp(computed(() => teams.value.length + showcaseTeams.value.length))
-
-// A deterministic shuffle keeps the grid mixed without cards jumping on every update.
-function teamOrderScore(id: string): number {
-  let hash = 2166136261
-  for (const char of `factory26:${id}`) {
-    hash ^= char.charCodeAt(0)
-    hash = Math.imul(hash, 16777619)
-  }
-  return hash >>> 0
-}
-
-// Theme filter (shared) applies equally to registered and showcase teams.
-const filteredTeams = computed<DisplayTeam[]>(() => {
-  const mixedTeams: DisplayTeam[] = [...teams.value, ...showcaseTeams.value]
-  const visibleTeams = teamFilter.value
-    ? mixedTeams.filter(team => (team.themes || []).some(theme => theme.includes(teamFilter.value)))
-    : mixedTeams
-  return [...visibleTeams].sort((a, b) => teamOrderScore(a.id) - teamOrderScore(b.id))
+const filteredTeams = computed(() => {
+  if (!teamFilter.value) return teams.value
+  return teams.value.filter(team => (team.themes || []).some(theme => theme.includes(teamFilter.value)))
 })
-
-function teamLikeCount(team: DisplayTeam): number {
-  const localShowcaseLike = team.isShowcase && likedTeams.value.has(team.id) ? 1 : 0
-  return (team.likes || 0) + localShowcaseLike
-}
 
 // Get members for a team from users array
 function getTeamMembers(teamId: string): User[] {
@@ -786,7 +654,7 @@ onUnmounted(() => {
               :class="likedTeams.has(team.id) ? 'text-red-500' : 'text-text-muted hover:text-red-400'"
             >
               <img :src="tw.heart" class="w-4 h-4" :class="likedTeams.has(team.id) ? '' : 'opacity-30 grayscale'" />
-              {{ teamLikeCount(team) }}
+              {{ team.likes || 0 }}
             </button>
           </div>
 
@@ -997,7 +865,7 @@ onUnmounted(() => {
                   :class="likedTeams.has(viewingTeam.id) ? 'border-accent-red/30 bg-badge-danger-bg text-red-500' : 'border-border text-text-secondary hover:border-border-hover'"
                 >
                   <svg class="w-4 h-4" :fill="likedTeams.has(viewingTeam.id) ? 'currentColor' : 'none'" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" /></svg>
-                  {{ teamLikeCount(viewingTeam) }}
+                  {{ viewingTeam.likes || 0 }}
                 </button>
 
                 <template v-if="teamMemberFeaturesEnabled">

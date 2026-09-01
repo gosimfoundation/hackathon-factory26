@@ -488,14 +488,14 @@ async function saveProfile() {
       type="button"
       @click="isLoggedIn ? openRegistrationEditor() : promptAuth('login')"
       class="registration-announcement block h-11 w-full overflow-hidden bg-[#8b4962] text-left text-white shadow-[0_8px_24px_rgba(75,31,60,.24)] transition-colors hover:bg-[#743b51]"
-      :aria-label="pick('Registration is now open. Register or sign in.', '报名现已开放，前往报名或登录。')"
+      :aria-label="pick(`${teams.length} teams have registered. Register or sign in.`, `已有 ${teams.length} 支队伍报名，前往报名或登录。`)"
     >
       <span aria-hidden="true" class="registration-announcement__track h-full items-center">
         <span v-for="set in 2" :key="set" class="registration-announcement__set h-full items-center">
           <span v-for="copy in 6" :key="copy" class="registration-announcement__item h-full items-center">
             <span class="inline-flex items-center gap-2 font-semibold">
               <span class="h-2 w-2 animate-pulse rounded-full bg-[#ffd2df]"></span>
-              {{ pick('REGISTRATION IS NOW OPEN', '报名现已开放') }}
+              {{ pick(`${teams.length} TEAMS REGISTERED`, `已有 ${teams.length} 支队伍报名`) }}
             </span>
             <span class="text-white/75">·</span>
             <span>{{ pick('One shared account per team', '每支队伍只需一个账号') }}</span>
