@@ -173,3 +173,14 @@ form, admin roster, and exports.
 
 Run `supabase/migrations/20260829_00_registration_wechat.sql` to add the optional
 WeChat contact field and Auth metadata synchronization.
+
+## 8. Team Rosters
+
+Run `supabase/migrations/20260902_00_team_members.sql` before deploying the
+member-roster form. It adds a private `team_members` table, backfills the primary
+contact for existing teams, and installs the atomic roster-update RPC.
+
+The existing `teams` table remains the source of team-level information. Each
+team still has one shared login account; additional roster members do not receive
+Supabase accounts. Member emails and demographics are available only to that
+team's authenticated lead and Supabase administrators.

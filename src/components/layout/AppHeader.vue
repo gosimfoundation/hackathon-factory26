@@ -5,7 +5,9 @@ import { useI18n } from '../../composables/useI18n'
 import { useAuth } from '../../composables/useAuth'
 import { useTheme } from '../../composables/useTheme'
 import { useTeams } from '../../composables/useTeams'
+import { registrationContactAsMember, type TeamMemberDraft } from '../../composables/useTeamRoster'
 import { assetUrl, publicSiteUrl } from '../../composables/api'
+import TeamMembersEditor from '../forms/TeamMembersEditor.vue'
 import QRCode from 'qrcode'
 import { supabase } from '../../lib/supabase'
 
@@ -107,6 +109,7 @@ const regTeamGithubRepo = ref('')
 const regTeamModel = ref('')
 const regTeamHarness = ref('')
 const regTeamProjectIdea = ref('')
+const regAdditionalMembers = ref<TeamMemberDraft[]>([])
 
 const registrationTrackIds = ['auth-session', 'repository-lifecycle', 'issues-forms', 'pull-request-review', 'actions-workflow', 'org-permissions-audit', 'compute-engine']
 const regTrackOptions = computed(() => (t('tracks.themes') as any[]).map((theme, i) => ({ id: registrationTrackIds[i], label: theme.title })))
@@ -164,6 +167,7 @@ watch(showAuthModal, (open) => {
     regTeamModel.value = ''
     regTeamHarness.value = ''
     regTeamProjectIdea.value = ''
+    regAdditionalMembers.value = []
     registerNeedsConfirm.value = false
     confirmedEmail.value = ''
     forgotSent.value = false
@@ -221,6 +225,18 @@ async function submitRegister() {
       model: regTeamModel.value,
       harness: regTeamHarness.value,
       projectIdea: regTeamProjectIdea.value.trim(),
+      members: [
+        registrationContactAsMember({
+          name: regName.value,
+          githubId: regGithubId.value,
+          email: regEmail.value,
+          professionalBackground: regRole.value,
+          location: regLocation.value,
+          organization: regOrganization.value,
+          ageRange: regAgeRange.value,
+        }),
+        ...regAdditionalMembers.value,
+      ],
     },
   })
   authLoading.value = false
@@ -707,13 +723,17 @@ async function saveProfile() {
             <template v-else>
             <div>
               <p class="font-mono text-[11px] uppercase tracking-[.14em] text-accent">{{ pick('How registration works', '报名前先看流程') }}</p>
-              <div class="mt-3 grid grid-cols-2 border border-border">
+              <div class="mt-3 grid grid-cols-3 border border-border">
                 <div class="p-3">
                   <span class="text-xs font-bold text-accent">01</span>
-                  <p class="mt-1 text-xs font-semibold leading-snug text-text-primary">{{ pick('Submit team details', '提交队伍资料') }}</p>
+                  <p class="mt-1 text-xs font-semibold leading-snug text-text-primary">{{ pick('Create a team account', '创建队伍账号') }}</p>
                 </div>
                 <div class="border-l border-border p-3">
                   <span class="text-xs font-bold text-accent">02</span>
+                  <p class="mt-1 text-xs font-semibold leading-snug text-text-primary">{{ pick('Add every member', '填写全部成员') }}</p>
+                </div>
+                <div class="border-l border-border p-3">
+                  <span class="text-xs font-bold text-accent">03</span>
                   <p class="mt-1 text-xs font-semibold leading-snug text-text-primary">{{ pick('Sign in and edit', '登录并可修改') }}</p>
                 </div>
               </div>
@@ -728,8 +748,8 @@ async function saveProfile() {
             <div class="flex items-center gap-3 pt-1">
               <span class="flex h-7 w-7 items-center justify-center rounded-full bg-accent text-xs font-bold text-white">1</span>
               <div>
-                <h3 class="text-sm font-semibold text-text-primary">{{ pick('Team account', '队伍账号') }}</h3>
-                <p class="text-xs text-text-muted">{{ pick('Used to sign in and edit the registration.', '用于登录以及后续修改报名资料。') }}</p>
+                <h3 class="text-sm font-semibold text-text-primary">{{ pick('Team account & primary contact', '队伍账号与主要联系人（成员 1）') }}</h3>
+                <p class="text-xs text-text-muted">{{ pick('This account signs in for the whole team. The contact below is saved as the first member.', '这个账号代表整支队伍登录；以下联系人会同时保存为成员 1。') }}</p>
               </div>
             </div>
             <div>
@@ -749,13 +769,13 @@ async function saveProfile() {
               <input v-model="regWechat" type="text" :placeholder="pick('Your WeChat ID', '你的微信号')" autocomplete="off" :class="inputClass" />
             </div>
             <div>
-              <label class="block text-sm text-text-secondary mb-1">{{ pick('GitHub Username', 'GitHub 用户名') }} <span class="text-accent-red">*</span></label>
-              <input v-model="regGithubId" type="text" required placeholder="e.g. octocat" :class="inputClass" />
+              <label class="block text-sm text-text-secondary mb-1">{{ pick('GitHub Username (optional)', 'GitHub 账号（选填）') }}</label>
+              <input v-model="regGithubId" type="text" placeholder="e.g. octocat" :class="inputClass" />
             </div>
             <div>
-              <label class="block text-sm text-text-secondary mb-1">{{ pick('Role', '角色') }}</label>
-              <select v-model="regRole" :class="[inputClass, 'appearance-none']">
-                <option value="" class="bg-bg-primary text-text-secondary">{{ pick('Select role (optional)', '选择角色（选填）') }}</option>
+              <label class="block text-sm text-text-secondary mb-1">{{ pick('Professional Background', '专业背景') }} <span class="text-accent-red">*</span></label>
+              <select v-model="regRole" required :class="[inputClass, 'appearance-none']">
+                <option value="" class="bg-bg-primary text-text-secondary">{{ pick('Select professional background', '选择专业背景') }}</option>
                 <option v-for="r in roleOptions" :key="r.value" :value="r.value" class="bg-bg-primary">{{ r.label }}</option>
               </select>
             </div>
@@ -849,6 +869,17 @@ async function saveProfile() {
                   <label class="block text-sm text-text-secondary mb-1">{{ pick('Project Idea (optional)', '项目想法（选填）') }}</label>
                   <input v-model="regTeamProjectIdea" type="text" :placeholder="pick('One sentence about your idea', '用一句话介绍你的想法')" :class="inputClass" />
                 </div>
+            </div>
+
+            <div class="space-y-4 border-l-2 border-accent-blue/30 pl-4">
+              <div class="flex items-center gap-3 -ml-[1.1rem] bg-bg-primary py-1">
+                <span class="flex h-7 w-7 items-center justify-center rounded-full bg-accent text-xs font-bold text-white">3</span>
+                <div>
+                  <h3 class="text-sm font-semibold text-text-primary">{{ pick('Other team members', '其他队伍成员') }}</h3>
+                  <p class="text-xs text-text-muted">{{ pick('Add everyone except the primary contact above. GitHub is optional; the other fields are required.', '添加除上方主要联系人之外的所有成员。GitHub 选填，其余字段必填。') }}</p>
+                </div>
+              </div>
+              <TeamMembersEditor v-model="regAdditionalMembers" />
             </div>
 
             <div class="border border-border bg-bg-secondary/50 p-3 text-xs leading-relaxed text-text-secondary">

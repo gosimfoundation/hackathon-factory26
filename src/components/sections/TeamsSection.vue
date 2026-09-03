@@ -6,6 +6,8 @@ import { useAuth, type User } from '../../composables/useAuth'
 import { useI18n } from '../../composables/useI18n'
 import { teamFilter } from '../../composables/useTeamFilter'
 import { assetUrl } from '../../composables/api'
+import { fetchTeamRoster, registrationContactAsMember, replaceTeamRoster, type TeamMemberDraft } from '../../composables/useTeamRoster'
+import TeamMembersEditor from '../forms/TeamMembersEditor.vue'
 
 const { t, pick, roleLabel, trackLabel } = useI18n()
 const { user, isLoggedIn, promptAuth, updateProfile, fetchMe, error: profileError } = useAuth()
@@ -142,6 +144,7 @@ const registrationTwitter = ref('')
 const registrationTelegram = ref('')
 const registrationLinkedin = ref('')
 const registrationWebsite = ref('')
+const registrationAdditionalMembers = ref<TeamMemberDraft[]>([])
 
 const roleOptions = computed(() => [
   { value: 'AI Engineer', label: pick('AI Engineer', 'AI 工程师') },
@@ -202,6 +205,7 @@ function resetForm() {
   teamAvatar.value = ''
   teamLocked.value = false
   maxSize.value = null
+  registrationAdditionalMembers.value = []
   error.value = ''
 }
 
@@ -246,7 +250,7 @@ function openViewModal(team: Team) {
   showModal.value = true
 }
 
-function openEditModal() {
+async function openEditModal() {
   if (!viewingTeam.value) return
   const team = viewingTeam.value
   modalMode.value = 'edit'
@@ -261,6 +265,38 @@ function openEditModal() {
   maxSize.value = team.maxSize
   error.value = ''
   fillRegistrationContactFields()
+  registrationAdditionalMembers.value = []
+  const rosterResult = await fetchTeamRoster(team.id)
+  if (rosterResult.error) {
+    error.value = pick('Unable to load the team roster. Please try again.', '无法读取队伍成员名单，请稍后重试。')
+    return
+  }
+  registrationAdditionalMembers.value = rosterResult.members.slice(1)
+}
+
+function currentRegistrationRoster(): TeamMemberDraft[] {
+  return [
+    registrationContactAsMember({
+      name: registrationName.value,
+      githubId: registrationGithubId.value,
+      email: user.value?.email || '',
+      professionalBackground: registrationRole.value,
+      location: registrationLocation.value,
+      organization: registrationOrganization.value,
+      ageRange: registrationAgeRange.value,
+    }),
+    ...registrationAdditionalMembers.value,
+  ]
+}
+
+async function saveCurrentRoster(teamId: string): Promise<boolean> {
+  const rosterResult = await replaceTeamRoster(teamId, currentRegistrationRoster())
+  if (rosterResult.ok) return true
+  error.value = pick(
+    'Unable to save the member roster. Check that every member has the required information and try again.',
+    '无法保存成员名单。请确认每位成员的必填信息完整后重试。',
+  )
+  return false
 }
 
 async function saveRegistrationContactFields(): Promise<boolean> {
@@ -313,6 +349,8 @@ async function submitCreate() {
   })
   if (ok) {
     await fetchMe()
+    const createdTeam = teams.value.find(team => team.leaderId === user.value?.id || team.id === user.value?.teamId)
+    if (!createdTeam || !(await saveCurrentRoster(createdTeam.id))) return
     showModal.value = false
     showToast(pick(`Team "${teamName.value}" registration completed!`, `队伍“${teamName.value}”报名已完成！`))
   }
@@ -334,6 +372,7 @@ async function submitEdit() {
     maxSize: null,
   })
   if (ok) {
+    if (!(await saveCurrentRoster(viewingTeam.value.id))) return
     showModal.value = false
     showToast(pick(`Registration for "${teamName.value}" updated!`, `队伍“${teamName.value}”的报名信息已更新！`))
   }
@@ -722,13 +761,13 @@ onUnmounted(() => {
                     <input v-model="registrationWechat" type="text" :placeholder="pick('Your WeChat ID', '你的微信号')" autocomplete="off" :class="inputClass" />
                   </div>
                   <div>
-                    <label class="block text-sm text-text-secondary mb-1">{{ pick('GitHub Username', 'GitHub 用户名') }} <span class="text-accent-red">*</span></label>
-                    <input v-model="registrationGithubId" type="text" required placeholder="e.g. octocat" :class="inputClass" />
+                    <label class="block text-sm text-text-secondary mb-1">{{ pick('GitHub Username (optional)', 'GitHub 账号（选填）') }}</label>
+                    <input v-model="registrationGithubId" type="text" placeholder="e.g. octocat" :class="inputClass" />
                   </div>
                   <div>
-                    <label class="block text-sm text-text-secondary mb-1">{{ pick('Role', '角色') }}</label>
-                    <select v-model="registrationRole" :class="[inputClass, 'appearance-none']">
-                      <option value="">{{ pick('Select role (optional)', '选择角色（选填）') }}</option>
+                    <label class="block text-sm text-text-secondary mb-1">{{ pick('Professional Background', '专业背景') }} <span class="text-accent-red">*</span></label>
+                    <select v-model="registrationRole" required :class="[inputClass, 'appearance-none']">
+                      <option value="">{{ pick('Select professional background', '选择专业背景') }}</option>
                       <option v-for="role in roleOptions" :key="role.value" :value="role.value">{{ role.label }}</option>
                     </select>
                   </div>
@@ -780,6 +819,17 @@ onUnmounted(() => {
                     <label class="block text-sm text-text-secondary mb-1">{{ pick('Project Idea (optional)', '项目想法（选填）') }}</label>
                     <input v-model="projectIdea" type="text" :placeholder="pick('One sentence about your idea', '用一句话介绍你的想法')" :class="inputClass" />
                   </div>
+                </section>
+
+                <section class="space-y-4">
+                  <div class="flex items-start gap-3 border-b border-border pb-3">
+                    <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-accent text-xs font-bold text-white">3</span>
+                    <div>
+                      <h4 class="text-sm font-semibold text-text-primary">{{ pick('Other team members', '其他队伍成员') }}</h4>
+                      <p class="mt-0.5 text-xs text-text-muted">{{ pick('The account contact above is member 1. Add every other member here.', '上方账号联系人是成员 1；请在这里添加其他所有成员。') }}</p>
+                    </div>
+                  </div>
+                  <TeamMembersEditor v-model="registrationAdditionalMembers" />
                 </section>
 
                 <button type="submit" :disabled="loading" class="w-full py-4 bg-btn-bg text-btn-text text-sm font-semibold tracking-widest uppercase hover:bg-btn-hover transition-colors disabled:opacity-50">

@@ -2,6 +2,7 @@ import { ref, provide, inject, type InjectionKey, type Ref, onMounted } from 'vu
 import type { Session } from '@supabase/supabase-js'
 import { supabase } from '../lib/supabase'
 import { publicSiteUrl } from './api'
+import { registrationContactAsMember, replaceTeamRoster, validateTeamRoster, type TeamMemberDraft, type TeamRosterValidationIssue } from './useTeamRoster'
 
 export interface User {
   id: string
@@ -61,6 +62,7 @@ interface RegisterData {
     model: string
     harness: string
     projectIdea: string
+    members: TeamMemberDraft[]
   }
 }
 
@@ -163,6 +165,13 @@ export function provideAuth(pick: <T>(english: T, chinese: T) => T) {
     return /jwt.*expired|token.*expired|pgrst301/i.test(message || '')
   }
 
+  function rosterValidationMessage(issue: TeamRosterValidationIssue): string {
+    if (issue === 'member-count') return pick('A team must have between 1 and 20 members.', '每支队伍需有 1–20 名成员。')
+    if (issue === 'invalid-email') return pick('Please check every member email address.', '请检查每位成员的邮箱格式。')
+    if (issue === 'duplicate-email') return pick('The same email cannot be used for two members.', '同一邮箱不能重复填写给两名成员。')
+    return pick('Please complete every required member field.', '请填写完整每位成员的必填资料。')
+  }
+
   async function clearExpiredSession(promptForLogin: boolean) {
     await supabase.auth.signOut({ scope: 'local' })
     user.value = null
@@ -245,45 +254,72 @@ export function provideAuth(pick: <T>(english: T, chinese: T) => T) {
         .single()
       if (profileError) { error.value = friendlyAuthError(profileError.message); return false }
 
-      if (profile?.team_id) {
-        await supabase.auth.updateUser({ data: { pending_team: null } })
-        return true
-      }
-
-      const { data: existingTeam } = await supabase
-        .from('teams')
-        .select('id')
-        .eq('leader_id', authUser.id)
-        .maybeSingle()
-
-      let teamId = existingTeam?.id
+      let teamId = profile?.team_id as string | undefined
       if (!teamId) {
-        const { data: createdTeam, error: teamError } = await supabase
+        const { data: existingTeam } = await supabase
           .from('teams')
-          .insert({
-            name: pendingTeam.name.trim(),
-            leader_id: authUser.id,
-            avatar: '',
-            github_repo: pendingTeam.githubRepo?.trim() || '',
-            themes: pendingTeam.themes || [],
-            model: pendingTeam.model || '',
-            harness: pendingTeam.harness || '',
-            project_idea: pendingTeam.projectIdea?.trim() || '',
-            contact_email: authUser.email || null,
-            locked: true,
-            max_size: null,
-          })
           .select('id')
-          .single()
-        if (teamError) { error.value = friendlyAuthError(teamError.message); return false }
-        teamId = createdTeam.id
+          .eq('leader_id', authUser.id)
+          .maybeSingle()
+        teamId = existingTeam?.id
+
+        if (!teamId) {
+          const { data: createdTeam, error: teamError } = await supabase
+            .from('teams')
+            .insert({
+              name: pendingTeam.name.trim(),
+              leader_id: authUser.id,
+              avatar: '',
+              github_repo: pendingTeam.githubRepo?.trim() || '',
+              themes: pendingTeam.themes || [],
+              model: pendingTeam.model || '',
+              harness: pendingTeam.harness || '',
+              project_idea: pendingTeam.projectIdea?.trim() || '',
+              contact_email: authUser.email || null,
+              locked: true,
+              max_size: null,
+            })
+            .select('id')
+            .single()
+          if (teamError) { error.value = friendlyAuthError(teamError.message); return false }
+          teamId = createdTeam.id
+        }
       }
 
-      const { error: linkError } = await supabase
-        .from('profiles')
-        .update({ team_id: teamId, looking_for_team: false })
-        .eq('id', authUser.id)
-      if (linkError) { error.value = friendlyAuthError(linkError.message); return false }
+      if (!teamId) {
+        error.value = pick('Unable to create the team. Please try again.', '无法创建队伍，请稍后重试。')
+        return false
+      }
+
+      const metadata = authUser.user_metadata || {}
+      const roster = Array.isArray(pendingTeam.members) && pendingTeam.members.length
+        ? pendingTeam.members
+        : [registrationContactAsMember({
+            name: metadata.name || authUser.email?.split('@')[0] || '',
+            githubId: metadata.github_id || '',
+            email: authUser.email || '',
+            professionalBackground: metadata.role || '',
+            location: [metadata.city, metadata.country].filter(Boolean).join(', '),
+            organization: metadata.organization || '',
+            ageRange: metadata.age_range || '',
+          })]
+      const rosterIssue = validateTeamRoster(roster)
+      // Registrations started on an older version may not contain all roster fields.
+      // Do not block those accounts; the migration backfills existing teams and the
+      // logged-in editor will collect any missing details on the next save.
+      if (!rosterIssue || Array.isArray(pendingTeam.members)) {
+        if (rosterIssue) { error.value = rosterValidationMessage(rosterIssue); return false }
+        const rosterResult = await replaceTeamRoster(teamId, roster)
+        if (!rosterResult.ok) { error.value = friendlyAuthError(rosterResult.error); return false }
+      }
+
+      if (profile?.team_id !== teamId) {
+        const { error: linkError } = await supabase
+          .from('profiles')
+          .update({ team_id: teamId, looking_for_team: false })
+          .eq('id', authUser.id)
+        if (linkError) { error.value = friendlyAuthError(linkError.message); return false }
+      }
 
       await supabase.auth.updateUser({ data: { pending_team: null } })
       return true
@@ -294,6 +330,11 @@ export function provideAuth(pick: <T>(english: T, chinese: T) => T) {
 
   async function register(data: RegisterData): Promise<boolean> {
     error.value = ''
+    const rosterIssue = validateTeamRoster(data.team.members)
+    if (rosterIssue) {
+      error.value = rosterValidationMessage(rosterIssue)
+      return false
+    }
     const { data: authData, error: signUpError } = await supabase.auth.signUp({
       email: data.email,
       password: data.password,
@@ -336,7 +377,7 @@ export function provideAuth(pick: <T>(english: T, chinese: T) => T) {
     if (authData.session) {
       await supabase.auth.setSession(authData.session)
       await upsertProfile(authData.user.id, data)
-      await ensureTeamFromRegistration(authData.user)
+      if (!(await ensureTeamFromRegistration(authData.user))) return false
       await fetchMe()
     }
     // 没 session 说明需要邮件确认，资料已存入 user_metadata，确认后在 SIGNED_IN 事件里创建 profile

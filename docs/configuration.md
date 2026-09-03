@@ -35,7 +35,7 @@ Do not publish values for the following fields until they are confirmed:
 
 ## Supabase
 
-Follow `docs/supabase-setup.md` and apply every migration under `supabase/migrations/` in filename order. The current public registration flow requires Supabase Auth plus the `profiles`, `teams`, `team_invitations`, and supporting tables documented there.
+Follow `docs/supabase-setup.md` and apply every migration under `supabase/migrations/` in filename order. The current public registration flow requires Supabase Auth plus the `profiles`, `teams`, private `team_members`, `team_invitations`, and supporting tables documented there.
 
 ## Email notifications
 
