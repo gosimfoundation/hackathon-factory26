@@ -89,7 +89,7 @@ function handleRegistrationAccess() {
         <span class="shrink-0 font-mono text-xs uppercase tracking-[0.1em] text-white/64">
           {{ pick('Partners', '合作伙伴') }}
         </span>
-        <div class="grid w-full grid-cols-2 gap-2 md:flex md:min-w-0 md:flex-1 md:flex-wrap">
+        <div class="grid w-full min-w-0 flex-1 grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
           <component
             v-for="partner in heroPartners"
             :key="partner.id"
@@ -98,7 +98,7 @@ function handleRegistrationAccess() {
             :target="partner.url ? '_blank' : undefined"
             :rel="partner.url ? 'noopener noreferrer' : undefined"
             :aria-label="partner.name"
-            class="hero-partner group flex h-11 min-w-0 max-w-none items-center justify-center gap-2 px-3 py-2 md:h-12 md:w-40 md:min-w-[8rem] md:max-w-[10rem] md:flex-1"
+            class="hero-partner group flex h-11 min-w-0 items-center justify-center gap-2 px-3 py-2 md:h-12"
           >
             <img
               v-if="partner.logo"
