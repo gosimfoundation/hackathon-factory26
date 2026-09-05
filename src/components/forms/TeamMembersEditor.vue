@@ -57,6 +57,18 @@ function removeMember(index: number) {
             <option v-for="range in teamMemberAgeRanges" :key="range" :value="range">{{ range }}</option>
           </select>
         </div>
+        <div>
+          <label class="mb-1 block text-sm text-text-secondary">{{ pick('School / major (optional)', '学校 / 专业（选填）') }}</label>
+          <input v-model.trim="member.schoolMajor" type="text" :placeholder="pick('e.g. XX University, Computer Science', '例如：XX 大学，计算机专业')" class="w-full border border-input-border bg-input-bg px-4 py-2.5 text-sm text-text-primary placeholder-input-placeholder transition-colors focus:border-accent/50 focus:outline-none" />
+        </div>
+        <div>
+          <label class="mb-1 block text-sm text-text-secondary">{{ pick('Which AI agents have you used? (optional)', '你用过哪些智能体？（选填）') }}</label>
+          <input v-model.trim="member.agentsUsed" type="text" :placeholder="pick('e.g. Codex, Claude Code, Cursor', '例如：Codex、Claude Code、Cursor')" class="w-full border border-input-border bg-input-bg px-4 py-2.5 text-sm text-text-primary placeholder-input-placeholder transition-colors focus:border-accent/50 focus:outline-none" />
+        </div>
+        <div class="sm:col-span-2">
+          <label class="mb-1 block text-sm text-text-secondary">{{ pick('A project you are most proud of (optional)', '你完成的最得意的项目（选填）') }}</label>
+          <textarea v-model.trim="member.proudProject" rows="2" :placeholder="pick('A short description is enough', '简单说两句就可以')" class="w-full resize-y border border-input-border bg-input-bg px-4 py-2.5 text-sm text-text-primary placeholder-input-placeholder transition-colors focus:border-accent/50 focus:outline-none"></textarea>
+        </div>
       </div>
     </article>
 

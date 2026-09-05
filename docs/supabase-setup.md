@@ -180,6 +180,10 @@ Run `supabase/migrations/20260902_00_team_members.sql` before deploying the
 member-roster form. It adds a private `team_members` table, backfills the primary
 contact for existing teams, and installs the atomic roster-update RPC.
 
+Then run `supabase/migrations/20260905_00_team_member_questionnaire.sql` to add
+the optional school/major, AI-agent experience, and proud-project answers to
+each member record and update the roster RPC.
+
 The existing `teams` table remains the source of team-level information. Each
 team still has one shared login account; additional roster members do not receive
 Supabase accounts. Member emails and demographics are available only to that

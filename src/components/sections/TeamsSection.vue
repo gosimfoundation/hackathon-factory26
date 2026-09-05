@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useCountUp } from '../../composables/useCountUp'
 import { useTeams, type Team } from '../../composables/useTeams'
 import { useAuth, type User } from '../../composables/useAuth'
@@ -45,6 +45,16 @@ const teamsCount = useCountUp(computed(() => teams.value.length))
 const filteredTeams = computed(() => {
   if (!teamFilter.value) return teams.value
   return teams.value.filter(team => (team.themes || []).some(theme => theme.includes(teamFilter.value)))
+})
+
+const initialVisibleTeamCount = 4
+const teamsExpanded = ref(false)
+const visibleTeams = computed(() =>
+  teamsExpanded.value ? filteredTeams.value : filteredTeams.value.slice(0, initialVisibleTeamCount)
+)
+
+watch(teamFilter, () => {
+  teamsExpanded.value = false
 })
 
 // Get members for a team from users array
@@ -138,6 +148,9 @@ const registrationRole = ref('')
 const registrationLocation = ref('')
 const registrationOrganization = ref('')
 const registrationAgeRange = ref('')
+const registrationAgentsUsed = ref('')
+const registrationSchoolMajor = ref('')
+const registrationProudProject = ref('')
 const registrationReferralSource = ref('')
 const registrationDiscord = ref('')
 const registrationTwitter = ref('')
@@ -206,6 +219,9 @@ function resetForm() {
   teamLocked.value = false
   maxSize.value = null
   registrationAdditionalMembers.value = []
+  registrationAgentsUsed.value = ''
+  registrationSchoolMajor.value = ''
+  registrationProudProject.value = ''
   error.value = ''
 }
 
@@ -217,6 +233,9 @@ function fillRegistrationContactFields() {
   registrationLocation.value = [user.value?.city, user.value?.country].filter(Boolean).join(', ')
   registrationOrganization.value = user.value?.organization || ''
   registrationAgeRange.value = user.value?.ageRange || ''
+  registrationAgentsUsed.value = ''
+  registrationSchoolMajor.value = ''
+  registrationProudProject.value = ''
   registrationReferralSource.value = user.value?.referralSource || ''
   registrationDiscord.value = user.value?.discord || ''
   registrationTwitter.value = user.value?.twitter || ''
@@ -271,6 +290,12 @@ async function openEditModal() {
     error.value = pick('Unable to load the team roster. Please try again.', '无法读取队伍成员名单，请稍后重试。')
     return
   }
+  const primaryMember = rosterResult.members[0]
+  if (primaryMember) {
+    registrationAgentsUsed.value = primaryMember.agentsUsed
+    registrationSchoolMajor.value = primaryMember.schoolMajor
+    registrationProudProject.value = primaryMember.proudProject
+  }
   registrationAdditionalMembers.value = rosterResult.members.slice(1)
 }
 
@@ -284,6 +309,9 @@ function currentRegistrationRoster(): TeamMemberDraft[] {
       location: registrationLocation.value,
       organization: registrationOrganization.value,
       ageRange: registrationAgeRange.value,
+      agentsUsed: registrationAgentsUsed.value,
+      schoolMajor: registrationSchoolMajor.value,
+      proudProject: registrationProudProject.value,
     }),
     ...registrationAdditionalMembers.value,
   ]
@@ -561,7 +589,7 @@ onUnmounted(() => {
     <div class="max-w-[1440px] mx-auto px-6 md:px-10 xl:px-14">
       <div class="grid gap-8 mb-14 reveal-blur lg:grid-cols-[.72fr_1.28fr] lg:gap-20">
         <div>
-          <span class="section-kicker">{{ pick('07 / Registry', '07 / 队伍名册') }}</span>
+          <span class="section-kicker">{{ pick('06 / Registry', '06 / 队伍名册') }}</span>
           <h2 class="section-title mt-8">{{ t('teams.title') }} {{ t('teams.titleAccent') }}</h2>
         </div>
         <div class="lg:pt-12">
@@ -642,7 +670,7 @@ onUnmounted(() => {
       <!-- Teams grid -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div
-          v-for="team in filteredTeams"
+          v-for="team in visibleTeams"
           :key="team.id"
           @click="openViewModal(team)"
           class="team-card p-6 pt-7 group relative cursor-pointer flex flex-col overflow-hidden"
@@ -700,6 +728,22 @@ onUnmounted(() => {
           <!-- Project idea -->
           <p v-if="team.projectIdea" class="mt-3 pt-3 border-t border-border-subtle text-xs text-text-secondary leading-relaxed line-clamp-2 italic flex items-start gap-1.5"><img :src="tw.bulb" class="w-3.5 h-3.5 shrink-0 mt-0.5" /> "{{ team.projectIdea }}"</p>
         </div>
+      </div>
+
+      <div v-if="filteredTeams.length > initialVisibleTeamCount" class="mt-8 flex justify-center">
+        <button
+          type="button"
+          :aria-expanded="teamsExpanded"
+          @click="teamsExpanded = !teamsExpanded"
+          class="inline-flex min-h-12 items-center justify-center gap-2 border border-accent px-7 py-3 text-sm font-semibold tracking-wider text-accent transition-colors hover:bg-accent hover:text-white"
+        >
+          {{ teamsExpanded
+            ? pick('Show fewer teams', '收起队伍')
+            : pick(`View all ${filteredTeams.length} teams`, `查看全部 ${filteredTeams.length} 支队伍`) }}
+          <svg class="h-4 w-4 transition-transform" :class="teamsExpanded ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m6 9 6 6 6-6" />
+          </svg>
+        </button>
       </div>
 
       <div v-if="!filteredTeams.length" class="text-center py-16">
@@ -785,6 +829,18 @@ onUnmounted(() => {
                       <option value="">{{ pick('Select age range', '选择年龄段') }}</option>
                       <option v-for="range in ageRangeOptions" :key="range" :value="range">{{ range }}</option>
                     </select>
+                  </div>
+                  <div>
+                    <label class="block text-sm text-text-secondary mb-1">{{ pick('School / Major (optional)', '学校 / 专业（选填）') }}</label>
+                    <input v-model="registrationSchoolMajor" type="text" :placeholder="pick('e.g. XX University, Computer Science', '例如：XX 大学，计算机专业')" :class="inputClass" />
+                  </div>
+                  <div>
+                    <label class="block text-sm text-text-secondary mb-1">{{ pick('Which AI agents have you used? (optional)', '你用过哪些智能体？（选填）') }}</label>
+                    <input v-model="registrationAgentsUsed" type="text" :placeholder="pick('e.g. Codex, Claude Code, Cursor', '例如：Codex、Claude Code、Cursor')" :class="inputClass" />
+                  </div>
+                  <div>
+                    <label class="block text-sm text-text-secondary mb-1">{{ pick('A project you are most proud of (optional)', '你完成的最得意的项目（选填）') }}</label>
+                    <textarea v-model="registrationProudProject" rows="3" :placeholder="pick('A short description is enough', '简单说两句就可以')" :class="[inputClass, 'resize-y']"></textarea>
                   </div>
                   <div>
                     <label class="block text-sm text-text-secondary mb-1">{{ pick('Where do you hear from us? (optional)', '你从哪里了解到我们？（选填）') }}</label>

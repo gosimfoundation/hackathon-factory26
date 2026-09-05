@@ -97,6 +97,9 @@ const regRole = ref('')
 const regLocation = ref('')
 const regOrganization = ref('')
 const regAgeRange = ref('')
+const regAgentsUsed = ref('')
+const regSchoolMajor = ref('')
+const regProudProject = ref('')
 const regReferralSource = ref('')
 const regDiscord = ref('')
 const regTwitter = ref('')
@@ -155,6 +158,9 @@ watch(showAuthModal, (open) => {
     regLocation.value = ''
     regOrganization.value = ''
     regAgeRange.value = ''
+    regAgentsUsed.value = ''
+    regSchoolMajor.value = ''
+    regProudProject.value = ''
     regReferralSource.value = ''
     regDiscord.value = ''
     regTwitter.value = ''
@@ -234,6 +240,9 @@ async function submitRegister() {
           location: regLocation.value,
           organization: regOrganization.value,
           ageRange: regAgeRange.value,
+          agentsUsed: regAgentsUsed.value,
+          schoolMajor: regSchoolMajor.value,
+          proudProject: regProudProject.value,
         }),
         ...regAdditionalMembers.value,
       ],
@@ -793,6 +802,18 @@ async function saveProfile() {
                 <option value="">{{ pick('Select age range', '选择年龄段') }}</option>
                 <option v-for="range in ageRangeOptions" :key="range" :value="range">{{ range }}</option>
               </select>
+            </div>
+            <div>
+              <label class="block text-sm text-text-secondary mb-1">{{ pick('School / Major (optional)', '学校 / 专业（选填）') }}</label>
+              <input v-model="regSchoolMajor" type="text" :placeholder="pick('e.g. XX University, Computer Science', '例如：XX 大学，计算机专业')" :class="inputClass" />
+            </div>
+            <div>
+              <label class="block text-sm text-text-secondary mb-1">{{ pick('Which AI agents have you used? (optional)', '你用过哪些智能体？（选填）') }}</label>
+              <input v-model="regAgentsUsed" type="text" :placeholder="pick('e.g. Codex, Claude Code, Cursor', '例如：Codex、Claude Code、Cursor')" :class="inputClass" />
+            </div>
+            <div>
+              <label class="block text-sm text-text-secondary mb-1">{{ pick('A project you are most proud of (optional)', '你完成的最得意的项目（选填）') }}</label>
+              <textarea v-model="regProudProject" rows="3" :placeholder="pick('A short description is enough', '简单说两句就可以')" :class="[inputClass, 'resize-y']"></textarea>
             </div>
             <div>
               <label class="block text-sm text-text-secondary mb-1">{{ pick('Where do you hear from us? (optional)', '你从哪里了解到我们？（选填）') }}</label>

@@ -7,6 +7,9 @@ export interface TeamMemberDraft {
   professionalBackground: string
   affiliation: string
   ageRange: string
+  agentsUsed: string
+  schoolMajor: string
+  proudProject: string
 }
 
 export const teamMemberAgeRanges = ['18-22', '23-28', '29-35', '36+'] as const
@@ -26,6 +29,9 @@ export function emptyTeamMember(): TeamMemberDraft {
     professionalBackground: '',
     affiliation: '',
     ageRange: '',
+    agentsUsed: '',
+    schoolMajor: '',
+    proudProject: '',
   }
 }
 
@@ -37,6 +43,9 @@ export function registrationContactAsMember(input: {
   location: string
   organization: string
   ageRange: string
+  agentsUsed?: string
+  schoolMajor?: string
+  proudProject?: string
 }): TeamMemberDraft {
   return {
     name: input.name.trim(),
@@ -45,6 +54,9 @@ export function registrationContactAsMember(input: {
     professionalBackground: input.professionalBackground.trim(),
     affiliation: [input.location.trim(), input.organization.trim()].filter(Boolean).join(' / '),
     ageRange: input.ageRange,
+    agentsUsed: input.agentsUsed?.trim() || '',
+    schoolMajor: input.schoolMajor?.trim() || '',
+    proudProject: input.proudProject?.trim() || '',
   }
 }
 
@@ -73,7 +85,7 @@ export function validateTeamRoster(members: TeamMemberDraft[]): TeamRosterValida
 export async function fetchTeamRoster(teamId: string): Promise<{ members: TeamMemberDraft[]; error: string }> {
   const { data, error } = await supabase
     .from('team_members')
-    .select('name,github_id,email,professional_background,affiliation,age_range,is_primary_contact,position')
+    .select('name,github_id,email,professional_background,affiliation,age_range,agents_used,school_major,proud_project,is_primary_contact,position')
     .eq('team_id', teamId)
     .order('position', { ascending: true })
 
@@ -87,6 +99,9 @@ export async function fetchTeamRoster(teamId: string): Promise<{ members: TeamMe
       professionalBackground: row.professional_background || '',
       affiliation: row.affiliation || '',
       ageRange: row.age_range || '',
+      agentsUsed: row.agents_used || '',
+      schoolMajor: row.school_major || '',
+      proudProject: row.proud_project || '',
     })),
     error: '',
   }
@@ -103,6 +118,9 @@ export async function replaceTeamRoster(teamId: string, members: TeamMemberDraft
     professionalBackground: member.professionalBackground.trim(),
     affiliation: member.affiliation.trim(),
     ageRange: member.ageRange,
+    agentsUsed: (member.agentsUsed || '').trim(),
+    schoolMajor: (member.schoolMajor || '').trim(),
+    proudProject: (member.proudProject || '').trim(),
   }))
   const { error } = await supabase.rpc('replace_team_members', {
     p_team_id: teamId,
