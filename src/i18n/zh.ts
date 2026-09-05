@@ -341,6 +341,7 @@ export default {
       { id: "ajcif", name: "全法中国青年科创协会", role: "支持单位", logo: "/sponsors/ajcif-clean.png" },
       { id: "huawei-cloud", name: "华为云", role: "支持单位", logo: "/sponsors/huawei-cloud-zh-clean.png", url: "https://www.huaweicloud.com/" },
       { id: "asiainfo", name: "亚信科技", role: "赞助商", logo: "/sponsors/asiainfo-clean.png", url: "https://www.asiainfo.com/" },
+      { id: "trae", name: "TRAE", role: "赞助商", logo: "/sponsors/trae-clean.png" },
     ],
   },
   teams: {

@@ -234,6 +234,7 @@ export default {
       { id: 'ajcif', name: 'Association des Jeunes Chinois pour la Technologie et l’Innovation Scientifique en France', role: 'Supporting Organization', logo: '/sponsors/ajcif-clean.png' },
       { id: 'huawei-cloud', name: 'Huawei Cloud', role: 'Supporting Organization', logo: '/sponsors/huawei-cloud-en-clean.png', url: 'https://www.huaweicloud.com/intl/en-us/' },
       { id: 'asiainfo', name: 'AsiaInfo Technologies', role: 'Sponsor', logo: '/sponsors/asiainfo-clean.png', url: 'https://www.asiainfo.com/' },
+      { id: 'trae', name: 'TRAE', role: 'Sponsor', logo: '/sponsors/trae-clean.png' },
     ],
   },
   teams: {

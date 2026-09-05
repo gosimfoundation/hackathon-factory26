@@ -89,7 +89,7 @@ function handleRegistrationAccess() {
         <span class="shrink-0 font-mono text-xs uppercase tracking-[0.1em] text-white/64">
           {{ pick('Partners', '合作伙伴') }}
         </span>
-        <div class="grid w-full min-w-0 flex-1 grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
+        <div class="grid w-full min-w-0 flex-1 grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-7">
           <component
             v-for="partner in heroPartners"
             :key="partner.id"
