@@ -593,9 +593,11 @@ onUnmounted(() => {
           <h2 class="section-title mt-8">{{ t('teams.title') }} {{ t('teams.titleAccent') }}</h2>
         </div>
         <div class="lg:pt-12">
-          <p class="text-text-secondary text-base max-w-2xl">{{ t('teams.subtitle') }}</p>
-          <p class="text-accent mt-4 text-sm font-semibold">{{ t('teams.registerNote') }}</p>
-          <p class="text-text-secondary mt-1 text-xs">{{ t('teams.registerWarn') }}</p>
+          <p class="text-text-secondary text-base max-w-2xl">{{ t(isFull ? 'teams.closedSubtitle' : 'teams.subtitle') }}</p>
+          <template v-if="!isFull">
+            <p class="text-accent mt-4 text-sm font-semibold">{{ t('teams.registerNote') }}</p>
+            <p class="text-text-secondary mt-1 text-xs">{{ t('teams.registerWarn') }}</p>
+          </template>
           <div class="flex items-center gap-3 mt-4">
           <span class="text-xs text-text-secondary">{{ pick('Updated', '更新于') }} {{ timeAgo(lastUpdated) }}</span>
           <button @click="fetchTeams" class="text-xs text-accent hover:text-text-primary transition-colors flex items-center gap-1">
@@ -638,20 +640,25 @@ onUnmounted(() => {
             </button>
           </div>
           <template v-else>
-            <p class="mb-4 font-mono text-[11px] uppercase tracking-[.14em] text-text-muted">{{ pick('Registration takes two steps', '报名需要 2 步') }}</p>
-            <div class="grid gap-4 sm:grid-cols-2">
-              <div class="flex gap-3">
-                <span class="font-mono text-sm font-bold text-accent">01</span>
-                <div><p class="text-sm font-semibold text-text-primary">{{ pick('Submit one team account', '提交一个队伍账号') }}</p><p class="mt-1 text-xs leading-relaxed text-text-muted">{{ pick('The team lead or main contact fills it in.', '由队长或主要联系人填写。') }}</p></div>
+            <template v-if="!isFull">
+              <p class="mb-4 font-mono text-[11px] uppercase tracking-[.14em] text-text-muted">{{ pick('Registration takes two steps', '报名需要 2 步') }}</p>
+              <div class="grid gap-4 sm:grid-cols-2">
+                <div class="flex gap-3">
+                  <span class="font-mono text-sm font-bold text-accent">01</span>
+                  <div><p class="text-sm font-semibold text-text-primary">{{ pick('Submit one team account', '提交一个队伍账号') }}</p><p class="mt-1 text-xs leading-relaxed text-text-muted">{{ pick('The team lead or main contact fills it in.', '由队长或主要联系人填写。') }}</p></div>
+                </div>
+                <div class="flex gap-3">
+                  <span class="font-mono text-sm font-bold text-accent">02</span>
+                  <div><p class="text-sm font-semibold text-text-primary">{{ pick('Sign in to view or edit', '登录查看或修改') }}</p><p class="mt-1 text-xs leading-relaxed text-text-muted">{{ pick('ARC-Bench access will be announced separately.', 'ARC-Bench 登录方式另行通知。') }}</p></div>
+                </div>
               </div>
-              <div class="flex gap-3">
-                <span class="font-mono text-sm font-bold text-accent">02</span>
-                <div><p class="text-sm font-semibold text-text-primary">{{ pick('Sign in to view or edit', '登录查看或修改') }}</p><p class="mt-1 text-xs leading-relaxed text-text-muted">{{ pick('ARC-Bench access will be announced separately.', 'ARC-Bench 登录方式另行通知。') }}</p></div>
-              </div>
-            </div>
+            </template>
+            <p v-else class="text-sm leading-relaxed text-text-secondary">
+              {{ pick('Existing teams can still sign in to view or edit their details.', '已报名队伍仍可登录查看或修改资料。') }}
+            </p>
             <div class="mt-5">
               <button @click="promptAuth('login')" class="px-8 py-4 bg-btn-bg text-btn-text text-sm font-semibold tracking-widest uppercase hover:bg-btn-hover transition-colors">
-                {{ pick('Register / Sign In', '报名/登录') }}
+                {{ isFull ? pick('Sign In', '登录') : pick('Register / Sign In', '报名/登录') }}
               </button>
             </div>
           </template>

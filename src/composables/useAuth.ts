@@ -3,6 +3,7 @@ import type { Session } from '@supabase/supabase-js'
 import { supabase } from '../lib/supabase'
 import { publicSiteUrl } from './api'
 import { registrationContactAsMember, replaceTeamRoster, validateTeamRoster, type TeamMemberDraft, type TeamRosterValidationIssue } from './useTeamRoster'
+import { registrationIsClosed } from './useRegistrationDeadline'
 
 export interface User {
   id: string
@@ -330,6 +331,13 @@ export function provideAuth(pick: <T>(english: T, chinese: T) => T) {
 
   async function register(data: RegisterData): Promise<boolean> {
     error.value = ''
+    if (registrationIsClosed()) {
+      error.value = pick(
+        'Registration closed (2026/9/8 23:59, Beijing time). Existing teams can still sign in to edit their details.',
+        '报名已截止（2026/9/8 23:59，北京时间）。已报名队伍仍可登录修改资料。',
+      )
+      return false
+    }
     const rosterIssue = validateTeamRoster(data.team.members)
     if (rosterIssue) {
       error.value = rosterValidationMessage(rosterIssue)

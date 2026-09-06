@@ -10,6 +10,7 @@ import { assetUrl, publicSiteUrl } from '../../composables/api'
 import TeamMembersEditor from '../forms/TeamMembersEditor.vue'
 import QRCode from 'qrcode'
 import { supabase } from '../../lib/supabase'
+import { useRegistrationDeadline } from '../../composables/useRegistrationDeadline'
 
 const { t, locale, pick, roleLabel, trackLabel, toggleLocale } = useI18n()
 const route = useRoute()
@@ -34,6 +35,10 @@ async function handleChangePassword() {
 }
 const { isDark, toggleTheme } = useTheme()
 const { teams } = useTeams()
+const { isClosed: registrationClosed } = useRegistrationDeadline()
+const registrationActionLabel = computed(() => registrationClosed.value
+  ? pick('Sign In', '登录')
+  : pick('Register / Sign In', '报名/登录'))
 
 // Registration currently uses one shared account per team.
 const teamMemberFeaturesEnabled = false
@@ -475,7 +480,7 @@ async function saveProfile() {
           @click="promptAuth('login')"
           class="inline-flex h-10 items-center bg-btn-bg px-4 py-0 text-xs font-semibold uppercase tracking-widest text-btn-text transition-colors hover:bg-btn-hover whitespace-nowrap"
         >
-          {{ pick('Register / Sign In', '报名/登录') }}
+          {{ registrationActionLabel }}
         </button>
         <router-link
           v-if="isLoggedIn && myTeam"
@@ -490,7 +495,7 @@ async function saveProfile() {
           @click="openRegistrationEditor"
           class="inline-flex h-10 items-center bg-btn-bg px-4 py-0 text-xs font-semibold uppercase tracking-widest text-btn-text transition-colors hover:bg-btn-hover whitespace-nowrap"
         >
-          {{ pick('Register / Sign In', '报名/登录') }}
+          {{ registrationClosed ? pick('Registration Closed', '报名已关闭') : registrationActionLabel }}
         </button>
       </nav>
 
@@ -513,7 +518,9 @@ async function saveProfile() {
       type="button"
       @click="isLoggedIn ? openRegistrationEditor() : promptAuth('login')"
       class="registration-announcement block h-11 w-full overflow-hidden bg-[#8b4962] text-left text-white shadow-[0_8px_24px_rgba(75,31,60,.24)] transition-colors hover:bg-[#743b51]"
-      :aria-label="pick(`${teams.length} teams have registered. Register or sign in.`, `已有 ${teams.length} 支队伍报名，前往报名或登录。`)"
+      :aria-label="registrationClosed
+        ? pick(`${teams.length} teams have registered. Registration is closed; sign in to manage an existing team.`, `已有 ${teams.length} 支队伍报名。报名已关闭；已报名队伍可登录管理资料。`)
+        : pick(`${teams.length} teams have registered. Register or sign in.`, `已有 ${teams.length} 支队伍报名，前往报名或登录。`)"
     >
       <span aria-hidden="true" class="registration-announcement__track h-full items-center">
         <span v-for="set in 2" :key="set" class="registration-announcement__set h-full items-center">
@@ -523,8 +530,8 @@ async function saveProfile() {
               {{ pick(`${teams.length} TEAMS REGISTERED`, `已有 ${teams.length} 支队伍报名`) }}
             </span>
             <span class="text-white/75">·</span>
-            <span>{{ pick('One shared account per team', '每支队伍只需一个账号') }}</span>
-            <span class="font-semibold">{{ pick('Register / Sign in', '报名/登录') }} →</span>
+            <span>{{ registrationClosed ? pick('Registration closed', '报名已截止') : t('hero.registrationDeadline') }}</span>
+            <span class="font-semibold">{{ registrationActionLabel }} →</span>
           </span>
         </span>
       </span>
@@ -583,10 +590,10 @@ async function saveProfile() {
           </button>
         </template>
         <button v-if="isLoggedIn" type="button" @click="openRegistrationEditor(); mobileOpen = false" class="mt-4 block w-full bg-btn-bg px-5 py-3 text-center text-xs font-semibold uppercase tracking-widest text-btn-text transition-colors hover:bg-btn-hover">
-          {{ pick('Register / Sign In', '报名/登录') }}
+          {{ registrationClosed && !myTeam ? pick('Registration Closed', '报名已关闭') : registrationActionLabel }}
         </button>
         <button v-else type="button" @click="promptAuth('login'); mobileOpen = false" class="mt-4 block w-full bg-btn-bg px-5 py-3 text-center text-xs font-semibold uppercase tracking-widest text-btn-text transition-colors hover:bg-btn-hover">
-          {{ pick('Register / Sign In', '报名/登录') }}
+          {{ registrationActionLabel }}
         </button>
       </div>
     </Transition>
@@ -616,6 +623,7 @@ async function saveProfile() {
               {{ pick('Login', '登录') }}
             </button>
             <button
+              v-if="!registrationClosed"
               @click="authModalTab = 'register'; authError = ''"
               class="pb-3 text-sm font-semibold transition-colors border-b-2 -mb-px"
               :class="authModalTab === 'register' ? 'text-text-primary border-accent' : 'text-text-secondary border-transparent hover:text-text-secondary'"
@@ -648,7 +656,7 @@ async function saveProfile() {
             <p class="text-center text-xs text-text-secondary mt-1">
               <button type="button" @click="authModalTab = 'forgot'; authError = ''" class="text-accent hover:underline">{{ pick('Forgot password?', '忘记密码？') }}</button>
             </p>
-            <div class="border-t border-border pt-4 text-center">
+            <div v-if="!registrationClosed" class="border-t border-border pt-4 text-center">
               <p class="mb-3 text-xs text-text-secondary">{{ pick("Don't have an account yet?", '还没有报名账号？') }}</p>
               <button type="button" @click="authModalTab = 'register'; authError = ''" class="w-full border border-accent px-4 py-3 text-xs font-semibold uppercase tracking-wider text-accent transition-colors hover:bg-accent hover:text-white">
                 {{ pick('Register Now', '立即报名') }}
@@ -673,7 +681,7 @@ async function saveProfile() {
           </div>
 
           <!-- Register form -->
-          <form v-else @submit.prevent="submitRegister" class="space-y-5">
+          <form v-else-if="!registrationClosed" @submit.prevent="submitRegister" class="space-y-5">
             <!-- Confirmation is a separate screen so the next action cannot be missed. -->
             <template v-if="registerNeedsConfirm">
               <div class="py-2 text-center">
@@ -915,6 +923,18 @@ async function saveProfile() {
             </p>
             </template>
           </form>
+
+          <div v-else class="space-y-5 py-2 text-center">
+            <p class="text-sm leading-relaxed text-text-secondary">
+              {{ pick(
+                'Registration closed (2026/9/8 23:59, Beijing time). Existing teams can still sign in to edit their details.',
+                '报名已截止（2026/9/8 23:59，北京时间）。已报名队伍仍可登录修改资料。',
+              ) }}
+            </p>
+            <button type="button" @click="authModalTab = 'login'; authError = ''" class="w-full bg-btn-bg px-4 py-3 text-xs font-semibold uppercase tracking-wider text-btn-text transition-colors hover:bg-btn-hover">
+              {{ pick('Sign in', '登录') }}
+            </button>
+          </div>
         </div>
       </div>
     </Transition>

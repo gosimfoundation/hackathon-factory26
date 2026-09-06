@@ -4,9 +4,11 @@ import { useCountdown } from '../../composables/useCountdown'
 import { useI18n } from '../../composables/useI18n'
 import { useAuth } from '../../composables/useAuth'
 import { assetUrl } from '../../composables/api'
+import { useRegistrationDeadline } from '../../composables/useRegistrationDeadline'
 
 const { t, pick } = useI18n()
 const { isLoggedIn, promptAuth } = useAuth()
+const { isClosed: registrationClosed } = useRegistrationDeadline()
 const locationLines = computed(() => t('hero.location') as string[])
 type HeroPartner = { id: string; name: string; shortName?: string; role: string; logo?: string; url?: string }
 const heroPartners = computed(() => t('sponsors.confirmed') as HeroPartner[])
@@ -35,7 +37,7 @@ function handleRegistrationAccess() {
 </script>
 
 <template>
-  <section class="hero-section relative min-h-[760px] h-[100svh] overflow-hidden bg-[#0b0d0c] text-white">
+  <section class="hero-section relative min-h-[100svh] overflow-hidden bg-[#0b0d0c] text-white md:h-[100svh] md:min-h-[760px]">
     <svg class="pointer-events-none absolute h-0 w-0" aria-hidden="true" focusable="false">
       <filter id="hero-cophi-knockout" color-interpolation-filters="sRGB">
         <feColorMatrix
@@ -53,7 +55,7 @@ function handleRegistrationAccess() {
     <div class="hero-color-wash absolute inset-0"></div>
     <div class="absolute inset-0 bg-black/50"></div>
 
-    <div class="relative z-10 mx-auto flex h-full max-w-[1440px] flex-col px-6 md:px-10 xl:px-14">
+    <div class="relative z-10 mx-auto flex min-h-[100svh] max-w-[1440px] flex-col px-6 md:h-full md:min-h-0 md:px-10 xl:px-14">
       <div class="flex flex-1 items-center pt-24 pb-10">
         <div class="w-full max-w-6xl">
           <div class="mb-7 flex items-center gap-4 font-mono text-xs uppercase leading-relaxed tracking-[0.12em] text-white/72 md:text-sm">
@@ -76,9 +78,12 @@ function handleRegistrationAccess() {
               </p>
             </div>
 
-            <div class="flex flex-wrap items-center gap-3 md:justify-end">
+            <div class="flex flex-col items-start gap-3 md:items-end">
+              <p class="font-mono text-xs font-semibold uppercase leading-relaxed tracking-[0.08em] text-[#efbdd0] md:max-w-xs md:text-right">
+                {{ t('hero.registrationDeadline') }}
+              </p>
               <button type="button" @click="handleRegistrationAccess" class="bg-[#c788a1] px-5 py-3 text-xs font-semibold uppercase tracking-[0.14em] text-[#111310] transition-colors hover:bg-white">
-                {{ pick('Register / Sign In', '报名/登录') }} <span class="ml-3">↗</span>
+                {{ registrationClosed ? pick('Sign In', '登录') : pick('Register / Sign In', '报名/登录') }} <span class="ml-3">↗</span>
               </button>
             </div>
           </div>

@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { useI18n } from '../../composables/useI18n'
 import { useAuth } from '../../composables/useAuth'
+import { useRegistrationDeadline } from '../../composables/useRegistrationDeadline'
 const { t, pick } = useI18n()
 const { isLoggedIn, promptAuth } = useAuth()
+const { isClosed: registrationClosed } = useRegistrationDeadline()
 
 function handleRegistrationAccess() {
   if (!isLoggedIn.value) {
@@ -21,9 +23,10 @@ function handleRegistrationAccess() {
         <h2 class="mt-8 max-w-[12ch] text-[clamp(2.75rem,6vw,6rem)] font-semibold leading-[1.16] tracking-[-.05em] md:leading-[1.12]">{{ t('cta.title') }}</h2>
         <p class="mt-8 max-w-2xl text-base font-medium leading-relaxed md:text-xl">{{ t('cta.tagline') }}</p>
         <p class="mono-label mt-4">{{ t('cta.location') }}</p>
+        <p class="mt-3 font-mono text-xs font-semibold uppercase tracking-[.08em] text-white">{{ t('hero.registrationDeadline') }}</p>
       </div>
       <button type="button" @click="handleRegistrationAccess" class="inline-flex min-w-48 items-center justify-between border border-white bg-white px-6 py-4 text-xs font-semibold uppercase tracking-[.14em] text-[#4b1f3c] transition-colors hover:bg-transparent hover:text-white">
-        {{ pick('Register / Sign In', '报名/登录') }} <span class="ml-8">↗</span>
+        {{ registrationClosed ? pick('Sign In', '登录') : pick('Register / Sign In', '报名/登录') }} <span class="ml-8">↗</span>
       </button>
     </div>
   </section>

@@ -2,6 +2,7 @@ import { ref, computed, onMounted } from 'vue'
 import type { User } from './useAuth'
 import { supabase } from '../lib/supabase'
 import { useI18n } from './useI18n'
+import { useRegistrationDeadline } from './useRegistrationDeadline'
 
 export interface Team {
   id: string
@@ -86,6 +87,7 @@ function teamRowToTeam(row: Record<string, any>, allUsers: User[]): Team {
 
 export function useTeams() {
   const { pick } = useI18n()
+  const { isClosed: registrationClosed } = useRegistrationDeadline()
   const notLoggedIn = () => pick('Not logged in', '请先登录')
   const networkError = () => pick('Network error', '网络错误，请稍后重试')
   const teamNotFound = () => pick('Team not found', '未找到该队伍')
@@ -96,7 +98,7 @@ export function useTeams() {
   const totalRegistered = computed(() => users.value.length)
   const maxParticipants = ref<number | null>(null)
   const spotsLeft = computed(() => 0)
-  const isFull = computed(() => false)
+  const isFull = computed(() => registrationClosed.value)
   const progress = computed(() => 0)
 
   const modelStats = computed(() => {
@@ -136,6 +138,14 @@ export function useTeams() {
   }) {
     loading.value = true
     error.value = ''
+    if (registrationClosed.value) {
+      error.value = pick(
+        'Registration closed (2026/9/8 23:59, Beijing time).',
+        '报名已截止（2026/9/8 23:59，北京时间）。',
+      )
+      loading.value = false
+      return false
+    }
     const { data: { session } } = await supabase.auth.getSession()
     if (!session) { error.value = notLoggedIn(); loading.value = false; return false }
     try {
