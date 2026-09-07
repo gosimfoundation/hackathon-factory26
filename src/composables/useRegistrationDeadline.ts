@@ -1,7 +1,7 @@
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 
-// Registration remains available for the full September 8 calendar day in Beijing.
-export const REGISTRATION_CLOSES_AT = '2026-09-09T00:00:00+08:00'
+// Registration remains available through 23:59 on September 7 in Beijing.
+export const REGISTRATION_CLOSES_AT = '2026-09-08T00:00:00+08:00'
 const registrationClosesAtMs = Date.parse(REGISTRATION_CLOSES_AT)
 
 export function registrationIsClosed(now = Date.now()): boolean {

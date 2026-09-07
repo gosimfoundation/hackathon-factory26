@@ -333,8 +333,8 @@ export function provideAuth(pick: <T>(english: T, chinese: T) => T) {
     error.value = ''
     if (registrationIsClosed()) {
       error.value = pick(
-        'Registration closed (2026/9/8 23:59, Beijing time). Existing teams can still sign in to edit their details.',
-        '报名已截止（2026/9/8 23:59，北京时间）。已报名队伍仍可登录修改资料。',
+        'Registration closed (09/07 23:59, Beijing time). Existing teams can still sign in to edit their details.',
+        '报名已截止（09/07 23:59，北京时间）。已报名队伍仍可登录修改资料。',
       )
       return false
     }

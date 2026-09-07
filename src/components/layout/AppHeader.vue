@@ -927,8 +927,8 @@ async function saveProfile() {
           <div v-else class="space-y-5 py-2 text-center">
             <p class="text-sm leading-relaxed text-text-secondary">
               {{ pick(
-                'Registration closed (2026/9/8 23:59, Beijing time). Existing teams can still sign in to edit their details.',
-                '报名已截止（2026/9/8 23:59，北京时间）。已报名队伍仍可登录修改资料。',
+                'Registration closed (09/07 23:59, Beijing time). Existing teams can still sign in to edit their details.',
+                '报名已截止（09/07 23:59，北京时间）。已报名队伍仍可登录修改资料。',
               ) }}
             </p>
             <button type="button" @click="authModalTab = 'login'; authError = ''" class="w-full bg-btn-bg px-4 py-3 text-xs font-semibold uppercase tracking-wider text-btn-text transition-colors hover:bg-btn-hover">

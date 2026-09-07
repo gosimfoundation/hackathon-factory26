@@ -140,8 +140,8 @@ export function useTeams() {
     error.value = ''
     if (registrationClosed.value) {
       error.value = pick(
-        'Registration closed (2026/9/8 23:59, Beijing time).',
-        '报名已截止（2026/9/8 23:59，北京时间）。',
+        'Registration closed (09/07 23:59, Beijing time).',
+        '报名已截止（09/07 23:59，北京时间）。',
       )
       loading.value = false
       return false
