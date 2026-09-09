@@ -1,11 +1,10 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { supabase } from '../lib/supabase'
-import QRCode from 'qrcode'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
 import { useI18n } from '../composables/useI18n'
-import { assetUrl, publicSiteUrl } from '../composables/api'
+import { assetUrl } from '../composables/api'
 
 const { pick, roleLabel, trackLabel } = useI18n()
 
@@ -50,17 +49,6 @@ const hoveredDay = ref(-1)
 // Edit modal
 const editingUser = ref<any>(null)
 const editFields = ref({ name: '', email: '', wechat: '', role: '', bio: '', github_id: '', country: '', city: '', organization: '', age_range: '', referral_source: '', discord: '', twitter: '', telegram: '', admin_notes: '' })
-
-// QR modal
-const qrUser = ref<any>(null)
-const qrDataUrl = ref('')
-
-async function showQr(user: any) {
-  qrUser.value = user
-  qrDataUrl.value = await QRCode.toDataURL(publicSiteUrl(`/profile/${user.id}`), {
-    width: 280, margin: 1, color: { dark: '#000000', light: '#ffffff' },
-  })
-}
 
 // Team view modal
 const viewingTeam = ref<any>(null)
@@ -759,7 +747,6 @@ onMounted(() => { if (authed.value) { loadData(); loadAnnouncement(); loadSubmis
                 <td class="py-3 px-3 text-gray-500 text-xs">{{ new Date(p.created_at).toLocaleDateString() }}</td>
                 <td class="py-3 px-3">
                   <div class="flex gap-2 items-center">
-                    <button @click="showQr(p)" class="text-xs text-amber-400 hover:text-amber-300">QR</button>
                     <button @click="openEdit(p)" class="text-xs text-blue-400 hover:text-blue-300">{{ pick('Edit', '编辑') }}</button>
                     <template v-if="p.checked_in && p.team_id && ['Kimi','GLM','MiniMax','DeepSeek'].includes(teams.find((t: any) => t.id === p.team_id)?.model)">
                       <template v-if="getUserCode(p.id)">
@@ -941,23 +928,5 @@ onMounted(() => { if (authed.value) { loadData(); loadAnnouncement(); loadSubmis
       </Transition>
     </Teleport>
 
-    <!-- QR Modal -->
-    <Teleport to="body">
-      <Transition enter-active-class="transition-opacity duration-150" enter-from-class="opacity-0" leave-active-class="transition-opacity duration-100" leave-to-class="opacity-0">
-        <div v-if="qrUser" class="fixed inset-0 z-[200] flex items-center justify-center p-4" @click="qrUser = null">
-          <div class="absolute inset-0 bg-black/80" />
-          <div class="relative bg-white p-8 rounded-lg shadow-2xl flex flex-col items-center" @click.stop>
-            <h3 class="text-lg font-bold text-gray-900 mb-1">{{ qrUser.name }}</h3>
-            <p class="text-sm text-gray-500 mb-1">{{ qrUser.email || '' }}</p>
-            <span :class="qrUser.approved ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'" class="text-xs font-semibold px-2 py-0.5 rounded mb-4">
-              {{ qrUser.approved ? pick('APPROVED', '已批准') : pick('NOT APPROVED', '未批准') }}
-            </span>
-            <img v-if="qrDataUrl" :src="qrDataUrl" class="w-56 h-56" />
-            <p class="text-xs text-gray-400 mt-3">{{ qrUser.id }}</p>
-            <button @click="qrUser = null" class="mt-4 px-6 py-2 bg-gray-900 text-white text-sm font-semibold hover:bg-gray-700 transition-colors">{{ pick('Close', '关闭') }}</button>
-          </div>
-        </div>
-      </Transition>
-    </Teleport>
   </div>
 </template>

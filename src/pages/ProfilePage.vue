@@ -1,42 +1,71 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, watch, onUnmounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { supabase } from '../lib/supabase'
-import QRCode from 'qrcode'
 import { useI18n } from '../composables/useI18n'
-import { publicSiteUrl } from '../composables/api'
+import { useAuth } from '../composables/useAuth'
 
 const route = useRoute()
 const { pick, roleLabel, trackLabel } = useI18n()
-const userId = route.params.id as string
+const { isLoggedIn, promptAuth } = useAuth()
 const profile = ref<Record<string, any> | null>(null)
 const loading = ref(true)
-const qrDataUrl = ref('')
+const needsLogin = ref(false)
+const loadFailed = ref(false)
+let loadVersion = 0
 
 function getGitHubAvatar(githubId?: string): string {
   if (!githubId) return ''
   return `https://avatars.githubusercontent.com/${githubId.replace(/^@/, '')}`
 }
 
-onMounted(async () => {
-  const { data } = await supabase.from('profiles').select('*').eq('id', userId).single()
-  profile.value = data
-  loading.value = false
-
-  if (data) {
-    qrDataUrl.value = await QRCode.toDataURL(publicSiteUrl(`/profile/${userId}`), {
-      width: 200,
-      margin: 1,
-      color: { dark: '#000000', light: '#ffffff' },
-    })
+async function loadProfile() {
+  const version = ++loadVersion
+  const userId = String(route.params.id || '')
+  loading.value = true
+  profile.value = null
+  needsLogin.value = false
+  loadFailed.value = false
+  try {
+    // A QR scan often opens a different, signed-out browser. Anonymous RLS
+    // results cannot tell us whether this registration exists.
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+    if (version !== loadVersion) return
+    if (sessionError) throw sessionError
+    if (!session) {
+      needsLogin.value = true
+      return
+    }
+    const { data, error } = await supabase.from('profiles')
+      .select('id,name,avatar,github_id,role,approved,checked_in,bio,themes,discord,twitter,telegram')
+      .eq('id', userId).maybeSingle()
+    if (version !== loadVersion) return
+    if (error) throw error
+    profile.value = data
+  } catch {
+    if (version === loadVersion) loadFailed.value = true
+  } finally {
+    if (version === loadVersion) loading.value = false
   }
-})
+}
+
+watch([() => route.params.id, isLoggedIn], loadProfile, { immediate: true })
+onUnmounted(() => { loadVersion++ })
 </script>
 
 <template>
   <div class="min-h-screen bg-bg-primary pt-24 pb-16">
     <div class="max-w-md mx-auto px-6">
       <div v-if="loading" class="text-center text-text-secondary py-20">{{ pick('Loading...', '加载中……') }}</div>
+      <div v-else-if="needsLogin" class="text-center text-text-secondary py-20">
+        <h1 class="text-xl font-bold text-text-primary mb-3">{{ pick('Log in to view registration details', '请登录后查看报名资料') }}</h1>
+        <p class="text-sm mb-6">{{ pick('This browser is not logged in. After logging in, this registration will open automatically.', '当前浏览器尚未登录。登录后会自动打开这份报名资料。') }}</p>
+        <button type="button" @click="promptAuth('login')" class="px-6 py-3 bg-btn-bg text-btn-text font-semibold">{{ pick('Log in', '登录') }}</button>
+      </div>
+      <div v-else-if="loadFailed" role="alert" class="text-center text-text-secondary py-20">
+        <p class="mb-4">{{ pick('Unable to load registration details. Please try again.', '报名资料加载失败，请重试。') }}</p>
+        <button type="button" @click="loadProfile" class="px-6 py-3 bg-btn-bg text-btn-text font-semibold">{{ pick('Retry', '重试') }}</button>
+      </div>
       <div v-else-if="!profile" class="text-center text-text-secondary py-20">{{ pick('User not found.', '未找到该用户。') }}</div>
       <div v-else class="bg-bg-secondary border border-border p-8">
         <div class="flex flex-col items-center text-center mb-6">
@@ -70,11 +99,6 @@ onMounted(async () => {
           <p v-if="profile.telegram" class="flex items-center gap-2 text-sm text-text-secondary"><span class="w-5 text-center">TG</span> {{ profile.telegram }}</p>
         </div>
 
-        <div v-if="qrDataUrl" class="flex flex-col items-center pt-4 border-t border-border">
-          <p class="text-xs text-text-muted uppercase tracking-wider mb-3">{{ pick('Registration QR Code', '报名二维码') }}</p>
-          <img :src="qrDataUrl" class="w-32 h-32" />
-          <p class="text-[10px] text-text-muted mt-2">{{ pick('Scan to open this registration record', '扫码打开这份报名资料') }}</p>
-        </div>
       </div>
     </div>
   </div>

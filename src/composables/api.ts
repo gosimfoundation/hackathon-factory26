@@ -10,7 +10,7 @@ export function appUrl(path: string = ''): string {
   return `${BASE_URL}${path.replace(/^\/+/, '')}`
 }
 
-// Resolve a public absolute URL for auth redirects, email links, and QR codes.
+// Resolve a public absolute URL for auth redirects and email links.
 export function publicSiteUrl(path: string = ''): string {
   const configuredSiteUrl = import.meta.env.VITE_SITE_URL?.replace(/\/+$/, '')
   const basePath = BASE_URL === '/' ? '' : BASE_URL.replace(/\/+$/, '')

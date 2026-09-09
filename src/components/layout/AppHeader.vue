@@ -6,9 +6,8 @@ import { useAuth } from '../../composables/useAuth'
 import { useTheme } from '../../composables/useTheme'
 import { useTeams } from '../../composables/useTeams'
 import { registrationContactAsMember, type TeamMemberDraft } from '../../composables/useTeamRoster'
-import { assetUrl, publicSiteUrl } from '../../composables/api'
+import { assetUrl } from '../../composables/api'
 import TeamMembersEditor from '../forms/TeamMembersEditor.vue'
-import QRCode from 'qrcode'
 import { supabase } from '../../lib/supabase'
 import { useRegistrationDeadline } from '../../composables/useRegistrationDeadline'
 
@@ -326,7 +325,6 @@ async function openRegistrationEditor() {
   }, 350)
 }
 
-const profileQr = ref('')
 const myRedeemCode = ref<any>(null)
 
 async function loadMyCode() {
@@ -335,7 +333,7 @@ async function loadMyCode() {
   myRedeemCode.value = data || null
 }
 
-async function openProfileModal() {
+function openProfileModal() {
   showUserDropdown.value = false
   if (user.value) {
     profileName.value = user.value.name
@@ -351,9 +349,6 @@ async function openProfileModal() {
     profileWebsite.value = user.value.website || ''
     profileLookingForTeam.value = user.value.lookingForTeam
     profileRSVP.value = user.value.confirmedAttendance
-    profileQr.value = await QRCode.toDataURL(publicSiteUrl(`/profile/${user.value.id}`), {
-      width: 200, margin: 1, color: { dark: '#000000', light: '#ffffff' },
-    })
   }
   profileEditing.value = false
   showProfileModal.value = true
@@ -999,11 +994,6 @@ async function saveProfile() {
               </template>
             </div>
 
-            <div v-if="user && profileQr" class="flex flex-col items-center pt-4 mt-2 border-t border-border">
-              <p class="text-xs text-text-muted uppercase tracking-wider mb-2">{{ pick('Your Registration QR Code', '你的报名二维码') }}</p>
-              <img :src="profileQr" class="w-28 h-28" />
-              <p class="mt-1 text-xs text-text-muted">{{ pick('Opens your registration record', '扫码打开你的报名资料') }}</p>
-            </div>
           </div>
 
           <!-- Edit Mode -->
