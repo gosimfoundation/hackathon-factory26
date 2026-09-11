@@ -89,7 +89,7 @@ export default {
     boardTitle: 'Live Leaderboard · Top 20',
     boardFull: 'Full standings',
     boardLoading: 'Loading…',
-    boardEmpty: 'The leaderboard goes live when the qualifier opens on September 21. Standings are maintained by ARC-Bench.',
+    boardEmpty: 'No results for this public competition yet. Completed submissions will appear here. Standings are maintained by ARC-Bench.',
     boardUnavailable: 'The live leaderboard is temporarily unavailable. Please try again shortly.',
     boardUser: 'Participant',
     boardModel: 'Model',

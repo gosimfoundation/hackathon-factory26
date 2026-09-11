@@ -1,14 +1,13 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 
-// ARC-Bench 目前只提供 HTTP 接口。生产官网是 HTTPS，因此通过 Supabase
-// Edge Function 代理请求，避免浏览器的 mixed-content 和 CORS 限制。
+// 通过代理或同域快照读取公开榜单，避免上游 CORS 限制。
 const SUPABASE_URL = String(import.meta.env.VITE_SUPABASE_URL || '').replace(/\/$/, '')
 const EDGE_LEADERBOARD_API = import.meta.env.VITE_ARCBENCH_LEADERBOARD_PROXY
   || (SUPABASE_URL ? `${SUPABASE_URL}/functions/v1/arcbench-leaderboard` : '')
 const STATIC_LEADERBOARD_API = `${import.meta.env.BASE_URL}arcbench-leaderboard.json`
 const LEADERBOARD_APIS = [EDGE_LEADERBOARD_API, STATIC_LEADERBOARD_API].filter(Boolean)
 
-export const LEADERBOARD_URL = 'http://arc-bench.com/competition'
+export const LEADERBOARD_URL = 'https://arc-bench.com/competition'
 
 /** 比赛期间每分钟刷新一次。 */
 const POLL_MS = 60_000
@@ -52,6 +51,8 @@ export function useLeaderboard(limit = 20) {
   const refreshing = ref(false)
   const error = ref('')
   const updatedAt = ref<Date | null>(null)
+  const competitionTitle = ref('')
+  const isSnapshot = ref(false)
 
   let previousRanks = new Map<string, number>()
   let timer: number | undefined
@@ -74,6 +75,7 @@ export function useLeaderboard(limit = 20) {
   }
 
   async function load() {
+    if (refreshing.value) return
     refreshing.value = true
     error.value = ''
     try {
@@ -82,12 +84,17 @@ export function useLeaderboard(limit = 20) {
         try {
           const url = new URL(endpoint, window.location.origin)
           url.searchParams.set('limit', String(limit))
-          const res = await fetch(url, { headers: { Accept: 'application/json' } })
+          const res = await fetch(url, { headers: { Accept: 'application/json' }, cache: 'no-store', signal: AbortSignal.timeout(10_000) })
           if (!res.ok) throw new Error(String(res.status))
           const body = await res.json()
-          const rows = Array.isArray(body) ? body : (body.entries ?? body.data ?? [])
+          if (!Array.isArray(body.entries) || !body.competition?.title || !body.updatedAt) throw new Error('Invalid leaderboard')
+          const timestamp = new Date(body.updatedAt)
+          if (!Number.isFinite(timestamp.getTime())) throw new Error('Invalid timestamp')
+          const rows = body.entries
           entries.value = withDeltas(rows.slice(0, limit).map(normalize))
-          updatedAt.value = new Date()
+          updatedAt.value = timestamp
+          competitionTitle.value = body.competition.title
+          isSnapshot.value = endpoint === STATIC_LEADERBOARD_API
           loaded = true
           break
         } catch {
@@ -119,5 +126,5 @@ export function useLeaderboard(limit = 20) {
     document.removeEventListener('visibilitychange', onVisible)
   })
 
-  return { entries, loading, refreshing, error, updatedAt, reload: load, leaderboardUrl: LEADERBOARD_URL }
+  return { entries, loading, refreshing, error, updatedAt, competitionTitle, isSnapshot, reload: load, leaderboardUrl: LEADERBOARD_URL }
 }

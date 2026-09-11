@@ -95,7 +95,7 @@ export default {
     boardTitle: "实时排行榜 · TOP 20",
     boardFull: "完整榜单",
     boardLoading: "读取中……",
-    boardEmpty: "排行榜将在 9 月 21 日初赛开赛后实时更新，数据由 ARC-Bench 维护。",
+    boardEmpty: "当前公开赛暂无成绩，提交完成后将同步展示。数据由 ARC-Bench 维护。",
     boardUnavailable: "实时排行榜暂时无法读取，请稍后重试。",
     boardUser: "参赛账号",
     boardModel: "模型",

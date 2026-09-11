@@ -4,11 +4,11 @@ import { useI18n } from '../../composables/useI18n'
 import { useLeaderboard } from '../../composables/useLeaderboard'
 
 const { t, pick } = useI18n()
-const { entries: board, loading: boardLoading, refreshing, error: boardError, updatedAt, reload, leaderboardUrl } = useLeaderboard(20)
+const { entries: board, loading: boardLoading, refreshing, error: boardError, updatedAt, competitionTitle, isSnapshot, reload, leaderboardUrl } = useLeaderboard(20)
 
 const updatedLabel = computed(() => {
   if (!updatedAt.value) return ''
-  return updatedAt.value.toLocaleTimeString(pick('en-US', 'zh-CN'), { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+  return updatedAt.value.toLocaleString(pick('en-US', 'zh-CN'), { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' })
 })
 
 function formatRuntime(seconds: number | null): string {
@@ -34,10 +34,10 @@ function formatTokens(millions: number | null): string {
           <p class="mt-8 max-w-xl text-sm leading-relaxed text-text-secondary md:text-base">{{ t('tracks.intro') }}</p>
           <p class="mt-6 max-w-xl text-sm leading-relaxed text-text-secondary">
             {{ t('tracks.detailsNote') }}
-            <a href="http://arc-bench.com" target="_blank" rel="noopener" class="border-b border-accent font-semibold text-text-primary transition-colors hover:text-accent">arc-bench.com ↗</a>
+            <a href="https://arc-bench.com" target="_blank" rel="noopener" class="border-b border-accent font-semibold text-text-primary transition-colors hover:text-accent">arc-bench.com ↗</a>
           </p>
           <a
-            href="http://arc-bench.com/login"
+            href="https://arc-bench.com/login"
             target="_blank"
             rel="noopener"
             class="mt-7 inline-flex items-center gap-2 bg-btn-bg px-5 py-3 text-xs font-semibold uppercase tracking-widest text-btn-text transition-colors hover:bg-btn-hover"
@@ -54,10 +54,10 @@ function formatTokens(millions: number | null): string {
         </div>
 
         <!-- 实时排行榜 · Top 20：与进决赛的名额一致（全量榜单由 ARC-Bench 维护） -->
-        <div class="reveal reveal-delay-1">
+        <div class="reveal reveal-delay-1 min-w-0">
           <div class="flex flex-wrap items-baseline justify-between gap-3 border-b border-border pb-4">
             <h3 class="flex items-center text-xl font-semibold tracking-[-0.03em] text-text-primary md:text-2xl">
-              <span v-if="board.length && !boardError && !boardLoading" class="live-dot" aria-hidden="true"></span>
+              <span v-if="board.length && !isSnapshot && !boardError && !boardLoading" class="live-dot" aria-hidden="true"></span>
               {{ t('tracks.boardTitle') }}
             </h3>
             <div class="flex items-center gap-4">
@@ -76,10 +76,15 @@ function formatTokens(millions: number | null): string {
             </div>
           </div>
 
+          <p v-if="competitionTitle" class="mt-4 text-sm text-text-secondary">
+            {{ competitionTitle }} · {{ pick('Public competition standings; not qualifier rankings.', '公开赛榜单，非正式初赛排名。') }}
+          </p>
           <p v-if="updatedLabel && !boardLoading" class="mono-label mt-3 text-text-muted">
             {{ t('tracks.boardUpdated') }} {{ updatedLabel }}
+            <span v-if="isSnapshot"> · {{ pick('Cached standings', '榜单快照') }}</span>
           </p>
 
+          <p v-if="boardError && board.length" class="mt-3 text-xs text-text-muted">{{ t('tracks.boardUnavailable') }}</p>
           <p v-if="boardLoading" class="mono-label mt-6 text-text-muted">{{ t('tracks.boardLoading') }}</p>
 
           <p v-else-if="boardError && !board.length" class="mt-6 text-sm leading-relaxed text-text-secondary">
@@ -117,7 +122,7 @@ function formatTokens(millions: number | null): string {
                     {{ row.username }}
                   </td>
                   <td class="py-2.5 text-[11px] text-text-secondary md:text-xs">{{ row.modelName }}</td>
-                  <td class="py-2.5 text-right font-mono text-[13px] text-text-primary">{{ row.avgPassRate != null ? row.avgPassRate.toFixed(1) : '—' }}</td>
+                  <td class="py-2.5 text-right font-mono text-[13px] text-text-primary">{{ row.avgPassRate != null ? `${row.avgPassRate.toFixed(1)}%` : '—' }}</td>
                   <td class="py-2.5 text-right font-mono text-[13px] text-text-secondary">{{ formatTokens(row.totalTokenMillions) }}</td>
                   <td class="py-2.5 text-right font-mono text-[13px] text-text-secondary">{{ formatRuntime(row.avgRuntimeSeconds) }}</td>
                   <td class="py-2.5 text-right font-mono text-[13px] text-text-secondary">{{ row.submissionCount }}</td>

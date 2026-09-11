@@ -1,5 +1,4 @@
-const ARCBENCH_LEADERBOARD_URL =
-  "http://arc-bench.com/api/competitions/leaderboard?track=all&competition_id=hackathon"
+const ARCBENCH_API = "https://arc-bench.com/api/competitions"
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -25,7 +24,12 @@ Deno.serve(async (request) => {
     : 20
 
   try {
-    const upstream = await fetch(ARCBENCH_LEADERBOARD_URL, {
+    const competitionsResponse = await fetch(ARCBENCH_API, { signal: AbortSignal.timeout(10_000) })
+    if (!competitionsResponse.ok) throw new Error(`ARC-Bench returned ${competitionsResponse.status}`)
+    const competitions = await competitionsResponse.json()
+    const competition = competitions.find((item: { is_public: boolean; task_count: number }) => item.is_public && item.task_count > 0)
+    if (!competition) throw new Error("No public ARC-Bench competition available")
+    const upstream = await fetch(`${ARCBENCH_API}/leaderboard?track=all&competition_id=${encodeURIComponent(competition.id)}`, {
       headers: { Accept: "application/json" },
       signal: AbortSignal.timeout(10_000),
     })
@@ -35,7 +39,7 @@ Deno.serve(async (request) => {
     const payload = await upstream.json()
     if (!Array.isArray(payload)) throw new Error("ARC-Bench returned an invalid payload")
 
-    return Response.json(payload.slice(0, limit), {
+    return Response.json({ competition: { id: competition.id, title: competition.title }, updatedAt: new Date().toISOString(), entries: payload.slice(0, limit) }, {
       headers: {
         ...corsHeaders,
         "Cache-Control": "public, max-age=30, s-maxage=60, stale-while-revalidate=300",
