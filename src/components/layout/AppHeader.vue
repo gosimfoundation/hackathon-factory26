@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import EventSwitcher from './EventSwitcher.vue'
 import { ref, watch, onMounted, onUnmounted, computed, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from '../../composables/useI18n'
@@ -386,19 +387,16 @@ async function saveProfile() {
 <template>
   <header
     class="site-header fixed top-0 left-0 right-0 z-50 border-b transition-colors duration-200"
-    :class="!isHome || scrolled || mobileOpen ? 'is-scrolled bg-bg-primary border-border' : 'border-white/25 bg-transparent'"
+    :class="!isHome || scrolled || mobileOpen ? 'is-scrolled border-border' : 'border-white/25'"
   >
-    <div class="max-w-[1440px] mx-auto px-6 md:px-10 xl:px-14 h-16 flex items-center justify-between">
+    <div class="gosim-nav-inner flex items-center justify-between gap-6">
+      <div class="gosim-brand-switcher">
       <a href="https://create.gosim.org/" aria-label="GOSIM Create home" class="flex min-w-0 items-center gap-3 group">
-        <span class="shrink-0 text-lg font-semibold tracking-[-0.05em] text-text-primary">GOSIM Create</span>
-        <span class="h-5 w-px shrink-0 bg-border"></span>
-        <span
-          class="font-mono uppercase leading-[1.35] text-text-tertiary"
-          :class="locale === 'zh'
-            ? 'whitespace-nowrap text-xs tracking-[0.1em]'
-            : 'max-w-[18rem] line-clamp-2 text-[11px] tracking-[0.08em] sm:text-xs sm:tracking-[0.1em]'"
-        >{{ t('hero.system') }}</span>
+        <span class="create-brand text-text-primary"><span class="create-logo" :style="{ maskImage: `url(${assetUrl('/gosim-logo.svg')})`, WebkitMaskImage: `url(${assetUrl('/gosim-logo.svg')})` }" aria-hidden="true"></span><span>Create</span></span>
       </a>
+        <span class="gosim-brand-divider" aria-hidden="true"></span>
+        <EventSwitcher current="/factory26/" :english="pick('en', 'zh') === 'en'" />
+      </div>
 
       <!-- Desktop Nav -->
       <nav class="hidden lg:flex items-center gap-3 xl:gap-4">
@@ -1185,6 +1183,11 @@ async function saveProfile() {
 </template>
 
 <style scoped>
+.site-header { background: rgba(16, 20, 18, .58); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
+.site-header.is-scrolled { background: color-mix(in srgb, var(--color-bg-primary) 82%, transparent); }
+.create-brand { display: inline-flex; align-items: center; gap: 9px; flex-shrink: 0; white-space: nowrap; font: 500 21px/1 'Manrope', sans-serif; letter-spacing: -.035em; }
+.create-logo { width: 76px; height: 24px; background: currentColor; mask-size: contain; mask-repeat: no-repeat; mask-position: center; }
+
 .registration-announcement__track {
   animation: registration-announcement-marquee 54s linear infinite;
   display: flex;
@@ -1217,4 +1220,19 @@ async function saveProfile() {
 @media (prefers-reduced-motion: reduce) {
   .registration-announcement__track { animation: none; }
 }
+</style>
+
+<style scoped>
+.gosim-nav-inner { box-sizing: border-box; width: 100%; max-width: 1280px; height: 64px; margin-inline: auto; padding-inline: 24px; }
+@media (max-width: 760px) { .gosim-nav-inner { padding-inline: 16px; } }
+</style>
+
+<style scoped>
+.gosim-brand-switcher { display: flex; align-items: center; gap: 12px; flex-shrink: 0; color: var(--color-text-primary); }
+.gosim-brand-divider { height: 20px; width: 1px; background: currentColor; opacity: .25; }
+@media (max-width: 639px) { .gosim-brand-switcher { gap: 6px; } .gosim-nav-inner { gap: 8px; } }
+</style>
+
+<style scoped>
+.site-header:not(.is-scrolled) .gosim-brand-switcher { color: #fff7e9; }
 </style>
