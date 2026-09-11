@@ -55,6 +55,14 @@ const sessions = [
 
 const resources = [
   {
+    zhTitle: '第二课课堂录像',
+    enTitle: 'Session 2 recording',
+    url: 'https://www.bilibili.com/video/BV1h3YE6WEyz/',
+    icon: 'video',
+    zhNote: '9 月 11 日下午 13:30（北京时间）开启线上授课和实践，课后录像发布在这里。',
+    enNote: 'Teaching and hands-on practice began 13:30 Beijing time on September 11; the recording is posted here afterwards.',
+  },
+  {
     zhTitle: '第一课课堂录像',
     enTitle: 'Session 1 recording',
     url: 'https://www.bilibili.com/video/BV1a5Yu68EcS/',
@@ -165,8 +173,7 @@ const registrationSteps = [
       </section>
 
       <section>
-        <h2>{{ isEn ? '3. Course materials' : '3. 课程资料' }}</h2>
-        <p>{{ isEn ? 'Online teaching and hands-on practice opened at 13:30 Beijing time on September 10.' : '9 月 10 日下午 13:30（北京时间）开启线上授课和实践。' }}</p>
+        <h2>{{ isEn ? '3. Course material index' : '3. 课程资料索引' }}</h2>
 
         <ul class="sessionlist">
           <li v-for="r in resources" :key="r.url">
