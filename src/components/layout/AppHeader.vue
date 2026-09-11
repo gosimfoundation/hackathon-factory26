@@ -35,6 +35,8 @@ async function handleChangePassword() {
 }
 const { isDark, toggleTheme } = useTheme()
 const { teams } = useTeams()
+// Announced figure, fixed on purpose — the ticker no longer counts rows in the database.
+const registeredTeamCount = 360
 const { isClosed: registrationClosed } = useRegistrationDeadline()
 const registrationActionLabel = computed(() => registrationClosed.value
   ? pick('Sign In', '登录')
@@ -410,6 +412,13 @@ async function saveProfile() {
           {{ item.label }}
         </a>
         <router-link
+          to="/bootcamp"
+          class="inline-flex h-10 items-center font-mono text-xs uppercase tracking-[0.06em] text-text-tertiary transition-colors hover:text-accent cursor-pointer"
+          :class="{ 'text-accent': route.path === '/bootcamp' }"
+        >
+          {{ t('nav.bootcamp') }}
+        </router-link>
+        <router-link
           to="/rules"
           class="inline-flex h-10 items-center font-mono text-xs uppercase tracking-[0.06em] text-text-tertiary transition-colors hover:text-accent cursor-pointer"
         >
@@ -506,29 +515,30 @@ async function saveProfile() {
       </button>
     </div>
 
-    <button
+    <router-link
       v-if="isHome"
-      type="button"
-      @click="isLoggedIn ? openRegistrationEditor() : promptAuth('login')"
+      to="/bootcamp"
       class="registration-announcement block h-11 w-full overflow-hidden bg-[#8b4962] text-left text-white shadow-[0_8px_24px_rgba(75,31,60,.24)] transition-colors hover:bg-[#743b51]"
-      :aria-label="registrationClosed
-        ? pick(`${teams.length} teams have registered. Registration is closed; sign in to manage an existing team.`, `已有 ${teams.length} 支队伍报名。报名已关闭；已报名队伍可登录管理资料。`)
-        : pick(`${teams.length} teams have registered. Register or sign in.`, `已有 ${teams.length} 支队伍报名，前往报名或登录。`)"
+      :aria-label="pick(
+        `${registeredTeamCount} teams have registered. The bootcamp is under way — see the details.`,
+        `已有 ${registeredTeamCount} 支队伍报名。研习营已开营，查看详情。`)"
     >
       <span aria-hidden="true" class="registration-announcement__track h-full items-center">
         <span v-for="set in 2" :key="set" class="registration-announcement__set h-full items-center">
           <span v-for="copy in 6" :key="copy" class="registration-announcement__item h-full items-center">
             <span class="inline-flex items-center gap-2 font-semibold">
               <span class="h-2 w-2 animate-pulse rounded-full bg-[#ffd2df]"></span>
-              {{ pick(`${teams.length} TEAMS REGISTERED`, `已有 ${teams.length} 支队伍报名`) }}
+              {{ pick(`${registeredTeamCount} TEAMS REGISTERED`, `已有 ${registeredTeamCount} 支队伍报名`) }}
             </span>
             <span class="text-white/75">·</span>
-            <span>{{ registrationClosed ? pick('Registration closed', '报名已截止') : t('hero.registrationDeadline') }}</span>
-            <span class="font-semibold">{{ registrationActionLabel }} →</span>
+            <span class="font-semibold">
+              {{ pick('Bootcamp is under way', '研习营已开营') }}
+              <span class="underline decoration-white/70 underline-offset-4">{{ pick('(details)', '（详情）') }}</span> →
+            </span>
           </span>
         </span>
       </span>
-    </button>
+    </router-link>
 
     <!-- Mobile Menu -->
     <Transition
@@ -549,6 +559,14 @@ async function saveProfile() {
         >
           {{ item.label }}
         </a>
+        <router-link
+          to="/bootcamp"
+          @click="mobileOpen = false"
+          class="block py-3 text-text-tertiary hover:text-text-primary transition-colors"
+          :class="{ 'text-text-primary': route.path === '/bootcamp' }"
+        >
+          {{ t('nav.bootcamp') }}
+        </router-link>
         <router-link
           to="/rules"
           @click="mobileOpen = false"

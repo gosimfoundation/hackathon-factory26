@@ -29,7 +29,7 @@ export default {
       'Oct 17, 2026 · Awards · GOSIM Shenzhen',
     ],
     registrationDeadline: 'Registration deadline: 09/07 23:59 (Beijing time)',
-    countdownLabel: 'Bootcamp begins September 7',
+    countdownLabel: 'Bootcamp begins September 10',
     days: 'Days',
     hours: 'Hours',
     mins: 'Mins',

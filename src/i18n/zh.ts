@@ -29,7 +29,7 @@ export default {
       "2026.10.17 · 颁奖 · 深圳 GOSIM 大会",
     ],
     registrationDeadline: "报名截止：09/07 23:59（北京时间）",
-    countdownLabel: "9月7日研习营开营",
+    countdownLabel: "9月10日研习营开营",
     days: "天",
     hours: "时",
     mins: "分",
