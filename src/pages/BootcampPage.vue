@@ -80,6 +80,14 @@ const sessions = [
 
 const resources = [
   {
+    zhTitle: '第三课课堂录像',
+    enTitle: 'Session 3 recording',
+    url: 'https://www.bilibili.com/video/BV1uHYR6pEaU/',
+    icon: 'video',
+    zhNote: '9 月 12 日下午 13:30（北京时间）开启线上授课和实践，课后录像发布在这里。',
+    enNote: 'Teaching and hands-on practice began 13:30 Beijing time on September 12; the recording is posted here afterwards.',
+  },
+  {
     zhTitle: '第二课课堂录像',
     enTitle: 'Session 2 recording',
     url: 'https://www.bilibili.com/video/BV1h3YE6WEyz/',
@@ -113,6 +121,14 @@ const resources = [
     icon: 'github',
     zhNote: '第一课课堂材料与课程 lab 都在这个仓库里。',
     enNote: 'Session materials and the course labs live in this repository.',
+  },
+  {
+    zhTitle: 'octos-arc 代码仓库',
+    enTitle: 'octos-arc repository',
+    url: 'https://github.com/octos-org/octos-arc',
+    icon: 'octos',
+    zhNote: 'Octos 智能体的 ARC 适配版。',
+    enNote: 'The ARC-adapted build of the Octos agent.',
   },
   {
     zhTitle: '竞赛 / 练习平台 ARC-Bench',
@@ -181,22 +197,22 @@ const modelscopeLinks = [
   },
 ]
 
-// 目录里顺带标出最近新增的内容，方便回访的人一眼看到改了什么。
+// 目录里只标最近一轮新增的内容；上一轮的标记在下次更新时清空。
 const toc = [
   {
     id: 'schedule', zh: '课程表', en: 'Course schedule',
-    zhNew: '新增 9 月 12 日课堂地址（腾讯会议号、密码）',
-    enNew: 'Added the September 12 meeting room (Tencent Meeting ID and password)',
+    zhNew: '',
+    enNew: '',
   },
   {
     id: 'topics', zh: '课程主题', en: 'Course topics',
-    zhNew: '新增第 07–10 讲：实战参考实现（Octos / ARC Agent / HAgency）与互动答疑',
-    enNew: 'Added topics 07–10: reference implementations (Octos / ARC Agent / HAgency) and the office hour',
+    zhNew: '',
+    enNew: '',
   },
   {
     id: 'materials', zh: '课程资料索引', en: 'Course material index',
-    zhNew: '新增第二课课堂录像，含章节目录',
-    enNew: 'Added the session 2 recording, with chapter markers',
+    zhNew: '新增第三课课堂录像、Octos 的 ARC 适配版仓库',
+    enNew: 'Added the session 3 recording and the ARC-adapted Octos repository',
   },
   {
     id: 'signup', zh: 'ARC-Bench 平台注册', en: 'Registering on ARC-Bench',
@@ -205,8 +221,8 @@ const toc = [
   },
   {
     id: 'more', zh: '更多资源', en: 'More resources',
-    zhNew: '新增 TRAE 学生 token 福利、魔搭社区魔粒',
-    enNew: 'Added the TRAE student token offer and ModelScope MagiCubes',
+    zhNew: '',
+    enNew: '',
   },
 ]
 
@@ -299,6 +315,7 @@ const registrationSteps = [
             <div class="session-head">
               <span class="res-icon" aria-hidden="true">
                 <img v-if="r.icon === 'qiwoo'" :src="assetUrl('/sponsors/qiwoo.svg')" alt="" class="res-logo" />
+                <img v-else-if="r.icon === 'octos'" :src="assetUrl('/resources/octos-logo.png')" alt="" class="res-logo" />
                 <svg v-else-if="r.icon === 'github'" viewBox="0 0 19 19" class="res-glyph"><path fill="currentColor" fill-rule="evenodd" d="M9.356 1.85C5.05 1.85 1.57 5.356 1.57 9.694a7.84 7.84 0 0 0 5.324 7.44c.387.079.528-.168.528-.376 0-.182-.013-.805-.013-1.454-2.165.467-2.616-.935-2.616-.935-.349-.91-.864-1.143-.864-1.143-.71-.48.051-.48.051-.48.787.051 1.2.805 1.2.805.695 1.194 1.817.857 2.268.649.064-.507.27-.857.49-1.052-1.728-.182-3.545-.857-3.545-3.87 0-.857.31-1.558.8-2.104-.078-.195-.349-1 .077-2.078 0 0 .657-.208 2.14.805a7.5 7.5 0 0 1 1.946-.26c.657 0 1.328.092 1.946.26 1.483-1.013 2.14-.805 2.14-.805.426 1.078.155 1.883.078 2.078.502.546.799 1.247.799 2.104 0 3.013-1.818 3.675-3.558 3.87.284.247.528.714.528 1.454 0 1.052-.012 1.896-.012 2.156 0 .208.142.455.528.377a7.84 7.84 0 0 0 5.324-7.441c.013-4.338-3.48-7.844-7.773-7.844" clip-rule="evenodd"/></svg>
                 <svg v-else-if="r.icon === 'video'" viewBox="0 0 24 24" class="res-glyph res-stroke"><rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="m10 9.5 4.5 2.5-4.5 2.5z"/></svg>
                 <svg v-else-if="r.icon === 'meter'" viewBox="0 0 24 24" class="res-glyph res-stroke"><path d="M3.5 18a8.5 8.5 0 1 1 17 0"/><path d="m12 18 4-5.5"/></svg>
