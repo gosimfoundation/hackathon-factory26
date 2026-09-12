@@ -61,8 +61,8 @@ const sessions = [
   {
     number: '08',
     day: '9/12',
-    zhTitle: '实战参考实现（ARC-Bench）',
-    enTitle: 'A reference implementation in practice (ARC-Bench)',
+    zhTitle: '实战参考实现（ARC Agent）',
+    enTitle: 'A reference implementation in practice (ARC Agent)',
   },
   {
     number: '09',
@@ -190,8 +190,8 @@ const toc = [
   },
   {
     id: 'topics', zh: '课程主题', en: 'Course topics',
-    zhNew: '新增第 07–10 讲：实战参考实现（Octos / ARC-Bench / HAgency）与互动答疑',
-    enNew: 'Added topics 07–10: reference implementations (Octos / ARC-Bench / HAgency) and the office hour',
+    zhNew: '新增第 07–10 讲：实战参考实现（Octos / ARC Agent / HAgency）与互动答疑',
+    enNew: 'Added topics 07–10: reference implementations (Octos / ARC Agent / HAgency) and the office hour',
   },
   {
     id: 'materials', zh: '课程资料索引', en: 'Course material index',
