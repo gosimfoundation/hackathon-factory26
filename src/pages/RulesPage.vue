@@ -41,11 +41,8 @@ const awardsSettled = computed(() => t('awards.settled') as any[])
 
       <section>
         <h2>{{ isEn ? '4. Submission package' : '4. 提交物' }}</h2>
-        <ul>
-          <li>{{ isEn ? 'A runnable rebuild: source code and startup instructions.' : '可运行的复刻：源码与启动方式。' }}</li>
-          <li>{{ isEn ? 'The complete production trace: prompts, tool calls, agent iterations, and human intervention points.' : '完整生产轨迹：prompts、工具调用、agent 迭代与人工干预点。' }}</li>
-          <li>{{ isEn ? 'A 3–5 minute demo.' : '3–5 分钟 Demo。' }}</li>
-        </ul>
+        <p v-if="isEn">Submit your agent software factory on the competition platform (<a href="https://arc-bench.com/competition" target="_blank" rel="noopener">https://arc-bench.com/competition</a>).</p>
+        <p v-else>在比赛平台（<a href="https://arc-bench.com/competition" target="_blank" rel="noopener">https://arc-bench.com/competition</a>）提交您的智能体软件工厂软件。</p>
       </section>
 
       <section>
@@ -81,4 +78,6 @@ const awardsSettled = computed(() => t('awards.settled') as any[])
 .rules-content p, .rules-content li { color: var(--color-text-secondary); line-height: 1.8; margin-bottom: .75rem; }
 .rules-content ul, .rules-content ol { padding-left: 1.35rem; list-style: disc; }
 .rules-content ol { list-style: decimal; }
+.rules-content a { color: var(--color-accent); text-decoration: underline; text-underline-offset: .2em; word-break: break-all; }
+.rules-content a:hover { color: var(--color-accent-hover); }
 </style>
