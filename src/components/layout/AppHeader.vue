@@ -515,13 +515,14 @@ async function saveProfile() {
       </button>
     </div>
 
-    <router-link
+    <a
       v-if="isHome"
-      to="/bootcamp"
-      class="registration-announcement block h-11 w-full overflow-hidden bg-[#8b4962] text-left text-white shadow-[0_8px_24px_rgba(75,31,60,.24)] transition-colors hover:bg-[#743b51]"
+      :href="router.resolve({ path: '/', hash: '#schedule' }).href"
+      @click.prevent="scrollTo('#schedule')"
+      class="registration-announcement block h-11 w-full cursor-pointer overflow-hidden bg-[#8b4962] text-left text-white shadow-[0_8px_24px_rgba(75,31,60,.24)] transition-colors hover:bg-[#743b51]"
       :aria-label="pick(
-        `${registeredTeamCount} teams have registered. The bootcamp is under way — see the details.`,
-        `已有 ${registeredTeamCount} 支队伍报名。研习营已开营，查看详情。`)"
+        `${registeredTeamCount} teams have registered. Note: following participant feedback and how the competition platform has been running, the qualifier and finals start dates have been adjusted. See the timeline.`,
+        `已有 ${registeredTeamCount} 支队伍报名。注意：结合比赛选手反馈以及比赛平台运行情况，初赛和决赛开始时间有所调整。查看赛程。`)"
     >
       <span aria-hidden="true" class="registration-announcement__track h-full items-center">
         <span v-for="set in 2" :key="set" class="registration-announcement__set h-full items-center">
@@ -532,13 +533,14 @@ async function saveProfile() {
             </span>
             <span class="text-white/75">·</span>
             <span class="font-semibold">
-              {{ pick('Bootcamp is under way', '研习营已开营') }}
-              <span class="underline decoration-white/70 underline-offset-4">{{ pick('(details)', '（详情）') }}</span> →
+              {{ pick(
+                'Note: following participant feedback and how the competition platform has been running, the qualifier and finals start dates have been adjusted',
+                '注意：结合比赛选手反馈以及比赛平台运行情况，初赛和决赛开始时间有所调整') }}
             </span>
           </span>
         </span>
       </span>
-    </router-link>
+    </a>
 
     <!-- Mobile Menu -->
     <Transition
@@ -1207,7 +1209,7 @@ async function saveProfile() {
 .create-logo { width: 76px; height: 24px; background: currentColor; mask-size: contain; mask-repeat: no-repeat; mask-position: center; }
 
 .registration-announcement__track {
-  animation: registration-announcement-marquee 54s linear infinite;
+  animation: registration-announcement-marquee 140s linear infinite;
   display: flex;
   width: max-content;
   will-change: transform;

@@ -17,15 +17,15 @@ export default {
     system: 'Agentic Software Factory',
     pipeline: [
       { label: 'Camp', date: 'Sep 7–20' },
-      { label: 'Qualifier', date: 'Sep 21–30' },
-      { label: 'Finals', date: 'Oct 1–7' },
+      { label: 'Qualifier', date: 'Sep 24–30' },
+      { label: 'Finals', date: 'Oct 5–7' },
       { label: 'Awards', date: 'Oct 17' },
     ],
     eventTitle: 'Organized by OAIC · Certified by Qiwoo Community (supported by the Ministry of Education)',
     location: [
       'Sep 7 – Sep 20, 2026 · Bootcamp · Online',
-      'Sep 21 – Sep 30, 2026 · Qualifier · Online',
-      'Oct 1 – Oct 7, 2026 · Finals · Online',
+      'Sep 24 – Sep 30, 2026 · Qualifier · Online',
+      'Oct 5 – Oct 7, 2026 · Finals · Online',
       'Oct 17, 2026 · Awards · GOSIM Shenzhen',
     ],
     registrationDeadline: 'Registration deadline: 09/07 23:59 (Beijing time)',
@@ -71,7 +71,7 @@ export default {
     label: '09.07—09.30 / ONLINE',
     title: 'Qualifier',
     subtitle: 'Worldwide',
-    desc: 'The bootcamp comes first, September 7–20: invited experts walk through the tooling on a mock run, with office hours for questions — all recorded, optional, and finished before anything is scored. The qualifier then opens September 21 and closes September 30, running online on a unified sandbox and model gateway with every team starting at the same moment.',
+    desc: 'The bootcamp comes first, September 7–20: invited experts walk through the tooling on a mock run, with office hours for questions — all recorded, optional, and finished before anything is scored. The qualifier then opens September 24 and closes September 30, running online on a unified sandbox and model gateway with every team starting at the same moment.',
     finaleTitle: 'Glory Day · GOSIM Shenzhen',
     finaleDesc: 'Grand-Prize teams are invited to GOSIM Shenzhen 2026 and honored on stage at the conference closing ceremony on October 17.',
     stats: [
@@ -190,12 +190,12 @@ export default {
     participantsLabel: 'Who advances',
     rounds: [
       {
-        number: '01', name: 'Bootcamp & Qualifier', dates: 'Bootcamp Sep 7–20 · Qualifier Sep 21–30', format: 'Online',
+        number: '01', name: 'Bootcamp & Qualifier', dates: 'Bootcamp Sep 7–20 · Qualifier Sep 24–30', format: 'Online',
         challenge: 'Rebuild selected GitHub + Spreadsheets capabilities: Actions, org permissions, audit, and Rulesets.',
         participants: 'Open worldwide, no prerequisites — individuals and teams alike.',
       },
       {
-        number: '02', name: 'Grand Challenge', dates: 'Oct 1–7', format: 'Online',
+        number: '02', name: 'Grand Challenge', dates: 'Oct 5–7', format: 'Online',
         challenge: 'A more demanding challenge drawn from real, complex enterprise requirements.',
         participants: 'Top 20 teams on the qualifier leaderboard.',
       },
@@ -253,7 +253,7 @@ export default {
     items: [
       { q: 'Who can participate?', a: 'Open worldwide with no prerequisites — individuals and teams alike, and no in-person attendance is required for the qualifier or the Grand Challenge. You do not need prior Harness Engineering experience; the bootcamp begins September 7.' },
       { q: 'When is registration complete?', a: 'The team lead or main contact submits one account for the whole team. The team is created immediately after a successful submission. You can later sign in to the registration site with that email and password to view or edit details. ARC-Bench access and login instructions will be announced separately.' },
-      { q: 'How do I compete? Is the qualifier required?', a: 'The qualifier is the only way in. The bootcamp runs first (Sep 7–20) and is optional; the qualifier then opens Sep 21 and closes Sep 30, and the top 20 teams on its leaderboard advance to the finals (Oct 1–7).' },
+      { q: 'How do I compete? Is the qualifier required?', a: 'The qualifier is the only way in. The bootcamp runs first (Sep 7–20) and is optional; the qualifier then opens Sep 24 and closes Sep 30, and the top 20 teams on its leaderboard advance to the finals (Oct 5–7).' },
       { q: 'What is the challenge?', a: 'The qualifier rebuilds selected GitHub and Spreadsheets capabilities — Actions, org permissions, audit, and Rulesets. The finals move to a challenge drawn from real, complex enterprise requirements. Full challenge details are on the competition platform, arc-bench.com.' },
       { q: 'Must I use a specific model?', a: 'Compute uses organizer-issued open-source model tokens: Kimi, GLM, MiniMax, and DeepSeek. Every call goes through one metered gateway so token efficiency can be compared.' },
       { q: 'Is the harness restricted?', a: 'No. The competition is open to Octos, HAgency, ARC, Claude Code, custom agents, and others. You may change your harness, but never the tests, gateway metering, or scoring.' },
