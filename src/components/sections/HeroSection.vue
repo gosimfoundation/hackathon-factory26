@@ -94,7 +94,7 @@ function handleRegistrationAccess() {
         <span class="shrink-0 font-mono text-xs uppercase tracking-[0.1em] text-white/64">
           {{ pick('Partners', '合作伙伴') }}
         </span>
-        <div class="grid w-full min-w-0 flex-1 grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-7">
+        <div class="grid w-full min-w-0 flex-1 grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
           <component
             v-for="partner in heroPartners"
             :key="partner.id"
@@ -109,7 +109,7 @@ function handleRegistrationAccess() {
               v-if="partner.logo"
               :src="assetUrl(partner.logo)"
               :alt="partner.name"
-              :class="['hero-partner-logo max-h-8 max-w-full object-contain', { 'hero-partner-logo--cophi': partner.id === 'cophi' }]"
+              :class="['hero-partner-logo max-h-8 max-w-full object-contain', { 'hero-partner-logo--cophi': partner.id === 'cophi', 'hero-partner-logo--kimi': partner.id === 'kimi' }]"
             />
             <span v-if="partner.id === 'qiwoo'" class="hero-partner-wordmark text-xs font-semibold leading-tight">{{ partner.name }}</span>
             <span v-else-if="partner.id === 'cophi'" class="hero-partner-wordmark text-xs font-semibold">CoPhi</span>
@@ -161,6 +161,11 @@ function handleRegistrationAccess() {
 
 .hero-partner-logo--cophi {
   filter: url('#hero-cophi-knockout');
+}
+
+.hero-partner-logo--kimi {
+  max-width: 5.5rem;
+  filter: none;
 }
 
 .hero-partner-wordmark {
