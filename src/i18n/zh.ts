@@ -337,6 +337,8 @@ export default {
     title: "合作伙伴",
     confirmed: [
       { id: "oaic", name: "OAIC 开放智能体产业联盟", role: "合作伙伴", logo: "/sponsors/oaic.png", url: "https://visionforum.ai/#about" },
+      { id: "minimax", name: "MiniMax", role: "赞助商", logo: "/sponsors/minimax.png", url: "https://www.minimaxi.com/" },
+      { id: "kimi", name: "Kimi", role: "赞助商", logo: "/sponsors/kimi.png", url: "https://www.kimi.com/" },
       { id: "qiwoo", name: "启悟学习社区", role: "合作伙伴", logo: "/sponsors/qiwoo.svg", url: "https://qiwoo.edu.cn/" },
       { id: "asiainfo", name: "亚信科技", role: "赞助商", logo: "/sponsors/asiainfo-clean.png", url: "https://www.asiainfo.com/" },
       { id: "taotoken", name: "TaoToken.net", role: "合作伙伴", logo: "/sponsors/taotoken.svg", url: "https://taotoken.net/" },

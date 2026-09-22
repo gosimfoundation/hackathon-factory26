@@ -230,6 +230,8 @@ export default {
     title: 'Partners',
     confirmed: [
       { id: 'oaic', name: 'OAIC', role: 'Partner', logo: '/sponsors/oaic.png', url: 'https://visionforum.ai/#about' },
+      { id: 'minimax', name: 'MiniMax', role: 'Sponsor', logo: '/sponsors/minimax.png', url: 'https://www.minimaxi.com/' },
+      { id: 'kimi', name: 'Kimi', role: 'Sponsor', logo: '/sponsors/kimi.png', url: 'https://www.kimi.com/' },
       { id: 'qiwoo', name: 'Qiwoo / Open Insight', role: 'Partner', logo: '/sponsors/qiwoo.svg', url: 'https://qiwoo.edu.cn/' },
       { id: 'asiainfo', name: 'AsiaInfo Technologies', role: 'Sponsor', logo: '/sponsors/asiainfo-clean.png', url: 'https://www.asiainfo.com/' },
       { id: 'taotoken', name: 'TaoToken.net', role: 'Partner', logo: '/sponsors/taotoken.svg', url: 'https://taotoken.net/' },
