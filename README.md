@@ -1,3 +1,5 @@
+> **Website repository:** `gosimfoundation/factory26` · [Maintenance and publishing](MAINTAINING.md) · [Live site](https://create.gosim.org/factory26/)
+
 # 2026 OAIC International Hackathon for Agentic Factory and Grand Challenge Series
 
 Official website for the **2026 OAIC International Hackathon for Agentic Factory and Grand Challenge Series**, running September 1–October 17, 2026 online and concluding at GOSIM Shenzhen.
