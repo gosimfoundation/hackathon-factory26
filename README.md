@@ -1,4 +1,4 @@
-> **Website repository:** `gosimfoundation/factory26` · [Maintenance and publishing](MAINTAINING.md) · [Live site](https://create.gosim.org/factory26/)
+> **Website repository:** `gosimfoundation/hackathon-factory26` · [Maintenance and publishing](MAINTAINING.md) · [Live site](https://create.gosim.org/factory26/)
 
 # 2026 OAIC International Hackathon for Agentic Factory and Grand Challenge Series
 
