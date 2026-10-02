@@ -5,13 +5,13 @@ const open = ref(false)
 const root = ref<HTMLElement | null>(null)
 const trigger = ref<HTMLButtonElement | null>(null)
 const events = [
-  { href: '/agenticapp26/', name: 'Agentic App 黑客松', en: 'Agentic App', detail: 'Shenzhen 2026 · Agentic App' },
-  { href: '/factory26/', name: '智能体工厂国际黑客松与大奖赛', en: 'Agentic Factory', detail: 'Shenzhen 2026 · OAIC' },
-  { href: '/survey26/', name: '巡天智能体', en: 'Agent Observer', detail: 'Shenzhen 2026 · Agent Observer' },
+  { href: '/agenticapp26/', name: '智能体应用 黑客松', en: 'Agentic App Hackathon', detail: '深圳 2026 · 智能体应用', detailEn: 'Shenzhen 2026 · Agentic App' },
+  { href: '/factory26/', name: '智能体软件工厂 黑客松', en: 'Agentic Software Factory Hackathon', detail: '深圳 2026 · OAIC', detailEn: 'Shenzhen 2026 · OAIC' },
+  { href: '/survey26/', name: '智能体巡天黑客松', en: 'Agentic Observer Hackathon', detail: '深圳 2026 · 智能体巡天', detailEn: 'Shenzhen 2026 · Agentic Observer' },
 ]
 const labels: Record<string, string[]> = {
-  '/factory26/': ['智能体工厂', 'Agentic Factory'],
-  '/survey26/': ['巡天智能体', 'Agent Observer'],
+  '/factory26/': ['智能体软件工厂', 'Agentic Software Factory'],
+  '/survey26/': ['智能体巡天', 'Agentic Observer'],
 }
 
 function dismiss(event: PointerEvent) {
@@ -40,7 +40,7 @@ onUnmounted(() => document.removeEventListener('pointerdown', dismiss))
       <div class="panel-label"><span>{{ props.english ? 'Shenzhen Hackathon Series' : '深圳黑客松系列' }}</span><span>{{ props.english ? 'Switch event' : '选择赛事' }}</span></div>
       <a v-for="(event, index) in events" :key="event.href" :href="event.href" :aria-current="event.href === props.current ? 'page' : undefined" @click="open = false">
         <span class="event-index" aria-hidden="true">0{{ index + 1 }}</span><span class="event-name">{{ props.english ? event.en : event.name }}<small v-if="event.href === props.current">{{ props.english ? 'Current' : '当前' }}</small></span>
-        <span class="event-detail">{{ event.detail }}</span>
+        <span class="event-detail">{{ props.english ? event.detailEn : event.detail }}</span>
       </a>
     </div>
   </div>

@@ -251,7 +251,7 @@ const registrationSteps = [
       <p class="text-text-muted text-sm mb-12">{{ isEn ? 'A series of sessions putting every participant on the same technical and resource footing.' : '一系列课程，把所有参赛者放到同一条技术与资源起跑线上。' }}</p>
 
       <p class="lede">
-        <a :href="announcementUrl" target="_blank" rel="noopener noreferrer" class="inline-link">{{ isEn ? 'The Agentic Software Factory Hackathon' : '智能体软件工厂黑客松' }} ↗</a>
+        <a :href="announcementUrl" target="_blank" rel="noopener noreferrer" class="inline-link">{{ isEn ? 'Agentic Software Factory Hackathon' : '智能体软件工厂 黑客松' }} ↗</a>
         {{ isEn
           ? ' opens on September 24. The competition asks participants to build software engineering agents that turn a precise requirements document into a running software system. To put everyone on the same technical and resource footing, the bootcamp offers a series of sessions covering the basic infrastructure of the competition, along with a set of technical routes to choose between.'
           : '将于 9 月 24 日举行。本次大赛旨在鼓励参赛者构建软件工程智能体，将明确的需求文档转化成可运行的软件系统。为了将所有参赛者放到一个统一的技术与资源起跑线上，本次大赛提供了一系列课程，帮助参赛的选手们了解赛事基本基础设施的使用，并且提供一系列技术路线供大家选择。' }}

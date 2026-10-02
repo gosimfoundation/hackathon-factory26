@@ -14,7 +14,7 @@ export default {
   },
   hero: {
     eyebrow: 'GOSIM Hackathon · Software Engineering × Agent',
-    system: 'Agentic Software Factory',
+    system: 'Agentic Software Factory Hackathon',
     pipeline: [
       { label: 'Camp', date: 'Sep 7–20' },
       { label: 'Qualifier', date: 'Sep 24–30' },
@@ -265,5 +265,5 @@ export default {
     ],
   },
   cta: { title: 'From vibe to harness, from luck to mastery', tagline: 'Software development did not die in the AI wave — it matters more than ever.', location: 'Sep 7 – Oct 17, 2026 · Online + GOSIM Shenzhen' },
-  footer: { copyright: '2026 OAIC International Hackathon for Agentic Factory and Grand Challenge Series', mainSite: 'ARC-Bench', register: 'Register / Sign In' },
+  footer: { copyright: '2026 OAIC Agentic Software Factory Hackathon', mainSite: 'ARC-Bench', register: 'Register / Sign In' },
 }

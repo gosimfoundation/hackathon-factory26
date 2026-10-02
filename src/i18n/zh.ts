@@ -14,7 +14,7 @@ export default {
   },
   hero: {
     eyebrow: "GOSIM 黑客松 · 软件工程 × 智能体",
-    system: "智能体软件工厂",
+    system: "智能体软件工厂 黑客松",
     pipeline: [
       { label: "研习营", date: "9.7 – 9.20" },
       { label: "初赛", date: "9.24 – 9.30" },
@@ -103,7 +103,7 @@ export default {
     boardTokens: "Token 总量",
     boardRuntime: "平均用时",
     boardSubmissions: "提交次数",
-    boardRefresh: "Refresh",
+    boardRefresh: "刷新",
     boardUpdated: "更新于",
     themes: [
       {
@@ -426,7 +426,7 @@ export default {
     location: "2026年9月7日 – 10月17日 · 线上 + 深圳 GOSIM",
   },
   footer: {
-    copyright: "2026 OAIC 智能体软件工厂国际黑客松和大奖赛系列",
+    copyright: "2026 OAIC 智能体软件工厂 黑客松",
     mainSite: "create.gosim.org",
     register: "报名/登录",
   },
