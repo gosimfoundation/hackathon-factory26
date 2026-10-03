@@ -207,7 +207,7 @@ export default {
       },
     ],
     activitiesTitle: 'Bootcamp activities',
-    activities: 'Six teaching sessions and three office hours (Sep 7–20): the competition system first, then reference implementations for four routes — your own agent, Octos, Claude Code, and Codex — with office hours on the platform and rules, on harnesses and agents, and on submission and scoring. Each runs under an hour, all are recorded, and none are required.',
+    activities: 'Teaching sessions and office hours (Sep 7–20): the competition system first, then reference implementations for four routes — your own agent, Octos, Claude Code, and Codex. Each runs under an hour, all are recorded, and none are required.',
     activitiesLink: 'See the bootcamp sessions',
   },
   judging: {
