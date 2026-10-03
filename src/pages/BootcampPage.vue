@@ -67,12 +67,6 @@ const sessions = [
   {
     number: '09',
     day: '',
-    zhTitle: '实战参考实现（HAgency）',
-    enTitle: 'A reference implementation in practice (HAgency)',
-  },
-  {
-    number: '10',
-    day: '',
     zhTitle: '互动答疑（Office Hour）',
     enTitle: 'Office hour',
   },

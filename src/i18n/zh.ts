@@ -290,7 +290,7 @@ export default {
     ],
     activitiesTitle: "研习营活动",
     activities:
-      "六讲课程 + 三场答疑（9/7–9/20）：先讲比赛系统，再讲自研 Agent、Octos、HAgency、Claude Code、Codex 五条参赛路径的参考实现；答疑按平台与规则、Harness 与 Agent、提交与评分分三场。每场一小时以内，提供录像，鼓励参加但不作要求。",
+      "六讲课程 + 三场答疑（9/7–9/20）：先讲比赛系统，再讲自研 Agent、Octos、Claude Code、Codex 四条参赛路径的参考实现；答疑按平台与规则、Harness 与 Agent、提交与评分分三场。每场一小时以内，提供录像，鼓励参加但不作要求。",
     activitiesLink: "查看研习营课程",
   },
   judging: {
