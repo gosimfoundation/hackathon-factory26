@@ -207,7 +207,7 @@ export default {
       },
     ],
     activitiesTitle: 'Bootcamp activities',
-    activities: 'Teaching sessions and office hours (Sep 7–20): the competition system first, then reference implementations for four routes — your own agent, Octos, Claude Code, and Codex. Each runs under an hour, all are recorded, and none are required.',
+    activities: 'Teaching sessions and office hours (Sep 7–20): test-driven development, requirement compilation, and the competition system first, then two reference implementations — Octos and ARC Agent. Each runs under an hour, all are recorded, and none are required.',
     activitiesLink: 'See the bootcamp sessions',
   },
   judging: {

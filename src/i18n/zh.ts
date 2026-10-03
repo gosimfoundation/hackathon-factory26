@@ -290,7 +290,7 @@ export default {
     ],
     activitiesTitle: "研习营活动",
     activities:
-      "多讲课程和答疑（9/7–9/20）：先讲比赛系统，再讲自研 Agent、Octos、Claude Code、Codex 四条参赛路径的参考实现。每场一小时以内，提供录像，鼓励参加但不作要求。",
+      "多讲课程和答疑（9/7–9/20）：先讲测试驱动开发、需求编译与比赛系统，再讲 Octos 与 ARC Agent 两个参考实现。每场一小时以内，提供录像，鼓励参加但不作要求。",
     activitiesLink: "查看研习营课程",
   },
   judging: {
