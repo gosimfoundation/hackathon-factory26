@@ -66,13 +66,21 @@ const sessions = [
   },
   {
     number: '09',
-    day: '',
+    day: '9/16',
     zhTitle: '互动答疑（Office Hour）',
     enTitle: 'Office hour',
   },
 ]
 
 const resources = [
+  {
+    zhTitle: '互动答疑录像',
+    enTitle: 'Office hour recording',
+    url: 'https://www.bilibili.com/video/BV1oAeP6xEAP',
+    icon: 'video',
+    zhNote: '9 月 16 日互动答疑（Office Hour）的录像回放。',
+    enNote: 'The recording of the September 16 office hour.',
+  },
   {
     zhTitle: '第三课课堂录像',
     enTitle: 'Session 3 recording',
@@ -205,8 +213,8 @@ const toc = [
   },
   {
     id: 'materials', zh: '课程资料索引', en: 'Course material index',
-    zhNew: '新增第三课课堂录像、Octos 的 ARC 适配版仓库',
-    enNew: 'Added the session 3 recording and the ARC-adapted Octos repository',
+    zhNew: '新增互动答疑录像',
+    enNew: 'Added the office hour recording',
   },
   {
     id: 'signup', zh: 'ARC-Bench 平台注册', en: 'Registering on ARC-Bench',
