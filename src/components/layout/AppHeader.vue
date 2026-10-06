@@ -63,6 +63,7 @@ const mobileOpen = ref(false)
 const navItems = computed(() => [
   { label: pick('Challenge & Vision', '赛题与愿景'), href: '#challenge' },
   { label: t('nav.schedule'), href: '#schedule' },
+  { label: pick('Qualified', '入围名单'), href: '#qualified' },
   { label: t('nav.awards'), href: '#awards' },
   { label: pick('Registration & Rankings', '报名与排名'), href: '#teams' },
 ])
