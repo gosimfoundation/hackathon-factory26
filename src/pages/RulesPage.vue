@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useI18n } from '../composables/useI18n'
+import { assetUrl } from '../composables/api'
 
 const { locale, t } = useI18n()
+const qualifierRulesPdf = assetUrl('/resources/factory26-qualifier-rules-zh.pdf')
 const isEn = computed(() => locale.value === 'en')
 const locationLines = computed(() => t('hero.location') as string[])
 const rounds = computed(() => t('schedule.rounds') as any[])
@@ -19,6 +21,16 @@ const awardsSettled = computed(() => t('awards.settled') as any[])
       <h1 class="heading-serif text-4xl md:text-5xl text-text-primary mb-4">{{ isEn ? 'Event Rules & Format' : '赛制与规则' }}</h1>
       <p class="text-text-tertiary mb-2">{{ t('hero.eventTitle') }}</p>
       <p v-for="line in locationLines" :key="line" class="text-text-muted text-sm last:mb-12">{{ line }}</p>
+
+      <aside class="doc-card" data-testid="qualifier-rules-pdf">
+        <span class="doc-kicker">{{ isEn ? 'Qualifier · PDF' : '初赛 · PDF' }}</span>
+        <h2>{{ isEn ? 'Qualifier participant guide (初赛参赛须知)' : '初赛参赛须知' }}</h2>
+        <p>{{ isEn ? 'Official qualifier rules (Chinese): schedule, practice and formal submissions, the scoring formula S(p, b), ranking, and FAQ on runtime limits, scaffolding, network access, and cheating.' : '初赛官方规则：赛程、本地练习与正式提交、计分公式 S(p, b)、排名规则，以及运行时限、脚手架、外网访问、违规判定等常见问题。' }}</p>
+        <p class="doc-actions">
+          <a :href="qualifierRulesPdf" target="_blank" rel="noopener">{{ isEn ? 'View PDF' : '在线查看' }} →</a>
+          <a :href="qualifierRulesPdf" download="初赛参赛须知.pdf">{{ isEn ? 'Download' : '下载' }} ↓</a>
+        </p>
+      </aside>
 
       <section>
         <h2>{{ isEn ? '1. Participation' : '1. 参赛' }}</h2>
@@ -80,4 +92,9 @@ const awardsSettled = computed(() => t('awards.settled') as any[])
 .rules-content ol { list-style: decimal; }
 .rules-content a { color: var(--color-accent); text-decoration: underline; text-underline-offset: .2em; word-break: break-all; }
 .rules-content a:hover { color: var(--color-accent-hover); }
+.rules-content .doc-card { border: 1px solid var(--color-accent); background: var(--color-bg-card); padding: 1.5rem 1.75rem; }
+.rules-content .doc-kicker { font-size: .75rem; letter-spacing: .18em; text-transform: uppercase; color: var(--color-accent); }
+.rules-content .doc-card h2 { margin: .5rem 0 .75rem; }
+.rules-content .doc-actions { display: flex; flex-wrap: wrap; gap: 1.5rem; margin: 1rem 0 0; }
+.rules-content .doc-actions a { word-break: normal; font-weight: 600; }
 </style>
