@@ -21,12 +21,12 @@ const qualifiedPdf = assetUrl('/resources/factory26-qualified-teams.pdf')
           <span class="section-kicker">{{ pick('Qualifier result', '初赛结果') }}</span>
           <h2 class="section-title mt-8">{{ pick('Qualified teams', '初赛入围名单') }}</h2>
           <p class="mt-8 max-w-lg leading-relaxed text-text-secondary">
-            {{ pick(`${qualifiedTeams.length} teams have qualified from the qualifier. Listed in no particular order. Thank you to every team for the work and creativity you brought.`, `以下 ${qualifiedTeams.length} 支队伍已在初赛中入围（排名不分先后）。感谢每一支队伍的投入与创造。`) }}
+            {{ pick(`The following teams have qualified from the qualifier, listed in no particular order. Thank you to every team for the work and creativity you brought.`, `以下队伍已在初赛中入围（排名不分先后）。感谢每一支队伍的投入与创造。`) }}
           </p>
           <a :href="qualifiedPdf" target="_blank" rel="noopener" class="mono-label mt-8 inline-block text-accent hover:underline">{{ pick('Official list (PDF) ↗', '官方名单 PDF ↗') }}</a>
         </div>
 
-        <ul class="reveal reveal-delay-1 qualified-grid border-t border-border">
+        <ul class="reveal reveal-delay-1 border-t border-border">
           <li v-for="team in qualifiedTeams" :key="team" class="flex items-baseline gap-4 border-b border-border py-4">
             <span class="shrink-0 text-accent" aria-hidden="true">●</span>
             <span class="min-w-0 break-words text-lg font-semibold tracking-[-0.02em] text-text-primary">{{ team }}</span>
@@ -36,8 +36,3 @@ const qualifiedPdf = assetUrl('/resources/factory26-qualified-teams.pdf')
     </div>
   </section>
 </template>
-
-<style scoped>
-.qualified-grid { display: grid; grid-template-columns: minmax(0, 1fr); column-gap: 2.5rem; }
-@media (min-width: 768px) { .qualified-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-</style>
