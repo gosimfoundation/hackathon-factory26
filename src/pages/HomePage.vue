@@ -7,6 +7,7 @@ import AboutSection from '../components/sections/AboutSection.vue'
 import TracksSection from '../components/sections/TracksSection.vue'
 import PrizesSection from '../components/sections/PrizesSection.vue'
 import ScheduleSection from '../components/sections/ScheduleSection.vue'
+import QualifiedSection from '../components/sections/QualifiedSection.vue'
 import JudgingSection from '../components/sections/JudgingSection.vue'
 import TeamsSection from '../components/sections/TeamsSection.vue'
 import FaqSection from '../components/sections/FaqSection.vue'
@@ -24,6 +25,7 @@ useVideoAutoplay()
     <TaskIntroSection />
     <AboutSection />
     <ScheduleSection />
+    <QualifiedSection />
     <PrizesSection />
     <JudgingSection />
     <TeamsSection />
