@@ -14,6 +14,7 @@ import TeamsSection from '../components/sections/TeamsSection.vue'
 import FaqSection from '../components/sections/FaqSection.vue'
 import SponsorsSection from '../components/sections/SponsorsSection.vue'
 import CtaSection from '../components/sections/CtaSection.vue'
+import FinalResultsModal from '../components/effects/FinalResultsModal.vue'
 
 useScrollReveal()
 useVideoAutoplay()
@@ -35,5 +36,6 @@ useVideoAutoplay()
     <SponsorsSection />
     <FaqSection />
     <CtaSection />
+    <FinalResultsModal />
   </main>
 </template>
