@@ -40,7 +40,7 @@ const confirmed = computed(() => t('sponsors.confirmed') as any[])
                 </div>
               </div>
               <div class="grid grid-cols-[2.25rem_1fr_auto] border-t border-border px-4 py-4">
-                <span class="font-mono text-xs text-accent">0{{ i + 1 }}</span>
+                <span class="font-mono text-xs text-accent">{{ String(i + 1).padStart(2, '0') }}</span>
                 <div>
                   <h3 class="text-sm font-semibold leading-snug text-text-primary">{{ item.name }}</h3>
                   <p class="mono-label mt-1 text-text-muted">{{ item.role }}</p>
