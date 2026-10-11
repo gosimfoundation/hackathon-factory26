@@ -34,7 +34,6 @@ const confirmed = computed(() => t('sponsors.confirmed') as any[])
                       :alt="item.name"
                       class="sponsor-logo"
                     />
-                    <span v-if="item.id === 'qiwoo'" class="sponsor-qiwoo-wordmark">{{ item.name }}</span>
                   </template>
                   <span v-else class="sponsor-text-logo">{{ item.name }}</span>
                 </div>
@@ -73,7 +72,6 @@ const confirmed = computed(() => t('sponsors.confirmed') as any[])
   width: auto;
 }
 
-.sponsor-qiwoo-wordmark,
 .sponsor-text-logo {
   color: #0f172a;
   font-size: clamp(1.05rem, 2vw, 1.35rem);
@@ -83,7 +81,4 @@ const confirmed = computed(() => t('sponsors.confirmed') as any[])
   text-align: center;
 }
 
-.sponsor-qiwoo-wordmark {
-  text-align: left;
-}
 </style>

@@ -233,7 +233,7 @@ export default {
       { id: 'openjiuwen', name: 'openJiuwen', role: 'Sponsor', logo: '/sponsors/openjiuwen.svg', url: 'https://www.openjiuwen.com/' },
       { id: 'minimax', name: 'MiniMax', role: 'Sponsor', logo: '/sponsors/minimax.png', url: 'https://www.minimaxi.com/' },
       { id: 'kimi', name: 'Kimi', role: 'Sponsor', logo: '/sponsors/kimi.png', url: 'https://www.kimi.com/' },
-      { id: 'qiwoo', name: 'Qiwoo / Open Insight', role: 'Partner', logo: '/sponsors/qiwoo.svg', url: 'https://qiwoo.edu.cn/' },
+      { id: 'qiwoo', name: 'Qiwoo / Open Insight', role: 'Partner', logo: '/sponsors/qiwoo.png', url: 'https://qiwoo.edu.cn/' },
       { id: 'asiainfo', name: 'AsiaInfo Technologies', role: 'Sponsor', logo: '/sponsors/asiainfo-clean.png', url: 'https://www.asiainfo.com/' },
       { id: 'taotoken', name: 'TaoToken.net', role: 'Partner', logo: '/sponsors/taotoken.svg', url: 'https://taotoken.net/' },
       { id: 'trae', name: 'TRAE', role: 'Sponsor', logo: '/sponsors/trae-clean.png' },
