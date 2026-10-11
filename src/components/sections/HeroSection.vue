@@ -111,8 +111,7 @@ function handleRegistrationAccess() {
               :alt="partner.name"
               :class="['hero-partner-logo max-h-8 max-w-full object-contain', { 'hero-partner-logo--cophi': partner.id === 'cophi', 'hero-partner-logo--kimi': partner.id === 'kimi' }]"
             />
-            <span v-if="partner.id === 'qiwoo'" class="hero-partner-wordmark text-xs font-semibold leading-tight">{{ partner.name }}</span>
-            <span v-else-if="partner.id === 'cophi'" class="hero-partner-wordmark text-xs font-semibold">CoPhi</span>
+            <span v-if="partner.id === 'cophi'" class="hero-partner-wordmark text-xs font-semibold">CoPhi</span>
             <span v-else-if="!partner.logo" class="hero-partner-wordmark text-center text-xs font-semibold leading-tight">{{ partner.shortName || partner.name }}</span>
           </component>
         </div>
