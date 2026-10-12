@@ -5,13 +5,13 @@ export type Finalist = {
 }
 
 // Official final standings from final-with-rank.csv. Repository links are matched by
-// rank, team name, and captain email from final-with-github-urls.csv.
+// rank, team name, and captain email from final-with-github-urls-2.csv.
 export const finalists: Finalist[] = [
-  { rank: 1, name: 'OpenCollab（zhx）' },
+  { rank: 1, name: 'OpenCollab（zhx）', repository: 'https://github.com/RISE-X-Lab/OpenCollab/tree/main/examples/arcbench-evolution-r6' },
   { rank: 2, name: '我和我们的队友都想去 gosim 参加颁…（VOLO-AI）', repository: 'https://github.com/thunderstone-group/volo-factory-finals' },
-  { rank: 3, name: "Limitless'（Limitless'）" },
+  { rank: 3, name: "Limitless'（Limitless'）", repository: 'https://github.com/Simonghj/arc_pi_r6' },
   { rank: 4, name: 'Orchestro（Orchestro）', repository: 'https://github.com/gaoyu06/arcbench-agent' },
-  { rank: 5, name: 'Eto Demerzel（RyanSanchez）' },
+  { rank: 5, name: 'Eto Demerzel（RyanSanchez）', repository: 'https://github.com/RyanSanchez-7115/mini-arc-agent' },
   { rank: 6, name: 'haiknow（haiknow）', repository: 'https://github.com/anson-zas/haiknow-arc-hackathon-pub' },
   { rank: 7, name: 'bzt（bzt）', repository: 'https://github.com/qcqcgaga/OAIC2026_final_by_BZT_7th' },
   { rank: 8, name: 'Shallow（Shallow）', repository: 'https://github.com/TheaDust/Shallow' },
@@ -21,10 +21,10 @@ export const finalists: Finalist[] = [
   { rank: 12, name: 'fuxing（fuxing）', repository: 'https://github.com/sjok666/arc-bench' },
   { rank: 13, name: 'AIOS（AIOS）', repository: 'https://github.com/amosarc/octos-arc' },
   { rank: 14, name: 'Lan_zhijiang（Lan_zhijiang）', repository: 'https://github.com/xiaoland/gosim-factory26' },
-  { rank: 15, name: 'evenni（evenni）' },
+  { rank: 15, name: 'evenni（evenni）', repository: 'https://github.com/evenli0/arc-bench-harness' },
   { rank: 16, name: 'Amazing（Amazing）', repository: 'https://github.com/Zzhousx/agentic-software-factory' },
   { rank: 17, name: 'xinyurun（xinyurun）', repository: 'https://github.com/xinyurun215/oaic' },
-  { rank: 18, name: 'wqing0093（wqing0093）' },
+  { rank: 18, name: 'wqing0093（wqing0093）', repository: 'https://github.com/passerby-bye/arc-evolution-agent' },
   { rank: 19, name: 'windy664（windy664）', repository: 'https://github.com/windy664/Torine-hackathon-agent-ts' },
   { rank: 20, name: 'HH（HH）' },
 ]
