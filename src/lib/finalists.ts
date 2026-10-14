@@ -26,7 +26,7 @@ export const finalists: Finalist[] = [
   { rank: 17, name: 'xinyurun（xinyurun）', repository: 'https://github.com/xinyurun215/oaic' },
   { rank: 18, name: 'wqing0093（wqing0093）', repository: 'https://github.com/passerby-bye/arc-evolution-agent' },
   { rank: 19, name: 'windy664（windy664）', repository: 'https://github.com/windy664/Torine-hackathon-agent-ts' },
-  { rank: 20, name: 'HH（HH）' },
+  { rank: 20, name: 'HH（HH）', repository: 'https://github.com/hga-jscs/repository_for_GOSIM' },
 ]
 
 export function repositoryLabel(repository: string) {
