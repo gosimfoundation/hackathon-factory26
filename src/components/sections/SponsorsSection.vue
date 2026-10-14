@@ -30,7 +30,7 @@ const confirmed = computed(() => t('sponsors.confirmed') as any[])
                 <div class="sponsor-logo-lockup">
                   <template v-if="item.logo">
                     <img
-                      :src="assetUrl(item.logo)"
+                      :src="assetUrl(item.logoLight || item.logo)"
                       :alt="item.name"
                       class="sponsor-logo"
                     />
