@@ -185,6 +185,11 @@ function handleRegistrationAccess() {
   opacity: 1;
 }
 
+.hero-partner:hover .hero-partner-logo.hero-partner-logo--kimi,
+.hero-partner:focus-visible .hero-partner-logo.hero-partner-logo--kimi {
+  filter: invert(1);
+}
+
 .hero-partner:hover .hero-partner-wordmark,
 .hero-partner:focus-visible .hero-partner-wordmark {
   color: #0f172a;
